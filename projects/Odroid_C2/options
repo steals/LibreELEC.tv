@@ -35,6 +35,7 @@
         # cortex-r4f cortex-m3 cortex-m1 xscale iwmmxt iwmmxt2 ep9312.
         #
 	TARGET_KERNEL_ARCH="arm64"
+	KERNEL_PATCH_ARCH="aarch64"
 	TARGET_FLOAT=hard
         TARGET_CPU="cortex-a53"
         TARGET_CPU_FLAGS="+crc"
