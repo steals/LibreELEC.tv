@@ -95,9 +95,9 @@ upload() {
 }
 
 build() {
-  for PROJECT in $2; do
-    for archfile in projects/$PROJECT/linux/linux.*.conf ; do
-      ARCH=`echo $archfile | sed -n '$s/\.conf//;$s/.*\.//p'`
+  #for PROJECT in $2; do
+    #for archfile in projects/$PROJECT/linux/linux.*.conf ; do
+      #ARCH=`echo $archfile | sed -n '$s/\.conf//;$s/.*\.//p'`
       for package in $(find $1 -iname package.mk) ; do
         (
         . $package
@@ -107,8 +107,8 @@ build() {
         fi
         )
       done
-    done
-  done
+    #done
+  #done
 }
 
 update_revision() {
