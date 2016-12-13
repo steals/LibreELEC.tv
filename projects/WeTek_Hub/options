@@ -27,6 +27,7 @@
 	TARGET_FLOAT=hard
         TARGET_CPU="cortex-a53"
         TARGET_CPU_FLAGS="+crc"
+	TARGET_FPU="neon-fp-armv8"
         ;;
     esac
 
