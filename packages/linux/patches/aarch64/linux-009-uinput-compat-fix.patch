@@ -1,0 +1,19 @@
+diff -Naur a/drivers/input/misc/uinput.c b/drivers/input/misc/uinput.c
+--- a/drivers/input/misc/uinput.c	2016-12-12 18:31:18.962965424 +0100
++++ b/drivers/input/misc/uinput.c	2016-12-12 18:34:48.250260666 +0100
+@@ -845,9 +845,15 @@
+ }
+ 
+ #ifdef CONFIG_COMPAT
++
++#define UI_SET_PHYS_COMPAT	_IOW(UINPUT_IOCTL_BASE, 108, compat_uptr_t)
++
+ static long uinput_compat_ioctl(struct file *file,
+ 				unsigned int cmd, unsigned long arg)
+ {
++ 	if (cmd == UI_SET_PHYS_COMPAT)
++ 		cmd = UI_SET_PHYS;
++ 
+ 	return uinput_ioctl_handler(file, cmd, arg, compat_ptr(arg));
+ }
+ #endif
