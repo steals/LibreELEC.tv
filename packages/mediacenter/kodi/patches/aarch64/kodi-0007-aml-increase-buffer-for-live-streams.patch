@@ -1,0 +1,26 @@
+From 853fb94aa4d924fc55ea1a4c7d41b1cea49a9c86 Mon Sep 17 00:00:00 2001
+From: Owersun <owersun@gmail.com>
+Date: Tue, 29 Nov 2016 22:24:56 +0100
+Subject: [PATCH] C2: 1 second buffer is not enough anymore for live streams to
+ buffer and start
+
+---
+ xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+index 894df3f..2be3718 100644
+--- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/AMLCodec.cpp
+@@ -1870,9 +1870,9 @@ int CAMLCodec::Decode(uint8_t *pData, size_t iSize, double dts, double pts)
+ 
+   // if we have still frames, demux size will be small
+   // and we need to pre-buffer more.
+-  double target_timesize = 1.0;
++  double target_timesize = 1.5;
+   if (iSize < 20)
+-    target_timesize = 2.0;
++    target_timesize += 1.0;
+ 
+   int rtn = 0;
+ 
