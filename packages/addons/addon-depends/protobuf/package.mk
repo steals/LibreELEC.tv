@@ -29,7 +29,6 @@ PKG_LONGDESC="protobuf: Protocol Buffers - Google's data interchange format"
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-PKG_CONFIGURE_OPTS_TARGET="--with-protoc=protoc"
 PKG_CMAKE_SCRIPT="cmake/CMakeLists.txt"
 
 PKG_CMAKE_OPTS_HOST="-DCMAKE_NO_SYSTEM_FROM_IMPORTED=1 \
