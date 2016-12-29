@@ -1,0 +1,21 @@
+From 08c7c69f3fee635746eca99feadfcfa390072168 Mon Sep 17 00:00:00 2001
+From: Markus Pfau <pfau@peak3d.de>
+Date: Mon, 26 Dec 2016 15:05:08 +0100
+Subject: [PATCH] Recalculate SyncClock after reconfigure
+
+---
+ xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index 7cb8e93..d15f0cc 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -319,6 +319,7 @@ bool CRenderManager::Configure()
+     m_renderedOverlay = false;
+     m_renderDebug = false;
+     m_clockSync.Reset();
++    CheckEnableClockSync();
+ 
+     m_renderState = STATE_CONFIGURED;
+ 
