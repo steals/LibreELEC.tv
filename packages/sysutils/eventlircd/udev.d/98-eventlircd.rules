@@ -74,7 +74,7 @@ SUBSYSTEMS=="input", ATTRS{name}=="gpio_keypad", \
   ENV{eventlircd_enable}="true", \
   ENV{eventlircd_evmap}="default.evmap"
 
-# WeTek Play 2 (remote)
+# Amlogic Remotes
 SUBSYSTEMS=="input", ATTRS{name}=="aml_keypad", \
   ENV{eventlircd_enable}="true", \
   ENV{eventlircd_evmap}="default.evmap"

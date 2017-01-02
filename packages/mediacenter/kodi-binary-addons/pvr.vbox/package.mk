@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="pvr.vbox"
-PKG_VERSION="c1a141b"
+PKG_VERSION="b433b01"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
