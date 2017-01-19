@@ -1,0 +1,55 @@
+From 80aff0050bcffabd1a46097c1d1db13f0a928ce8 Mon Sep 17 00:00:00 2001
+From: Marcel Holtmann <marcel@holtmann.org>
+Date: Mon, 25 Jan 2016 08:44:03 +0100
+Subject: [PATCH 1/2] Bluetooth: Add missing COMPATIBLE_IOCTL for UART line
+ discipline
+
+The HCIUARTGETDEVICE, HCIUARTSETFLAGS and HCIUARTGETFLAGS ioctl are
+missing the COMPATIBLE_IOCTL declaration.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ fs/compat_ioctl.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/fs/compat_ioctl.c b/fs/compat_ioctl.c
+index 41bd7ae5..76e1f2d 100644
+--- a/fs/compat_ioctl.c
++++ b/fs/compat_ioctl.c
+@@ -1239,6 +1239,9 @@ COMPATIBLE_IOCTL(HCIUNBLOCKADDR)
+ COMPATIBLE_IOCTL(HCIINQUIRY)
+ COMPATIBLE_IOCTL(HCIUARTSETPROTO)
+ COMPATIBLE_IOCTL(HCIUARTGETPROTO)
++COMPATIBLE_IOCTL(HCIUARTGETDEVICE)
++COMPATIBLE_IOCTL(HCIUARTSETFLAGS)
++COMPATIBLE_IOCTL(HCIUARTGETFLAGS)
+ COMPATIBLE_IOCTL(RFCOMMCREATEDEV)
+ COMPATIBLE_IOCTL(RFCOMMRELEASEDEV)
+ COMPATIBLE_IOCTL(RFCOMMGETDEVLIST)
+
+From 9e743f99546c546dddc5a92889aae64af6ad254f Mon Sep 17 00:00:00 2001
+From: kszaq <kszaquitto@gmail.com>
+Date: Tue, 17 Jan 2017 22:09:06 +0100
+Subject: [PATCH 2/2] arch/arm64: select KEYS_COMPAT if needed
+
+This fixes using keyctl in 32-bit userspace
+---
+ arch/arm64/Kconfig | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 4fb5f31..90bb8c0 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -636,6 +636,10 @@ config SYSVIPC_COMPAT
+ 	def_bool y
+ 	depends on COMPAT && SYSVIPC
+ 
++config KEYS_COMPAT
++	def_bool y
++	depends on COMPAT && KEYS
++
+ endmenu
+ 
+ menu "Power management options"
