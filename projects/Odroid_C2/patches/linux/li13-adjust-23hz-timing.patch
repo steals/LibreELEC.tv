@@ -1,0 +1,22 @@
+From 9579988f7595e2a96541f26ae43486e90f8acba2 Mon Sep 17 00:00:00 2001
+From: Jamie Coldhill <wrxtasy@amnet.net.au>
+Date: Wed, 13 Apr 2016 17:51:14 +0800
+Subject: [PATCH] drivers/amlogic/display/vout2: adjust 23Hz timing
+
+---
+ drivers/amlogic/display/vout2/tv_vout2.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/amlogic/display/vout2/tv_vout2.h b/drivers/amlogic/display/vout2/tv_vout2.h
+index 0f2b77c..d905fd1 100644
+--- a/drivers/amlogic/display/vout2/tv_vout2.h
++++ b/drivers/amlogic/display/vout2/tv_vout2.h
+@@ -427,7 +427,7 @@ static const struct vinfo_s tv_info[] = {
+ 		.aspect_ratio_den  = 9,
+ 		.sync_duration_num = 2397,
+ 		.sync_duration_den = 100,
+-		.video_clk         = 74250000,
++		.video_clk         = 74176000,
+ 	},
+ #endif
+ 	{ /* VMODE_4K2K_30HZ */

@@ -1,0 +1,24 @@
+From 75f9d17f9d03ae5cc3e6483eafd3ed03864bb2a2 Mon Sep 17 00:00:00 2001
+From: Jamie Coldhill <wrxtasy@amnet.net.au>
+Date: Tue, 24 Jan 2017 17:53:22 +0800
+Subject: [PATCH] AMremote-Lirc-toggle.patch
+
+---
+ arch/arm64/boot/dts/meson64_odroidc2.dts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/meson64_odroidc2.dts b/arch/arm64/boot/dts/meson64_odroidc2.dts
+index 92c72aa..937c777 100644
+--- a/arch/arm64/boot/dts/meson64_odroidc2.dts
++++ b/arch/arm64/boot/dts/meson64_odroidc2.dts
+@@ -892,6 +892,6 @@
+ &audio_data{
+ 	status = "okay";
+ };
+-&meson_ir {
++&aml_remote {
+ 	status = "okay";
+ };
+-- 
+2.7.4
+

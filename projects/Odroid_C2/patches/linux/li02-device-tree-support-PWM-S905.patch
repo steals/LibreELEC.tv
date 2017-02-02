@@ -1,0 +1,68 @@
+From 9ae1d0df92e5531609b2a10891581e1db73f0726 Mon Sep 17 00:00:00 2001
+From: Jamie Coldhill <wrxtasy@amnet.net.au>
+Date: Wed, 11 Jan 2017 00:51:51 +0800
+Subject: [PATCH] Device Tree support for PWM S905
+
+---
+ arch/arm64/boot/dts/meson64_odroidc2.dts | 37 +++++++++++++++++++++-----------
+ 1 file changed, 24 insertions(+), 13 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/meson64_odroidc2.dts b/arch/arm64/boot/dts/meson64_odroidc2.dts
+index 77ee90d..92c72aa 100644
+--- a/arch/arm64/boot/dts/meson64_odroidc2.dts
++++ b/arch/arm64/boot/dts/meson64_odroidc2.dts
+@@ -193,20 +193,18 @@
+         };
+ 
+ 	pwm {
+-		compatible = "amlogic, gx-pwm";
++		compatible = "amlogic, odroid-pwm";
++		dev_name = "meson_pwm";
++		status = "okay";
++		pinctrl-names = "odroid_pwm0","odroid_pwm1";
++		pinctrl-0 = <&odroid_pwm0>;
++		pinctrl-1 = <&odroid_pwm1>;
++	};
++
++	pwm-ctrl {
++		compatible = "amlogic, pwm-ctrl";
++		dev_name = "pwm-ctrl";
+ 		status = "okay";
+-		pwm-outputs = <0>,<1>,<2>,<3>,<4>,<5>,<6>,<7>;
+-		reg = <0x0 0xc1108550 0x0 0x30>,
+-				<0x0 0xc8100550 0x0 0x10>;
+-		clocks = <&clock CLK_XTAL>,
+-				<&clock CLK_VID_PLL>,
+-				<&clock CLK_FPLL_DIV4>,
+-				<&clock CLK_FPLL_DIV3>;
+-		clock-names = "xtal",
+-				"vid_pll_clk",
+-				"fclk_div4",
+-				"fclk_div3";
+-		clock-select = <0x0>,<0x0>,<0x0>,<0x0>,<0x3>,<0x0>,<0x0>,<0x0>;
+ 	};
+ 
+ 	mesonstream {
+@@ -873,6 +871,19 @@
+                 amlogic,clrmask = <AO 0x80000018>;
+                 amlogic,pins = "GPIOAO_13";
+         };
++
++	odroid_pwm0: odroid_pwm0 {
++		amlogic,setmask=<3 0x00020000>;
++		amlogic,clrmask=<3 0x00000200>;
++		amlogic,pins="GPIOX_6";
++	};
++	odroid_pwm1: odroid_pwm1 {
++		amlogic,setmask=<3 0x00020000
++		                 3 0x00060000>;
++		amlogic,clrmask=<3 0x00000300
++		                 8 0x00000800>;
++		amlogic,pins="GPIOX_6","GPIOX_7";
++	};
+ };
+ 
+ &efuse {
+-- 
+2.7.4
+
