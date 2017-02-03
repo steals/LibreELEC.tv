@@ -56,7 +56,7 @@ ORIGIN_URL="$(git remote -v | awk '$1 == "origin" { print $2 }' | head -1 | sed 
 if [ "$OFFICIAL" = "yes" ]; then
   LIBREELEC_BUILD="official"
 else
-  LIBREELEC_BUILD="community"
+  LIBREELEC_BUILD="wrxtasy-raybuntu-media_build"
 fi
 
 if [ -n "$CUSTOM_VERSION" ]; then
@@ -549,4 +549,8 @@ if [ "$1" = "release" -o "$1" = "mkimage" -o "$1" = "amlpkg" -o "$1" = "noobs" ]
     # cleanup release dir
     rm -rf $RELEASE_DIR
   fi
+
+    # lets get rid of things we don't care about in $TARGET_IMG
+    mv $TARGET_IMG/$IMAGE_NAME.system $INSTALL/../SYSTEM
+    mv $TARGET_IMG/$IMAGE_NAME.kernel $INSTALL/../KERNEL
 fi
