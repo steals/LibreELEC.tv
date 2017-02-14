@@ -1,0 +1,928 @@
+From 8386e404766c270aa72043215184400d2ec96c25 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Mon, 19 Dec 2016 13:28:26 +0000
+Subject: [PATCH 01/61] [cec] Drop CEC_DOUBLE_TAP_TIMEOUT_MS_OLD code
+
+Kodi won't even build with libcec 3, so supporting a libcec 2.2 setting is of no value
+---
+ xbmc/peripherals/devices/PeripheralCecAdapter.cpp | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+index 54dc37e751ba4ec50cfa922cfe4c0b1fd354e3cd..73872e3c6126bf4a4e8b998491f87a35dcbdaceb 100644
+--- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
++++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+@@ -1391,13 +1391,8 @@ void CPeripheralCecAdapter::SetConfigurationFromSettings(void)
+   m_configuration.bPowerOffOnStandby = iStandbyAction == LOCALISED_ID_SUSPEND ? 1 : 0;
+   m_bShutdownOnStandby = iStandbyAction == LOCALISED_ID_POWEROFF;
+ 
+-#if defined(CEC_DOUBLE_TAP_TIMEOUT_MS_OLD)
+-  // double tap prevention timeout in ms. libCEC uses 50ms units for this in 2.2.0, so divide by 50
+-  m_configuration.iDoubleTapTimeout50Ms = GetSettingInt("double_tap_timeout_ms") / 50;
+-#else
+-  // backwards compatibility. will be removed once the next major release of libCEC is out
++  // double tap prevention timeout in ms
+   m_configuration.iDoubleTapTimeoutMs = GetSettingInt("double_tap_timeout_ms");
+-#endif
+ 
+   if (GetSettingBool("pause_playback_on_deactivate"))
+   {
+
+From 606fde4f5f9e8cd26600d949619db516fd8d4ec1 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Tue, 28 Oct 2014 00:19:40 +0000
+Subject: [PATCH 02/61] [cec] Add settings for configuring button repeats
+
+---
+ addons/resource.language.en_gb/resources/strings.po | 15 +++++++++++++++
+ system/peripherals.xml                              |  4 +++-
+ xbmc/peripherals/devices/PeripheralCecAdapter.cpp   | 11 +++++++++++
+ 3 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index 0cdc64916aec1c12bfa2bb617eec530d5f1efe80..b356dbe55165567a232c2a6afd00387122aee96f 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -20424,3 +20424,18 @@ msgstr ""
+ msgctxt "#39014"
+ msgid "Would you also like to remove all related data (e.g. settings) of this add-on?"
+ msgstr ""
++
++#: system/peripherals.xml
++msgctxt "#38050"
++msgid "Remote button press delay before repeating (ms)"
++msgstr ""
++
++#: system/peripherals.xml
++msgctxt "#38051"
++msgid "Remote button press repeat rate (ms)"
++msgstr ""
++
++#: system/peripherals.xml
++msgctxt "#38052"
++msgid "Remote button press release time (ms)"
++msgstr ""
+diff --git a/system/peripherals.xml b/system/peripherals.xml
+index d5704b249c3065b2980dc92c7c81dc7b384187bc..02b1a9ed6fce1986bd864bba09a9df0621f9e041 100644
+--- a/system/peripherals.xml
++++ b/system/peripherals.xml
+@@ -31,7 +31,9 @@
+     <setting key="device_type" type="int" value="1" configurable="0" />
+     <setting key="wake_devices_advanced" type="string" value="" configurable="0" />
+     <setting key="standby_devices_advanced" type="string" value="" configurable="0" />
+-    <setting key="double_tap_timeout_ms" type="int" min="0" value="300" configurable="0" />
++    <setting key="double_tap_timeout_ms" type="int" min="50" max="1000" step="50" value="300" label="38050" order="16" />
++    <setting key="button_repeat_rate_ms" type="int" min="0" max="250" step="10" value="0" label="38051" order="17" />
++    <setting key="button_release_delay_ms" type="int" min="0" max="500" step="50" value="0" label="38052" order="18" />
+   </peripheral>
+ 
+   <peripheral vendor_product="2548:1001,2548:1002" bus="usb" name="Pulse-Eight CEC Adapter" mapTo="cec">
+diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+index 73872e3c6126bf4a4e8b998491f87a35dcbdaceb..92c901e044aeb7b9bece17636ffe89c05648814f 100644
+--- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
++++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+@@ -1296,6 +1296,15 @@ void CPeripheralCecAdapter::SetConfigurationFromLibCEC(const CEC::libcec_configu
+   m_configuration.bActivateSource = config.bActivateSource;
+   bChanged |= SetSetting("activate_source", m_configuration.bActivateSource == 1);
+ 
++  m_configuration.iDoubleTapTimeoutMs = config.iDoubleTapTimeoutMs;
++  bChanged |= SetSetting("double_tap_timeout_ms", (int)m_configuration.iDoubleTapTimeoutMs);
++
++  m_configuration.iButtonRepeatRateMs = config.iButtonRepeatRateMs;
++  bChanged |= SetSetting("button_repeat_rate_ms", (int)m_configuration.iButtonRepeatRateMs);
++
++  m_configuration.iButtonReleaseDelayMs = config.iButtonReleaseDelayMs;
++  bChanged |= SetSetting("button_release_delay_ms", (int)m_configuration.iButtonReleaseDelayMs);
++
+   m_configuration.bPowerOffOnStandby = config.bPowerOffOnStandby;
+ 
+   m_configuration.iFirmwareVersion = config.iFirmwareVersion;
+@@ -1393,6 +1402,8 @@ void CPeripheralCecAdapter::SetConfigurationFromSettings(void)
+ 
+   // double tap prevention timeout in ms
+   m_configuration.iDoubleTapTimeoutMs = GetSettingInt("double_tap_timeout_ms");
++  m_configuration.iButtonRepeatRateMs = GetSettingInt("button_repeat_rate_ms");
++  m_configuration.iButtonReleaseDelayMs = GetSettingInt("button_release_delay_ms");
+ 
+   if (GetSettingBool("pause_playback_on_deactivate"))
+   {
+
+From cf1c64764598b85d9da9032feddd87c8f0fc58b6 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Mon, 3 Nov 2014 23:17:46 +0000
+Subject: [PATCH 03/61] [cec] Don't discard buttons when repeat mode is enabled
+
+---
+ xbmc/peripherals/devices/PeripheralCecAdapter.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+index 92c901e044aeb7b9bece17636ffe89c05648814f..da99db975e994c0e1d9d9b420f3ad92c6ed91eb6 100644
+--- a/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
++++ b/xbmc/peripherals/devices/PeripheralCecAdapter.cpp
+@@ -803,7 +803,10 @@ void CPeripheralCecAdapter::PushCecKeypress(const CecButtonPress &key)
+   CLog::Log(LOGDEBUG, "%s - received key %2x duration %d", __FUNCTION__, key.iButton, key.iDuration);
+ 
+   CSingleLock lock(m_critSection);
+-  if (key.iDuration > 0)
++  // avoid the queue getting too long
++  if (m_configuration.iButtonRepeatRateMs && m_buttonQueue.size() > 5)
++    return;
++  if (m_configuration.iButtonRepeatRateMs == 0 && key.iDuration > 0)
+   {
+     if (m_currentButton.iButton == key.iButton && m_currentButton.iDuration == 0)
+     {
+
+From: popcornmix <popcornmix@gmail.com>
+Date: Sun, 10 Aug 2014 16:45:16 +0100
+Subject: [PATCH 07/62] filesystem: Make support of browsing into archives
+ optional
+
+The ability to browse, scan and play content in archives can cause problems on low powered/low memory devices.
+It's quite common to see reports of a large rar file that causes xbmc to crash with an out-of-memory error when browsing or scanning.
+It also can be slow as any archive in the directory is opened and extracted.
+
+This causes issues for people who scan library with archives disabled, then subsequently enable it.
+The library has the .rar files in which don't play without removing and re-adding.
+
+We'll let people who don't use archives disable it manually
+---
+ addons/resource.language.en_gb/resources/strings.po |  9 +++++++++
+ system/settings/rbp.xml                             | 11 +++++++++++
+ xbmc/Util.cpp                                       |  4 ++--
+ xbmc/filesystem/FileDirectoryFactory.cpp            |  4 ++++
+ 4 files changed, 26 insertions(+), 2 deletions(-)
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index dbd80f07e305ad99a29d90211a7596b8bb5cedec..ecea05ac43622f75034c60cc3b2bd16859065a80 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -19371,6 +19371,15 @@ msgstr ""
+ #: system/settings/rbp.xml
+ msgctxt "#38010"
+ msgid "GPU accelerated"
++
++#: system/settings/settings.xml
++msgctxt "#38040"
++msgid "Support browsing into archives"
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#38041"
++msgid "Allow viewing and playing files in archives (e.g. zip, rar)"
+ msgstr ""
+ 
+ #. Setting #38011 "Show All Items entry"
+diff --git a/system/settings/rbp.xml b/system/settings/rbp.xml
+index 62e9c8ed2199f8c57a640b06b0216ee4c8f0ca1e..e8b0d3d472b02fd161a4b51e957b9129e3cb9792 100644
+--- a/system/settings/rbp.xml
++++ b/system/settings/rbp.xml
+@@ -102,4 +102,15 @@
+       </group>
+     </category>
+   </section>
++  <section id="library">
++    <category id="filelists">
++      <group id="1">
++        <setting id="filelists.browsearchives" type="boolean" label="38040" help="38041">
++          <level>1</level>
++          <default>true</default>
++          <control type="toggle" />
++        </setting>
++      </group>
++    </category>
++  </section>
+ </settings>
+diff --git a/xbmc/Util.cpp b/xbmc/Util.cpp
+index c3567941192c724f2600494a8d7e355584b57b52..da1508dcedbd196789988d895e64548a08439d8f 100644
+--- a/xbmc/Util.cpp
++++ b/xbmc/Util.cpp
+@@ -1899,7 +1899,7 @@ void CUtil::ScanPathsForAssociatedItems(const std::string& videoName,
+     URIUtils::RemoveExtension(strCandidate);
+     if (StringUtils::StartsWithNoCase(strCandidate, videoName))
+     {
+-      if (URIUtils::IsRAR(pItem->GetPath()) || URIUtils::IsZIP(pItem->GetPath()))
++      if (CSettings::GetInstance().GetBool("filelists.browsearchives") && (URIUtils::IsRAR(pItem->GetPath()) || URIUtils::IsZIP(pItem->GetPath())))
+         CUtil::ScanArchiveForAssociatedItems(pItem->GetPath(), "", item_exts, associatedFiles);
+       else
+       {
+@@ -1909,7 +1909,7 @@ void CUtil::ScanPathsForAssociatedItems(const std::string& videoName,
+     }
+     else
+     {
+-      if (URIUtils::IsRAR(pItem->GetPath()) || URIUtils::IsZIP(pItem->GetPath()))
++      if (CSettings::GetInstance().GetBool("filelists.browsearchives") && (URIUtils::IsRAR(pItem->GetPath()) || URIUtils::IsZIP(pItem->GetPath())))
+         CUtil::ScanArchiveForAssociatedItems(pItem->GetPath(), videoName, item_exts, associatedFiles);
+     }
+   }
+diff --git a/xbmc/filesystem/FileDirectoryFactory.cpp b/xbmc/filesystem/FileDirectoryFactory.cpp
+index a0fd0a9011e71f4af1535110c696b6ea5c4b37db..688b71a297c7c617c6764bfe6be157d727eb49d3 100644
+--- a/xbmc/filesystem/FileDirectoryFactory.cpp
++++ b/xbmc/filesystem/FileDirectoryFactory.cpp
+@@ -40,6 +40,7 @@
+ #include "playlists/PlayListFactory.h"
+ #include "Directory.h"
+ #include "File.h"
++#include "settings/Settings.h"
+ #include "FileItem.h"
+ #include "utils/StringUtils.h"
+ #include "URL.h"
+@@ -116,6 +117,8 @@ IFileDirectory* CFileDirectoryFactory::Create(const CURL& url, CFileItem* pItem,
+     return NULL;
+   }
+ #endif
++  if (CSettings::GetInstance().GetBool("filelists.browsearchives"))
++  {
+   if (url.IsFileType("zip"))
+   {
+     CURL zipURL = URIUtils::CreateArchivePath("zip", url);
+@@ -189,6 +192,7 @@ IFileDirectory* CFileDirectoryFactory::Create(const CURL& url, CFileItem* pItem,
+     }
+     return NULL;
+   }
++  }
+   if (url.IsFileType("xbt"))
+   {
+     CURL xbtUrl = URIUtils::CreateArchivePath("xbt", url);
+
+From 7f0028ec330b751c0c006ab2b496c5aeb6f67ac3 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Wed, 24 Sep 2014 23:13:52 +0100
+Subject: [PATCH 10/62] [audio] Add settings option to boost centre channel
+ when downmixing
+
+This allows a dB volume increase to be added to centre channel.
+This can help improve dialgue in the presence of background music/effects.
+It can go up to 30dB for testing purposes, but value of 6 is probably more reasonable.
+It is recommended to ensure "Normalise levels on downmix" is enabled when boosting by large values to avoid clipping.
+
+Should work with Pi Sink (dvdplayer/paplayer) and omxplayer
+---
+ addons/resource.language.en_gb/resources/strings.po       | 15 +++++++++++++++
+ system/settings/settings.xml                              | 12 ++++++++++++
+ .../Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp           |  7 +++++++
+ .../AudioEngine/Engines/ActiveAE/ActiveAEResamplePi.cpp   |  6 ++++++
+ xbmc/cores/omxplayer/OMXAudio.cpp                         |  6 ++++++
+ 5 files changed, 46 insertions(+)
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index ecea05ac43622f75034c60cc3b2bd16859065a80..de5eb0dd99700c0bdc7c3409c1b63f1c01c650bb 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -19591,6 +19591,21 @@ msgstr ""
+ 
+ #empty strings from id 38062 to 38099
+ 
++#: system/settings/settings.xml
++msgctxt "#38007"
++msgid "Boost centre channel when downmixing"
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#38008"
++msgid "Increase this value to make the dialogue louder compared to background sounds when downmixing multichannel audio"
++msgstr ""
++
++#: system/settings/settings.xml
++msgctxt "#38009"
++msgid "%i dB"
++msgstr ""
++
+ #. Description of section #14200 "Player""
+ #: system/settings/settings.xml
+ msgctxt "#38100"
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 63613fc13acfd66476a880f8ebe9047a53837a33..9ce9e725aec4d8ed000200342a2a99f3bc34a749 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -2358,6 +2358,18 @@
+           </dependencies>
+           <control type="toggle" />
+         </setting>
++        <setting id="audiooutput.boostcenter" type="integer" label="38007" help="38008">
++          <level>2</level>
++          <default>0</default>
++          <constraints>
++            <minimum>0</minimum>
++            <step>1</step>
++            <maximum>30</maximum>
++          </constraints>
++          <control type="spinner" format="string">
++            <formatlabel>38009</formatlabel>
++          </control>
++        </setting>
+         <setting id="audiooutput.processquality" type="integer" label="13505" help="36169">
+           <requirement>HAS_AE_QUALITY_LEVELS</requirement>
+           <level>2</level>
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
+index af5bf93116543bd282953b01d0c5bcef93bb3a84..d7165dedd242abdfa7c0607eee332451c3187298 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
+@@ -20,6 +20,7 @@
+ 
+ #include "cores/AudioEngine/Utils/AEUtil.h"
+ #include "ActiveAEResampleFFMPEG.h"
++#include "settings/Settings.h"
+ #include "utils/log.h"
+ 
+ extern "C" {
+@@ -104,6 +105,12 @@ bool CActiveAEResampleFFMPEG::Init(uint64_t dst_chan_layout, int dst_channels, i
+   {
+      av_opt_set_double(m_pContext, "rematrix_maxval", 1.0, 0);
+   }
++  int boost_center = CSettings::GetInstance().GetInt("audiooutput.boostcenter");
++  if (boost_center)
++  {
++    float gain = pow(10.0f, ((float)(-3 + boost_center))/20.0f);
++    av_opt_set_double(m_pContext, "center_mix_level", gain, 0);
++  }
+ 
+   if (remapLayout)
+   {
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResamplePi.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResamplePi.cpp
+index 78071493fca4756c6741d7085e35cbe2f27038e6..698a6ae1e2bc0cc9256caec42c0dcfb0893301b5 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResamplePi.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResamplePi.cpp
+@@ -164,6 +164,12 @@ bool CActiveAEResamplePi::Init(uint64_t dst_chan_layout, int dst_channels, int d
+   {
+     av_opt_set_double(m_pContext, "rematrix_maxval", 1.0, 0);
+   }
++  int boost_center = CSettings::GetInstance().GetInt("audiooutput.boostcenter");
++  if (boost_center)
++  {
++    float gain = pow(10.0f, ((float)(-3 + boost_center))/20.0f);
++    av_opt_set_double(m_pContext, "center_mix_level", gain, 0);
++  }
+ 
+   if (remapLayout)
+   {
+diff --git a/xbmc/cores/omxplayer/OMXAudio.cpp b/xbmc/cores/omxplayer/OMXAudio.cpp
+index f16b822ed7b4aebe18b5d339b3f71ee66e97c23f..993d4b33a294e88c2c004b7943895ba55558c2d0 100644
+--- a/xbmc/cores/omxplayer/OMXAudio.cpp
++++ b/xbmc/cores/omxplayer/OMXAudio.cpp
+@@ -633,6 +633,12 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
+     {
+        av_opt_set_double(m_pContext, "rematrix_maxval", 1.0, 0);
+     }
++    int boost_center = CSettings::GetInstance().GetInt("audiooutput.boostcenter");
++    if (boost_center)
++    {
++      float gain = pow(10.0f, ((float)(-3 + boost_center))/20.0f);
++      av_opt_set_double(m_pContext, "center_mix_level", gain, 0);
++    }
+ 
+     // stereo upmix
+     if (upmix && m_src_channels == 2 && m_dst_channels > 2)
+
+From 9fecb172939f96a23cacafe2e40cbd462cfa9da3 Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Thu, 27 Nov 2014 16:31:56 +0000
+Subject: [PATCH 12/62] [languageinvoker] Reduce priority of python threads
+
+---
+ xbmc/interfaces/generic/LanguageInvokerThread.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/xbmc/interfaces/generic/LanguageInvokerThread.cpp b/xbmc/interfaces/generic/LanguageInvokerThread.cpp
+index fcdd0633f30cd9595ae6cc4ed293677cdcb1f422..16f0c8916b5e0a9e90973d194cf2ebd12b5a81fd 100644
+--- a/xbmc/interfaces/generic/LanguageInvokerThread.cpp
++++ b/xbmc/interfaces/generic/LanguageInvokerThread.cpp
+@@ -50,6 +50,11 @@ bool CLanguageInvokerThread::execute(const std::string &script, const std::vecto
+   m_args = arguments;
+ 
+   Create();
++
++  /* low prio */
++  SetPriority(GetPriority()-1);
++
++
+   return true;
+ }
+
+From 8f2d2d8618a4051fdeedfc528a21fc0657614d9e Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Thu, 11 Dec 2014 17:00:57 +0000
+Subject: [PATCH 14/62] Fix for UI not showing both extractflags and
+ extractthumb
+
+---
+ addons/resource.language.en_gb/resources/strings.po | 10 +++++++---
+ system/settings/settings.xml                        |  4 ++--
+ 2 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
+index de5eb0dd99700c0bdc7c3409c1b63f1c01c650bb..ae3aa10aa65beac6689f129d60056cadf8a5b5c1 100644
+--- a/addons/resource.language.en_gb/resources/strings.po
++++ b/addons/resource.language.en_gb/resources/strings.po
+@@ -12451,7 +12451,7 @@ msgstr ""
+ 
+ #: system/settings/settings.xml
+ msgctxt "#20433"
+-msgid "Extract thumbnails and video information"
++msgid "Extract video information from files"
+ msgstr ""
+ 
+ #: xbmc/dialogs/GUIDialogSmartPlaylistRule.cpp
+@@ -17011,7 +17011,7 @@ msgstr ""
+ #. Description of setting with label #20433 "Extract thumbnails and video information"
+ #: system/settings/settings.xml
+ msgctxt "#36178"
+-msgid "Extract thumbnails and metadata information such as codec and aspect ratio from videos."
++msgid "Extract metadata information such as codec and aspect ratio from videos."
+ msgstr ""
+ 
+ #. Description of setting with label #20419 "Replace file names with library titles"
+@@ -17023,7 +17023,7 @@ msgstr ""
+ #. Description of setting with label #20433 "Extract thumbnails and video information"
+ #: system/settings/settings.xml
+ msgctxt "#36180"
+-msgid "Extract thumbnails and information, such as codecs and aspect ratio, to display in library mode."
++msgid "Extract thumbnails, to display in library Mode."
+ msgstr ""
+ 
+ #: system/settings/settings.xml
+@@ -19763,3 +19763,7 @@ msgstr ""
+ msgctxt "#38208"
+ msgid "If EXIF information exists (date, time, camera used, etc.), it will be displayed."
+ msgstr ""
++
++msgctxt "#38190"
++msgid "Extract thumbnails from video files"
++msgstr ""
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 9ce9e725aec4d8ed000200342a2a99f3bc34a749..326ffbd0f08428c3b4a95208134253feeabf1b1f 100644
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -969,8 +969,8 @@
+           <default>true</default>
+           <control type="toggle" />
+         </setting>
+-        <setting id="myvideos.extractthumb" type="boolean" label="20433" help="36180">
+-          <level>4</level>
++        <setting id="myvideos.extractthumb" type="boolean" label="38190" help="36180">
++          <level>1</level>
+           <default>true</default>
+           <control type="toggle" />
+         </setting>
+
+From 2d8206baa4bb9229a75e71a3de87628d60e006e5 Mon Sep 17 00:00:00 2001
+From: anaconda <anaconda@menakite.eu>
+Date: Thu, 11 Sep 2014 21:30:43 +0200
+Subject: [PATCH 15/62] Disable autoscrolling while on screensaver and while
+ opening streams.
+
+---
+ xbmc/Application.cpp                | 10 ++++++++++
+ xbmc/Application.h                  |  2 ++
+ xbmc/guilib/GUIFadeLabelControl.cpp |  4 +++-
+ xbmc/guilib/GUIFont.cpp             |  4 ++++
+ xbmc/guilib/GUILabel.cpp            |  4 +++-
+ xbmc/guilib/GUITextBox.cpp          |  3 ++-
+ 6 files changed, 24 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
+index 620366e4bcb8593484bc205af4c33fc13dab924a..cf77c3dbb84b86c755ee792294760c5c4c38742d 100644
+--- a/xbmc/Application.cpp
++++ b/xbmc/Application.cpp
+@@ -5215,3 +5215,13 @@ bool CApplication::NotifyActionListeners(const CAction &action) const
+   
+   return false;
+ }
++
++bool CApplication::ScreenSaverDisablesAutoScrolling()
++{
++  bool onBlackDimScreenSaver = IsInScreenSaver() && m_screenSaver &&
++    (m_screenSaver->ID() == "screensaver.xbmc.builtin.black" ||
++     m_screenSaver->ID() == "screensaver.xbmc.builtin.dim");
++  bool openingStreams = m_pPlayer->IsPlaying() && g_windowManager.IsWindowActive(WINDOW_DIALOG_BUSY);
++
++  return onBlackDimScreenSaver || openingStreams;
++}
+diff --git a/xbmc/Application.h b/xbmc/Application.h
+index 580fdce5476312c83c82bec07f48b3eaf8fe9797..e04788e1e3574aa5ecf9b14490fe1fd967ce8ec9 100644
+--- a/xbmc/Application.h
++++ b/xbmc/Application.h
+@@ -392,6 +392,8 @@ public:
+    */
+   void UnregisterActionListener(IActionListener *listener);
+ 
++  bool ScreenSaverDisablesAutoScrolling();
++
+   std::unique_ptr<CServiceManager> m_ServiceManager;
+ 
+   /*!
+diff --git a/xbmc/guilib/GUIFadeLabelControl.cpp b/xbmc/guilib/GUIFadeLabelControl.cpp
+index 01826a5f7ca2ccb104f897ca0670571a9b04b83d..553a6458a71009dd592c8a843eeb3bc336864d61 100644
+--- a/xbmc/guilib/GUIFadeLabelControl.cpp
++++ b/xbmc/guilib/GUIFadeLabelControl.cpp
+@@ -21,6 +21,8 @@
+ #include "GUIFadeLabelControl.h"
+ #include "utils/Random.h"
+ 
++#include "Application.h"
++
+ CGUIFadeLabelControl::CGUIFadeLabelControl(int parentID, int controlID, float posX, float posY, float width, float height, const CLabelInfo& labelInfo, bool scrollOut, unsigned int timeToDelayAtEnd, bool resetOnLabelChange, bool randomized)
+     : CGUIControl(parentID, controlID, posX, posY, width, height), m_label(labelInfo), m_scrollInfo(50, labelInfo.offsetX, labelInfo.scrollSpeed)
+     , m_textLayout(labelInfo.font, false)
+@@ -106,7 +108,7 @@ void CGUIFadeLabelControl::Process(unsigned int currentTime, CDirtyRegionList &d
+     m_lastLabel = m_currentLabel;
+   }
+ 
+-  if (m_infoLabels.size() > 1 || !m_shortText)
++  if ((m_infoLabels.size() > 1 || !m_shortText) && !g_application.ScreenSaverDisablesAutoScrolling())
+   { // have scrolling text
+     bool moveToNextLabel = false;
+     if (!m_scrollOut)
+diff --git a/xbmc/guilib/GUIFont.cpp b/xbmc/guilib/GUIFont.cpp
+index 7f1108939a63162024c7a055403a58e395f090b6..1192b74675b79d1a862de2949a60163abb916035 100644
+--- a/xbmc/guilib/GUIFont.cpp
++++ b/xbmc/guilib/GUIFont.cpp
+@@ -22,6 +22,7 @@
+ #include "GUIFontTTF.h"
+ #include "GraphicContext.h"
+ 
++#include "Application.h"
+ #include "threads/SingleLock.h"
+ #include "utils/TimeUtils.h"
+ #include "utils/MathUtils.h"
+@@ -128,6 +129,9 @@ bool CGUIFont::UpdateScrollInfo(const vecText &text, CScrollInfo &scrollInfo)
+   //   If the string is smaller than the viewport, then it may be plotted even
+   //   more times than that.
+   //
++  if (g_application.ScreenSaverDisablesAutoScrolling())
++    return false;
++
+   if (scrollInfo.waitTime)
+   {
+     scrollInfo.waitTime--;
+diff --git a/xbmc/guilib/GUILabel.cpp b/xbmc/guilib/GUILabel.cpp
+index f15e847ec43d07b44660caec9f8faca780b0a061..ba88a7c5e45da13404d59dfbf1bbc8b93d3528c1 100644
+--- a/xbmc/guilib/GUILabel.cpp
++++ b/xbmc/guilib/GUILabel.cpp
+@@ -21,6 +21,8 @@
+ #include "GUILabel.h"
+ #include <limits>
+ 
++#include "Application.h"
++
+ CGUILabel::CGUILabel(float posX, float posY, float width, float height, const CLabelInfo& labelInfo, CGUILabel::OVER_FLOW overflow)
+     : m_label(labelInfo)
+     , m_textLayout(labelInfo.font, overflow == OVER_FLOW_WRAP, height)
+@@ -103,7 +105,7 @@ void CGUILabel::Render()
+   color_t color = GetColor();
+   bool renderSolid = (m_color == COLOR_DISABLED);
+   bool overFlows = (m_renderRect.Width() + 0.5f < m_textLayout.GetTextWidth()); // 0.5f to deal with floating point rounding issues
+-  if (overFlows && m_scrolling && !renderSolid)
++  if (overFlows && m_scrolling && !renderSolid && !g_application.ScreenSaverDisablesAutoScrolling())
+     m_textLayout.RenderScrolling(m_renderRect.x1, m_renderRect.y1, m_label.angle, color, m_label.shadowColor, 0, m_renderRect.Width(), m_scrollInfo);
+   else
+   {
+diff --git a/xbmc/guilib/GUITextBox.cpp b/xbmc/guilib/GUITextBox.cpp
+index d7bc1c5ba6067af9a460589920367288c640a915..ac766293f1c47c7f145cb46f6b152144b303f15f 100644
+--- a/xbmc/guilib/GUITextBox.cpp
++++ b/xbmc/guilib/GUITextBox.cpp
+@@ -24,6 +24,7 @@
+ #include "utils/MathUtils.h"
+ #include "utils/StringUtils.h"
+ #include "guiinfo/GUIInfoLabels.h"
++#include "Application.h"
+ 
+ #include <algorithm>
+ 
+@@ -133,7 +134,7 @@ void CGUITextBox::Process(unsigned int currentTime, CDirtyRegionList &dirtyregio
+   // update our auto-scrolling as necessary
+   if (m_autoScrollTime && m_lines.size() > m_itemsPerPage)
+   {
+-    if (!m_autoScrollCondition || m_autoScrollCondition->Get())
++    if ((!m_autoScrollCondition || m_autoScrollCondition->Get()) && !g_application.ScreenSaverDisablesAutoScrolling())
+     {
+       if (m_lastRenderTime)
+         m_autoScrollDelayTime += currentTime - m_lastRenderTime;
+
+From 83250abe1869bc07d70466de8bb6f9d6342aec7c Mon Sep 17 00:00:00 2001
+From: anaconda <anaconda@menakite.eu>
+Date: Wed, 25 Feb 2015 18:22:21 +0100
+Subject: [PATCH 17/62] Load OSD dialogs on startup.
+
+Fixes skipped frames the first time they're loaded in memory on less powered
+devices, like a Raspberry Pi, when using DVDPlayer.
+See http://forum.kodi.tv/showthread.php?tid=211501&pid=1938811#pid1938811
+---
+ xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp          | 1 +
+ xbmc/pvr/dialogs/GUIDialogPVRGuideOSD.cpp             | 1 +
+ xbmc/video/dialogs/GUIDialogAudioSubtitleSettings.cpp | 4 +++-
+ xbmc/video/dialogs/GUIDialogSubtitles.cpp             | 2 +-
+ xbmc/video/dialogs/GUIDialogVideoOSD.cpp              | 2 +-
+ xbmc/video/dialogs/GUIDialogVideoSettings.cpp         | 4 +++-
+ 6 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp b/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp
+index 1beb8560a1030f6198b22f5d9c082a27dd85d8a8..ca7c90b0c4a7fc34a31fe6dcf787b8980d28df71 100644
+--- a/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp
++++ b/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp
+@@ -49,6 +49,7 @@ using namespace KODI::MESSAGING;
+ CGUIDialogPVRChannelsOSD::CGUIDialogPVRChannelsOSD() :
+     CGUIDialog(WINDOW_DIALOG_PVR_OSD_CHANNELS, "DialogPVRChannelsOSD.xml")
+ {
++  m_loadType = LOAD_ON_GUI_INIT;
+   m_vecItems = new CFileItemList;
+ }
+ 
+diff --git a/xbmc/pvr/dialogs/GUIDialogPVRGuideOSD.cpp b/xbmc/pvr/dialogs/GUIDialogPVRGuideOSD.cpp
+index 8b472435e26e455249637faf5120055b415fc49e..be1f64d552161f8a86a5c5d89c1bc23328574fb6 100644
+--- a/xbmc/pvr/dialogs/GUIDialogPVRGuideOSD.cpp
++++ b/xbmc/pvr/dialogs/GUIDialogPVRGuideOSD.cpp
+@@ -36,6 +36,7 @@ using namespace PVR;
+ CGUIDialogPVRGuideOSD::CGUIDialogPVRGuideOSD()
+     : CGUIDialog(WINDOW_DIALOG_PVR_OSD_GUIDE, "DialogPVRGuideOSD.xml")
+ {
++  m_loadType = LOAD_ON_GUI_INIT;
+   m_vecItems = new CFileItemList;
+ }
+ 
+diff --git a/xbmc/video/dialogs/GUIDialogAudioSubtitleSettings.cpp b/xbmc/video/dialogs/GUIDialogAudioSubtitleSettings.cpp
+index eb67552344f59b8857b16c882c29e3fa62bed75c..f31572b34d376e70a35003a8c2e175b45daf8070 100644
+--- a/xbmc/video/dialogs/GUIDialogAudioSubtitleSettings.cpp
++++ b/xbmc/video/dialogs/GUIDialogAudioSubtitleSettings.cpp
+@@ -68,7 +68,9 @@ CGUIDialogAudioSubtitleSettings::CGUIDialogAudioSubtitleSettings()
+   : CGUIDialogSettingsManualBase(WINDOW_DIALOG_AUDIO_OSD_SETTINGS, "DialogSettings.xml"),
+     m_passthrough(false),
+     m_dspEnabled(false)
+-{ }
++{
++  m_loadType = LOAD_ON_GUI_INIT;
++}
+ 
+ CGUIDialogAudioSubtitleSettings::~CGUIDialogAudioSubtitleSettings()
+ { }
+diff --git a/xbmc/video/dialogs/GUIDialogSubtitles.cpp b/xbmc/video/dialogs/GUIDialogSubtitles.cpp
+index 398558e4d5d0cae30ee1c73e2b70e3b2f787e8fc..4e8a9b1e307a89d3a7b68402e2ff11b57e7dccd4 100644
+--- a/xbmc/video/dialogs/GUIDialogSubtitles.cpp
++++ b/xbmc/video/dialogs/GUIDialogSubtitles.cpp
+@@ -103,7 +103,7 @@ CGUIDialogSubtitles::CGUIDialogSubtitles(void)
+     , m_pausedOnRun(false)
+     , m_updateSubsList(false)
+ {
+-  m_loadType = KEEP_IN_MEMORY;
++  m_loadType  = LOAD_ON_GUI_INIT;
+ }
+ 
+ CGUIDialogSubtitles::~CGUIDialogSubtitles(void)
+diff --git a/xbmc/video/dialogs/GUIDialogVideoOSD.cpp b/xbmc/video/dialogs/GUIDialogVideoOSD.cpp
+index e498e1fd476d9ab5300bb00bc39946a22cfd93cb..a6648d016b07e2eb3e52f8d927697cc53a42fd7b 100644
+--- a/xbmc/video/dialogs/GUIDialogVideoOSD.cpp
++++ b/xbmc/video/dialogs/GUIDialogVideoOSD.cpp
+@@ -30,7 +30,7 @@ using namespace PVR;
+ CGUIDialogVideoOSD::CGUIDialogVideoOSD(void)
+     : CGUIDialog(WINDOW_DIALOG_VIDEO_OSD, "VideoOSD.xml")
+ {
+-  m_loadType = KEEP_IN_MEMORY;
++  m_loadType = LOAD_ON_GUI_INIT;
+ }
+ 
+ CGUIDialogVideoOSD::~CGUIDialogVideoOSD(void)
+diff --git a/xbmc/video/dialogs/GUIDialogVideoSettings.cpp b/xbmc/video/dialogs/GUIDialogVideoSettings.cpp
+index 0534828dd85520134f7a6890e43a873e223062c1..5a86dfc1e2a54c8fe8d82cb75b612d8e1a0fd2a7 100644
+--- a/xbmc/video/dialogs/GUIDialogVideoSettings.cpp
++++ b/xbmc/video/dialogs/GUIDialogVideoSettings.cpp
+@@ -66,7 +66,9 @@
+ CGUIDialogVideoSettings::CGUIDialogVideoSettings()
+     : CGUIDialogSettingsManualBase(WINDOW_DIALOG_VIDEO_OSD_SETTINGS, "DialogSettings.xml"),
+       m_viewModeChanged(false)
+-{ }
++{
++  m_loadType = LOAD_ON_GUI_INIT;
++}
+ 
+ CGUIDialogVideoSettings::~CGUIDialogVideoSettings()
+ { }
+
+
+From 6bbda4d7e81f32b2e046e81fc7ea3d810b117eae Mon Sep 17 00:00:00 2001
+From: popcornmix <popcornmix@gmail.com>
+Date: Tue, 5 May 2015 23:58:06 +0100
+Subject: [PATCH 19/62] [screensaver] Leave GUI contents available for
+ screensaver
+
+---
+ xbmc/guilib/GUIWindowManager.cpp | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/guilib/GUIWindowManager.cpp b/xbmc/guilib/GUIWindowManager.cpp
+index 5808f7ed1e94d68ead7305ba6d284edd4df12bdd..2a3b7f16531c9822e79c77efabdd30acdaa2a3c9 100644
+--- a/xbmc/guilib/GUIWindowManager.cpp
++++ b/xbmc/guilib/GUIWindowManager.cpp
+@@ -795,7 +795,16 @@ void CGUIWindowManager::ActivateWindow_Internal(int iWindowID, const std::vector
+   int currentWindow = GetActiveWindow();
+   CGUIWindow *pWindow = GetWindow(currentWindow);
+   if (pWindow)
+-    CloseWindowSync(pWindow, iWindowID);
++  {
++    if (iWindowID == WINDOW_SCREENSAVER)
++    {
++      pWindow->Close(true, iWindowID);
++    }
++    else
++    {
++      CloseWindowSync(pWindow, iWindowID);
++    }
++  }
+   g_infoManager.SetNextWindow(WINDOW_INVALID);
+ 
+   // Add window to the history list (we must do this before we activate it,
+
+From b5b121249287c4d102d61ae0aafa05f40e79af44 Mon Sep 17 00:00:00 2001
+From: Claudio-Sjo <Claudio.Porfiri@gmail.com>
+Date: Mon, 16 Feb 2015 14:51:26 +0100
+Subject: [PATCH 21/62] - allow reads < CDIO_CD_FRAMESIZE_RAW by using a buffer
+ - fixes #15794
+
+---
+ xbmc/filesystem/CDDAFile.cpp | 120 ++++++++++++++++++++++++++++++++-----------
+ xbmc/filesystem/CDDAFile.h   |   3 ++
+ 2 files changed, 92 insertions(+), 31 deletions(-)
+
+diff --git a/xbmc/filesystem/CDDAFile.cpp b/xbmc/filesystem/CDDAFile.cpp
+index 722e62602084923bd040803f0e5a5c336a42fa3b..b0f53e5d44e108d88d7af0e46913a7f29328cd31 100644
+--- a/xbmc/filesystem/CDDAFile.cpp
++++ b/xbmc/filesystem/CDDAFile.cpp
+@@ -42,10 +42,14 @@ CFileCDDA::CFileCDDA(void)
+   m_lsnEnd = CDIO_INVALID_LSN;
+   m_cdio = CLibcdio::GetInstance();
+   m_iSectorCount = 52;
++  m_TrackBuf = (uint8_t *) malloc(CDIO_CD_FRAMESIZE_RAW);
++  p_TrackBuf = 0;
++  f_TrackBuf = 0;
+ }
+ 
+ CFileCDDA::~CFileCDDA(void)
+ {
++  free(m_TrackBuf);
+   Close();
+ }
+ 
+@@ -53,6 +57,9 @@ bool CFileCDDA::Open(const CURL& url)
+ {
+   std::string strURL = url.GetWithoutFilename();
+ 
++  // Flag TrackBuffer = FALSE, TrackBuffer is empty
++  f_TrackBuf = 0;
++
+   if (!g_mediaManager.IsDiscInDrive(strURL) || !IsValidFile(url))
+     return false;
+ 
+@@ -117,50 +124,98 @@ int CFileCDDA::Stat(const CURL& url, struct __stat64* buffer)
+ 
+ ssize_t CFileCDDA::Read(void* lpBuf, size_t uiBufSize)
+ {
+-  if (!m_pCdIo || !g_mediaManager.IsDiscInDrive())
+-    return -1;
+ 
+-  if (uiBufSize > SSIZE_MAX)
+-    uiBufSize = SSIZE_MAX;
++  ssize_t returnValue;
++  int iSectorCount;
++  void *destBuf;
+ 
+-  // limit number of sectors that fits in buffer by m_iSectorCount
+-  int iSectorCount = std::min((int)uiBufSize / CDIO_CD_FRAMESIZE_RAW, m_iSectorCount);
+ 
+-  if (iSectorCount <= 0)
++  if (!m_pCdIo || !g_mediaManager.IsDiscInDrive())
++  {
++    CLog::Log(LOGERROR, "file cdda: Aborted because no disc in drive or no m_pCdIo");
+     return -1;
++  }
+ 
+-  // Are there enough sectors left to read
+-  if (m_lsnCurrent + iSectorCount > m_lsnEnd)
+-    iSectorCount = m_lsnEnd - m_lsnCurrent;
++  uiBufSize = std::min( uiBufSize, (size_t)SSIZE_MAX );
+ 
+-  // The loop tries to solve read error problem by lowering number of sectors to read (iSectorCount).
+-  // When problem is solved the proper number of sectors is stored in m_iSectorCount
+-  int big_iSectorCount = iSectorCount;
+-  while (iSectorCount > 0)
++  // If we have data in the TrackBuffer, they must be used first
++  if (f_TrackBuf)
+   {
+-    int iret = m_cdio->cdio_read_audio_sectors(m_pCdIo, lpBuf, m_lsnCurrent, iSectorCount);
++    // Get at most the remaining data in m_TrackBuf
++    uiBufSize = std::min(uiBufSize, CDIO_CD_FRAMESIZE_RAW - p_TrackBuf);
++    memcpy(lpBuf, m_TrackBuf + p_TrackBuf, uiBufSize);
++    // Update the data offset
++    p_TrackBuf += uiBufSize;
++    // Is m_TrackBuf empty?
++    f_TrackBuf = (CDIO_CD_FRAMESIZE_RAW == p_TrackBuf);
++    // All done, return read bytes
++    return uiBufSize;
++  }
++
++  // No data left in buffer
++
++  // Is this a short read?
++  if (uiBufSize < CDIO_CD_FRAMESIZE_RAW)
++  {
++    // short request, buffer one full sector
++    iSectorCount = 1;
++    destBuf = m_TrackBuf;
++  }
++  else // normal request
++  {
++    // limit number of sectors that fits in buffer by m_iSectorCount
++    iSectorCount = std::min((int)uiBufSize / CDIO_CD_FRAMESIZE_RAW, m_iSectorCount);
++    destBuf = lpBuf;
++  }
+ 
++  // Are there enough sectors left to read?
++  iSectorCount = std::min(iSectorCount, m_lsnEnd - m_lsnCurrent);
++
++  // Have we reached EOF?
++  if (iSectorCount == 0)
++  {
++    CLog::Log(LOGNOTICE, "file cdda: Read EoF");
++    return 0; // Success, but nothing read
++  } // Reached EoF
++
++  // At leat one sector to read
++  int retries;
++  int iret;
++  // Try reading a decresing number of sectors, then 3 times with 1 sector
++  for (retries = 3; retries > 0; iSectorCount>1 ? iSectorCount-- : retries--)
++  {
++    iret = m_cdio->cdio_read_audio_sectors(m_pCdIo, destBuf, m_lsnCurrent, iSectorCount);
+     if (iret == DRIVER_OP_SUCCESS)
++      break; // Get out from the loop
++    else
+     {
+-      // If lower iSectorCount solved the problem limit it's value
+-      if (iSectorCount < big_iSectorCount)
+-      {
+-        m_iSectorCount = iSectorCount;
+-      }
+-      break;
+-    }
+-
+-    // iSectorCount is low so it cannot solve read problem
+-    if (iSectorCount <= 10)
+-    {
+-      CLog::Log(LOGERROR, "file cdda: Reading %d sectors of audio data starting at lsn %d failed with error code %i", iSectorCount, m_lsnCurrent, iret);
+-      return -1;
+-    }
+-
+-    iSectorCount = 10;
++      CLog::Log(LOGERROR, "file cdda: Read cdio error when reading track ");
++    } // Errors when reading file
+   }
++  // retries == 0 only if failed reading at least one sector
++  if (retries == 0)
++  {
++    CLog::Log(LOGERROR, "file cdda: Reading %d sectors of audio data starting at lsn %d failed with error code %i", iSectorCount, m_lsnCurrent, iret);
++    return -1;
++  }
++
++  // Update position in file
+   m_lsnCurrent += iSectorCount;
+ 
++  // Was it a short request?
++  if (uiBufSize < CDIO_CD_FRAMESIZE_RAW)
++  {
++    // We copy the amount if requested data into the destination buffer
++    memcpy(lpBuf, m_TrackBuf, uiBufSize);
++    // and keep track of the first available data
++    p_TrackBuf = uiBufSize;
++    // Finally, we set the buffer flag as TRUE
++    f_TrackBuf = true;
++    // We will return uiBufSize
++    return uiBufSize;
++  }
++
++  // Otherwise, just return the size of read data
+   return iSectorCount*CDIO_CD_FRAMESIZE_RAW;
+ }
+ 
+@@ -194,6 +249,9 @@ int64_t CFileCDDA::Seek(int64_t iFilePosition, int iWhence /*=SEEK_SET*/)
+ 
+ void CFileCDDA::Close()
+ {
++  // Flag TrackBuffer = FALSE, TrackBuffer is empty
++  f_TrackBuf = 0;
++
+   if (m_pCdIo)
+   {
+     m_cdio->cdio_destroy(m_pCdIo);
+diff --git a/xbmc/filesystem/CDDAFile.h b/xbmc/filesystem/CDDAFile.h
+index 0427af4534bfe59a343f0518c7f4242d93299836..e99236294fa8b9b613e465a8ecaf3ad3ba8b5a6f 100644
+--- a/xbmc/filesystem/CDDAFile.h
++++ b/xbmc/filesystem/CDDAFile.h
+@@ -50,6 +50,9 @@ protected:
+ 
+ protected:
+   CdIo_t* m_pCdIo;
++  uint8_t *m_TrackBuf;
++  size_t   p_TrackBuf;
++  int      f_TrackBuf;
+   lsn_t m_lsnStart;  // Start of m_iTrack in logical sector number
+   lsn_t m_lsnCurrent; // Position inside the track in logical sector number
+   lsn_t m_lsnEnd;   // End of m_iTrack in logical sector number
+
