@@ -1,14 +1,14 @@
-From 4f24a459519c655c2dcd254c18a06f81cc226c24 Mon Sep 17 00:00:00 2001
+From 4d9aafbe5014e1aaa752385ab7ba7a8befee3091 Mon Sep 17 00:00:00 2001
 From: Jamie Coldhill <wrxtasy@amnet.net.au>
-Date: Wed, 15 Feb 2017 09:45:43 +0800
+Date: Wed, 15 Feb 2017 11:26:30 +0800
 Subject: [PATCH] kodi: improve sysinfo for AML aarch64
 
 ---
- xbmc/windows/GUIWindowSystemInfo.cpp | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+ xbmc/windows/GUIWindowSystemInfo.cpp | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/xbmc/windows/GUIWindowSystemInfo.cpp b/xbmc/windows/GUIWindowSystemInfo.cpp
-index 93e9f74..1874bb4 100644
+index 93e9f74..59f6c52 100644
 --- a/xbmc/windows/GUIWindowSystemInfo.cpp
 +++ b/xbmc/windows/GUIWindowSystemInfo.cpp
 @@ -109,7 +109,6 @@ void CGUIWindowSystemInfo::FrameMove()
@@ -19,16 +19,7 @@ index 93e9f74..1874bb4 100644
    }
  
    else if (m_section == CONTROL_BT_STORAGE)
-@@ -132,8 +131,6 @@ void CGUIWindowSystemInfo::FrameMove()
-     SetControlLabel(i++, "%s: %s", 150, NETWORK_IP_ADDRESS);
-     SetControlLabel(i++, "%s: %s", 13159, NETWORK_SUBNET_MASK);
-     SetControlLabel(i++, "%s: %s", 13160, NETWORK_GATEWAY_ADDRESS);
--    SetControlLabel(i++, "%s: %s", 13161, NETWORK_DNS1_ADDRESS);
--    SetControlLabel(i++, "%s: %s", 20307, NETWORK_DNS2_ADDRESS);
-     SetControlLabel(i++, "%s %s", 13295, SYSTEM_INTERNET_STATE);
-   }
- 
-@@ -157,17 +154,15 @@ void CGUIWindowSystemInfo::FrameMove()
+@@ -157,17 +156,15 @@ void CGUIWindowSystemInfo::FrameMove()
    {
      SET_CONTROL_LABEL(40,g_localizeStrings.Get(20160));
      SET_CONTROL_LABEL(i++, g_sysinfo.GetCPUModel());
