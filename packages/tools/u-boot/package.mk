@@ -27,13 +27,19 @@ if [ "$UBOOT_VERSION" = "imx6-cuboxi" ]; then
   PKG_SOURCE_DIR="$PKG_NAME-imx6-${PKG_COMMIT}*"
   [ -n "$UBOOT_CONFIG_V2" ] && PKG_DEPENDS_TARGET="toolchain u-boot-v2"
 elif [ "$UBOOT_VERSION" = "hardkernel" ]; then
-  PKG_VERSION="6e4e886"
-  PKG_SITE="https://github.com/hardkernel/u-boot"
-  PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:host"
+    PKG_SITE="https://github.com/hardkernel/u-boot"
+  if [ "$PROJECT" = "Odroid_C1" ]; then
+    PKG_VERSION="86125f8"
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-arm-none-eabi:host"
+  elif [ "$PROJECT" = "Odroid_C2" ]; then
+    PKG_VERSION="6e4e886"
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:host"
+  fi
+    PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
 else
   exit 0
 fi
+PKG_SOURCE_DIR="$PKG_NAME-$PKG_VERSION*"
 PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_SECTION="tools"
@@ -75,6 +81,10 @@ make_target() {
       CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make mrproper
       CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make $UBOOT_TARGET
       CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make HOSTCC="$HOST_CC" HOSTSTRIP="true"
+    elif [ "$PROJECT" = "Odroid_C1" ]; then
+      make CROSS_COMPILE=arm-none-eabi- ARCH=arm mrproper
+      make CROSS_COMPILE=arm-none-eabi- ARCH=arm $UBOOT_TARGET
+      make CROSS_COMPILE=arm-none-eabi- ARCH=arm HOSTCC="$HOST_CC" HOSTSTRIP="true"
     else
       make CROSS_COMPILE="$TARGET_PREFIX" ARCH=arm mrproper
       make CROSS_COMPILE="$TARGET_PREFIX" ARCH=arm $UBOOT_TARGET
@@ -138,6 +148,14 @@ makeinstall_target() {
         cp -PRv $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz $INSTALL/usr/share/bootloader
       elif [ -f $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz ]; then
         cp -PRv $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz $INSTALL/usr/share/bootloader
+      fi
+      ;;
+    Odroid_C1)
+      cp -PRv $PKG_DIR/scripts/update-c1.sh $INSTALL/usr/share/bootloader/update.sh
+      cp -PRv $ROOT/$PKG_BUILD/sd_fuse/bl1.bin.hardkernel $INSTALL/usr/share/bootloader/bl1
+      cp -PRv $ROOT/$PKG_BUILD/sd_fuse/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
+      if [ -f $PROJECT_DIR/$PROJECT/bootloader/boot.ini.new ]; then
+        cp -PRv $PROJECT_DIR/$PROJECT/bootloader/boot.ini.new $INSTALL/usr/share/bootloader
       fi
       ;;
     imx6)
