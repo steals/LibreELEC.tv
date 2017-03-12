@@ -66,8 +66,8 @@ if [ "$1" = "cpu" -o "$TEMP" = "0" ]; then
     TEMP=`cat /sys/devices/virtual/thermal/thermal_zone0/temp`
   fi
 
-  # used on RaspberryPi
-  if [ "$TEMP" = "0" -a -f /sys/class/thermal/thermal_zone0/temp ]; then
+  # used on RaspberryPi and AMLogic
+  if [ "$TEMP" != "0" -a -f /sys/class/thermal/thermal_zone0/temp ]; then
     TEMP=`cat /sys/class/thermal/thermal_zone0/temp`
   fi
 
