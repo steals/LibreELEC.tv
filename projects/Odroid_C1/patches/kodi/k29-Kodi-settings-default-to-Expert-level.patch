@@ -1,0 +1,33 @@
+From 1044fe6c6e1b70a2f2b428a6cc6d49b9bcbcb276 Mon Sep 17 00:00:00 2001
+From: wrxtasy <wrxtasy@amnet.net.au>
+Date: Tue, 7 Mar 2017 12:30:11 +0800
+Subject: [PATCH 2/4] Kodi settings: default to Expert level
+
+---
+ xbmc/view/ViewStateSettings.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/view/ViewStateSettings.cpp b/xbmc/view/ViewStateSettings.cpp
+index a608a82..8122c43 100644
+--- a/xbmc/view/ViewStateSettings.cpp
++++ b/xbmc/view/ViewStateSettings.cpp
+@@ -124,12 +124,14 @@ bool CViewStateSettings::Load(const TiXmlNode *settings)
+   pElement = settings->FirstChild(XML_GENERAL);
+   if (pElement != NULL)
+   {
++    /*
++    // Force setting level to expert
+     int settingLevel;
+     if (XMLUtils::GetInt(pElement, XML_SETTINGLEVEL, settingLevel, (const int)SettingLevelBasic, (const int)SettingLevelExpert))
+       m_settingLevel = (SettingLevel)settingLevel;
+     else
+-      m_settingLevel = SettingLevelStandard;
+-
++    */
++      m_settingLevel = SettingLevelExpert;
+     const TiXmlNode* pEventLogNode = pElement->FirstChild(XML_EVENTLOG);
+     if (pEventLogNode != NULL)
+     {
+-- 
+2.7.4
+

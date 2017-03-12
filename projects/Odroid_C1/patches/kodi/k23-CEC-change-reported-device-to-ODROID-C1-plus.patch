@@ -1,0 +1,36 @@
+From 13b2ab394e1f1d185ae0a26f1c31eb18794eb776 Mon Sep 17 00:00:00 2001
+From: wrxtasy <wrxtasy@amnet.net.au>
+Date: Tue, 7 Mar 2017 12:25:38 +0800
+Subject: [PATCH] CEC: change reported device to ODROID-C1 plus
+
+---
+ system/peripherals.xml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/system/peripherals.xml b/system/peripherals.xml
+index d5704b2..c649938 100644
+--- a/system/peripherals.xml
++++ b/system/peripherals.xml
+@@ -12,7 +12,7 @@
+     <setting key="enabled" type="bool" value="1" label="305" order="1" />
+     <setting key="activate_source" type="bool" value="1" label="36020" order="2" />
+     <setting key="wake_devices" type="enum" value="36037" label="36007" lvalues="36037|36038|36039|231" order="3" />
+-    <setting key="standby_devices" type="enum" value="36037" label="36008" lvalues="36037|36038|36039|231" order="4" />
++    <setting key="standby_devices" type="enum" value="231" label="36008" lvalues="36037|36038|36039|231" order="4" />
+     <setting key="send_inactive_source" type="bool" value="1" label="36025" order="5" />
+     <setting key="cec_standby_screensaver" type="bool" value="0" label="36009" order="6" />
+     <setting key="cec_wake_screensaver" type="bool" value="1" label="36010" order="7" />
+@@ -27,8 +27,8 @@
+     <setting key="power_avr_on_as" type="bool" label="36046" value="0" order="15" />
+ 
+     <setting key="tv_vendor" type="int" value="0" configurable="0" />
+-    <setting key="device_name" type="string" value="Kodi" configurable="0" />
+-    <setting key="device_type" type="int" value="1" configurable="0" />
++    <setting key="device_name" type="string" value="ODROID-C1+" configurable="0" />
++    <setting key="device_type" type="int" value="1" configurable="0" />
+     <setting key="wake_devices_advanced" type="string" value="" configurable="0" />
+     <setting key="standby_devices_advanced" type="string" value="" configurable="0" />
+     <setting key="double_tap_timeout_ms" type="int" min="0" value="300" configurable="0" />
+-- 
+2.7.4
+
