@@ -58,8 +58,9 @@
 
   # Kernel to use. values can be:
     LINUX="custom"
-    KERNEL_VERSION="C1-3.10-4e977ca"
-    KERNEL_URL="https://dl.dropboxusercontent.com/u/27641650/ODROID/C1/linux-$KERNEL_VERSION.tar.xz"
+    KERNEL_VERSION="3eeaf4f"
+    KERNEL_SOURCE_DIR="linux-C1-$KERNEL_VERSION*"
+    KERNEL_URL="https://github.com/wrxtasy/linux-C1/archive/$KERNEL_VERSION.tar.gz"
 
 ################################################################################
 # setup build defaults
@@ -149,5 +150,5 @@
     OPENVPN_SUPPORT="yes"
 
   # set the addon dirs
-  #  ADDON_PATH="$ADDON_VERSION/WeTek_Play/$TARGET_ARCH"
-
+    ADDON_PATH="$ADDON_VERSION/WeTek_Play/$TARGET_ARCH"
+    ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
