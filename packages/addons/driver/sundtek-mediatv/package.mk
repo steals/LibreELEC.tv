@@ -37,14 +37,14 @@ make_target() {
   mkdir -p $PKG_BUILD
   cd $PKG_BUILD
 
-  case $TARGET_ARCH in
+  case $TARGET_KERNEL_ARCH in
     x86_64)
       INSTALLER_URL="http://sundtek.de/media/netinst/64bit/installer.tar.gz"
       ;;
     arm)
       INSTALLER_URL="http://sundtek.de/media/netinst/armsysvhf/installer.tar.gz"
       ;;
-    aarch64)
+    arm64)
       INSTALLER_URL="http://sundtek.de/media/netinst/arm64/installer.tar.gz"
       ;;
   esac

@@ -132,6 +132,10 @@ if [ -d "$SOURCES/$1" -o -d "$PKG_DIR/sources" ]; then
     done
   fi
 
+if [[ -n "$KERNEL_PATCH_ARCH" ]]; then
+  PATCH_ARCH="$KERNEL_PATCH_ARCH"
+fi
+
   for i in $PKG_DIR/patches/$PKG_NAME-*.patch \
            $PKG_DIR/patches/$PATCH_ARCH/$PKG_NAME-*.patch \
            $PATCH_DIRS_PKG \
