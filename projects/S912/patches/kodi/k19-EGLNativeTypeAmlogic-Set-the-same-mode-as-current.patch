@@ -1,0 +1,29 @@
+From 0ffed1cdc6c42ee118c398b0bfc58288ac383919 Mon Sep 17 00:00:00 2001
+From: Jamie Coldhill <wrxtasy@amnet.net.au>
+Date: Mon, 5 Jun 2017 02:15:02 +0800
+Subject: [PATCH] jg-10bit
+
+---
+ xbmc/utils/AMLUtils.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index c674655..2c28aa5 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -593,9 +593,9 @@ bool aml_set_native_resolution(const RESOLUTION_INFO &res, std::string framebuff
+   bool result = false;
+ 
+   // Don't set the same mode as current
+-  std::string mode;
+-  SysfsUtils::GetString("/sys/class/display/mode", mode);
+-  if (res.strId != mode)
++  //std::string mode;
++  //SysfsUtils::GetString("/sys/class/display/mode", mode);
++  //if (res.strId != mode)
+     result = aml_set_display_resolution(res.strId.c_str(), framebuffer_name);
+ 
+   aml_handle_scale(res);
+-- 
+2.7.4
+

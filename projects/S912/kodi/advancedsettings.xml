@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<advancedsettings>
+  <showexitbutton>false</showexitbutton>
+  <cputempcommand>cputemp</cputempcommand>
+  <gputempcommand>cputemp</gputempcommand>
+
+  <samba>
+    <clienttimeout>30</clienttimeout>
+  </samba>
+
+  <gui>
+   <algorithmdirtyregions>1</algorithmdirtyregions>
+  </gui>
+
+  <network>
+   <buffermode>1</buffermode>
+   <readfactor>20.0 </readfactor>
+   <memorysize>104857600</memorysize>
+  </network>
+
+</advancedsettings>

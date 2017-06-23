@@ -1,0 +1,34 @@
+From 609946e79196d801c5c10a6c034bfe65a253207f Mon Sep 17 00:00:00 2001
+From: Jamie Coldhill <wrxtasy@amnet.net.au>
+Date: Tue, 13 Jun 2017 22:55:22 +0800
+Subject: [PATCH] projects/S905: use "null" display mode only when needed
+ Display mode has to be set to "null" only when switching to the same refresh
+ rate with different denominator. In other cases it only causes black screen
+ and no audio for a few seconds.
+
+---
+ xbmc/utils/AMLUtils.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
+index 336efd9..6207e61 100644
+--- a/xbmc/utils/AMLUtils.cpp
++++ b/xbmc/utils/AMLUtils.cpp
+@@ -664,7 +664,14 @@ bool aml_get_preferred_resolution(RESOLUTION_INFO *res)
+ bool aml_set_display_resolution(const char *resolution, std::string framebuffer_name)
+ {
+   std::string mode = resolution;
++  std::string cur_mode;
++
+   // switch display resolution
++  SysfsUtils::GetString("/sys/class/display/mode", cur_mode);
++
++  if (cur_mode == mode)
++    SysfsUtils::SetString("/sys/class/display/mode", "null");
++
+   SysfsUtils::SetString("/sys/class/display/mode", mode.c_str());
+ 
+   RESOLUTION_INFO res;
+-- 
+2.7.4
+
