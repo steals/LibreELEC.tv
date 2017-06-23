@@ -24,4 +24,3 @@ index 6e70d3e..c35f009 100644
                            | MHD_USE_DEBUG /* Print MHD error messages to log */
 -- 
 2.7.4
-
