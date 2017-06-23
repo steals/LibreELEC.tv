@@ -47,27 +47,6 @@ index 6f023a9..ad53c9d 100644
  
  
  version 3.0:
-diff --git b/RELEASE_NOTES a/RELEASE_NOTES
-new file mode 100644
-index 0000000..c3ec010
---- /dev/null
-+++ a/RELEASE_NOTES
-@@ -0,0 +1,15 @@
-+
-+              ┌────────────────────────────────────────┐
-+              │ RELEASE NOTES for FFmpeg 3.2 "Hypatia" │
-+              └────────────────────────────────────────┘
-+
-+   The FFmpeg Project proudly presents FFmpeg 3.2 "Hypatia", about 4
-+   months after the release of FFmpeg 3.1.
-+
-+   A complete Changelog is available at the root of the project, and the
-+   complete Git history on http://source.ffmpeg.org.
-+
-+   We hope you will like this release as much as we enjoyed working on it, and
-+   as usual, if you have any questions about it, or any FFmpeg related topic,
-+   feel free to join us on the #ffmpeg IRC channel (on irc.freenode.net) or ask
-+   on the mailing-lists.
 diff --git b/doc/Doxyfile a/doc/Doxyfile
 index 0891899..8f855f8 100644
 --- b/doc/Doxyfile
