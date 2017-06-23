@@ -1,0 +1,1003 @@
+From beba8ecf6a060f0cae3bf00e501f48f5e881d948 Mon Sep 17 00:00:00 2001
+From: peak3d <pfau@peak3d.de>
+Date: Wed, 14 Jun 2017 15:23:29 +0200
+Subject: [PATCH 1/6] [GUI] Prevent parse step of VisibleConditions if
+ expression is already in m_bools / Reset queued animations if they get active
+ / prevent refresh-update for invisible controls / Work with a copy of
+ CFileItem in AddonSettings Dialog instead with the shared ptr
+
+---
+ xbmc/GUIInfoManager.cpp                 |  5 ++++-
+ xbmc/addons/GUIDialogAddonInfo.cpp      |  2 +-
+ xbmc/guilib/GUIControlGroup.cpp         |  4 ++++
+ xbmc/guilib/GUILabel.cpp                | 13 ++++++-------
+ xbmc/guilib/GUILabel.h                  |  5 +++--
+ xbmc/guilib/GUILabelControl.cpp         |  3 ++-
+ xbmc/guilib/GUIListLabel.cpp            |  4 +---
+ xbmc/guilib/VisibleEffect.cpp           |  3 +--
+ xbmc/interfaces/info/InfoBool.h         |  4 +++-
+ xbmc/interfaces/info/InfoExpression.cpp | 12 +++++-------
+ xbmc/interfaces/info/InfoExpression.h   | 10 +++++++---
+ 11 files changed, 37 insertions(+), 28 deletions(-)
+
+diff --git a/xbmc/GUIInfoManager.cpp b/xbmc/GUIInfoManager.cpp
+index 5eddb2c65d58..01aa1e2c17b3 100644
+--- a/xbmc/GUIInfoManager.cpp
++++ b/xbmc/GUIInfoManager.cpp
+@@ -6846,13 +6846,16 @@ INFO::InfoPtr CGUIInfoManager::Register(const std::string &expression, int conte
+     return INFO::InfoPtr();
+ 
+   CSingleLock lock(m_critInfo);
+-  std::pair<INFOBOOLTYPE::const_iterator, bool> res;
++  std::pair<INFOBOOLTYPE::iterator, bool> res;
+ 
+   if (condition.find_first_of("|+[]!") != condition.npos)
+     res = m_bools.insert(std::make_shared<InfoExpression>(condition, context, m_refreshCounter));
+   else
+     res = m_bools.insert(std::make_shared<InfoSingle>(condition, context, m_refreshCounter));
+ 
++  if (res.second)
++    res.first->get()->Initialize();
++
+   return *(res.first);
+ }
+ 
+diff --git a/xbmc/addons/GUIDialogAddonInfo.cpp b/xbmc/addons/GUIDialogAddonInfo.cpp
+index c7b0fa9afe70..bffcfe41aeb9 100644
+--- a/xbmc/addons/GUIDialogAddonInfo.cpp
++++ b/xbmc/addons/GUIDialogAddonInfo.cpp
+@@ -481,7 +481,7 @@ bool CGUIDialogAddonInfo::SetItem(const CFileItemPtr& item)
+   if (!item || !item->HasAddonInfo())
+     return false;
+ 
+-  m_item = item;
++  m_item = CFileItemPtr(new CFileItem(*item));
+   m_localAddon.reset();
+   CAddonMgr::GetInstance().GetAddon(item->GetAddonInfo()->ID(), m_localAddon, ADDON_UNKNOWN, false);
+   return true;
+diff --git a/xbmc/guilib/GUIControlGroup.cpp b/xbmc/guilib/GUIControlGroup.cpp
+index 4dad84920b31..525512a0ddfd 100644
+--- a/xbmc/guilib/GUIControlGroup.cpp
++++ b/xbmc/guilib/GUIControlGroup.cpp
+@@ -244,6 +244,10 @@ bool CGUIControlGroup::OnMessage(CGUIMessage& message)
+       return true;
+     }
+     break;
++  case GUI_MSG_REFRESH_TIMER:
++    if (!IsVisible() || !IsVisibleFromSkin())
++      return true;
++    break;
+   }
+   bool handled(false);
+   //not intented for any specific control, send to all childs and our base handler.
+diff --git a/xbmc/guilib/GUILabel.cpp b/xbmc/guilib/GUILabel.cpp
+index 00bd1eefb281..9d60af60a276 100644
+--- a/xbmc/guilib/GUILabel.cpp
++++ b/xbmc/guilib/GUILabel.cpp
+@@ -49,12 +49,6 @@ bool CGUILabel::SetScrolling(bool scrolling)
+   return changed;
+ }
+ 
+-unsigned int CGUILabel::GetScrollLoopCount() const
+-{
+-  return m_scrollInfo.m_loopCount;
+-}
+-
+-
+ bool CGUILabel::SetOverflow(OVER_FLOW overflow)
+ {
+   bool changed = m_overflowType != overflow;
+@@ -99,7 +93,12 @@ bool CGUILabel::Process(unsigned int currentTime)
+   bool renderSolid = (m_color == COLOR_DISABLED);
+ 
+   if (overFlows && m_scrolling && !renderSolid)
+-    return m_textLayout.UpdateScrollinfo(m_scrollInfo);
++  {
++    if (m_maxScrollLoops < m_scrollInfo.m_loopCount)
++      SetScrolling(false);
++    else
++      return m_textLayout.UpdateScrollinfo(m_scrollInfo);
++  }
+ 
+   return false;
+ }
+diff --git a/xbmc/guilib/GUILabel.h b/xbmc/guilib/GUILabel.h
+index 96e4325d3342..eead41924a2d 100644
+--- a/xbmc/guilib/GUILabel.h
++++ b/xbmc/guilib/GUILabel.h
+@@ -155,9 +155,9 @@ class CGUILabel
+    */
+   bool SetScrolling(bool scrolling);
+ 
+-  /*! \brief returns how often Text has already passed
++  /*! \brief Set max. text scroll count
+   */
+-  unsigned int GetScrollLoopCount()const;
++  void SetScrollLoopCount(unsigned int loopCount) { m_maxScrollLoops = loopCount; };
+ 
+   /*! \brief Set how this label should handle overflowing text.
+    \param overflow the overflow type
+@@ -245,4 +245,5 @@ class CGUILabel
+   CRect          m_maxRect;      ///< maximum sizing of text
+   bool           m_invalid;      ///< if true, the label needs recomputing
+   COLOR          m_color;        ///< color to render text \sa SetColor, GetColor
++  unsigned int   m_maxScrollLoops = ~0;
+ };
+diff --git a/xbmc/guilib/GUILabelControl.cpp b/xbmc/guilib/GUILabelControl.cpp
+index a6d2cd6c4725..54e13e0f27b0 100644
+--- a/xbmc/guilib/GUILabelControl.cpp
++++ b/xbmc/guilib/GUILabelControl.cpp
+@@ -34,6 +34,7 @@ CGUILabelControl::CGUILabelControl(int parentID, int controlID, float posX, floa
+   m_startHighlight = m_endHighlight = 0;
+   m_startSelection = m_endSelection = 0;
+   m_minWidth = 0;
++  m_label.SetScrollLoopCount(2);
+ }
+ 
+ CGUILabelControl::~CGUILabelControl(void)
+@@ -210,7 +211,7 @@ bool CGUILabelControl::OnMessage(CGUIMessage& message)
+       return true;
+     }
+   }
+-  if (message.GetMessage() == GUI_MSG_REFRESH_TIMER)
++  if (message.GetMessage() == GUI_MSG_REFRESH_TIMER && IsVisible())
+     UpdateInfo();
+ 
+   return CGUIControl::OnMessage(message);
+diff --git a/xbmc/guilib/GUIListLabel.cpp b/xbmc/guilib/GUIListLabel.cpp
+index 3a3f5e7b5794..f480a2d0c8f2 100644
+--- a/xbmc/guilib/GUIListLabel.cpp
++++ b/xbmc/guilib/GUIListLabel.cpp
+@@ -30,6 +30,7 @@ CGUIListLabel::CGUIListLabel(int parentID, int controlID, float posX, float posY
+   m_scroll = scroll;
+   if (m_info.IsConstant())
+     SetLabel(m_info.GetLabel(m_parentID, true));
++  m_label.SetScrollLoopCount(2);
+   ControlType = GUICONTROL_LISTLABEL;
+ }
+ 
+@@ -72,9 +73,6 @@ void CGUIListLabel::Process(unsigned int currentTime, CDirtyRegionList &dirtyreg
+   if (m_label.Process(currentTime))
+     MarkDirtyRegion();
+ 
+-  if (m_label.GetScrollLoopCount() >= 3)
+-    SetScrolling(false);
+-
+   CGUIControl::Process(currentTime, dirtyregions);
+ }
+ 
+diff --git a/xbmc/guilib/VisibleEffect.cpp b/xbmc/guilib/VisibleEffect.cpp
+index 37bd67b08e52..70376b8e9d0e 100644
+--- a/xbmc/guilib/VisibleEffect.cpp
++++ b/xbmc/guilib/VisibleEffect.cpp
+@@ -440,8 +440,7 @@ void CAnimation::Animate(unsigned int time, bool startAnim)
+     m_currentProcess = ANIM_PROCESS_REVERSE;
+   }
+   // reset the queued state once we've rendered to ensure allocation has occured
+-  if (startAnim || m_queuedProcess == ANIM_PROCESS_REVERSE)
+-    m_queuedProcess = ANIM_PROCESS_NONE;
++  m_queuedProcess = ANIM_PROCESS_NONE;
+ 
+   // Update our animation process
+   if (m_currentProcess == ANIM_PROCESS_NORMAL)
+diff --git a/xbmc/interfaces/info/InfoBool.h b/xbmc/interfaces/info/InfoBool.h
+index 4318d9190897..dfc22f05d1ff 100644
+--- a/xbmc/interfaces/info/InfoBool.h
++++ b/xbmc/interfaces/info/InfoBool.h
+@@ -37,6 +37,8 @@ class InfoBool
+   InfoBool(const std::string &expression, int context, unsigned int &refreshCounter);
+   virtual ~InfoBool() {};
+ 
++  virtual void Initialize() {};
++
+   /*! \brief Get the value of this info bool
+    This is called to update (if dirty) and fetch the value of the info bool
+    \param item the item used to evaluate the bool
+@@ -81,9 +83,9 @@ class InfoBool
+   bool m_value;                ///< current value
+   int m_context;               ///< contextual information to go with the condition
+   bool m_listItemDependent;    ///< do not cache if a listitem pointer is given
++  std::string  m_expression;   ///< original expression
+ 
+ private:
+-  std::string  m_expression;   ///< original expression
+   unsigned int m_refeshCounter;
+   unsigned int &m_parentRefreshCounter;
+ };
+diff --git a/xbmc/interfaces/info/InfoExpression.cpp b/xbmc/interfaces/info/InfoExpression.cpp
+index f21f8613f7da..168ab1e18b92 100644
+--- a/xbmc/interfaces/info/InfoExpression.cpp
++++ b/xbmc/interfaces/info/InfoExpression.cpp
+@@ -27,10 +27,9 @@
+ 
+ using namespace INFO;
+ 
+-InfoSingle::InfoSingle(const std::string &expression, int context, unsigned int& refreshCounter)
+-: InfoBool(expression, context, refreshCounter)
++void InfoSingle::Initialize()
+ {
+-  m_condition = g_infoManager.TranslateSingleString(expression, m_listItemDependent);
++  m_condition = g_infoManager.TranslateSingleString(m_expression, m_listItemDependent);
+ }
+ 
+ void InfoSingle::Update(const CGUIListItem *item)
+@@ -38,12 +37,11 @@ void InfoSingle::Update(const CGUIListItem *item)
+   m_value = g_infoManager.GetBool(m_condition, m_context, item);
+ }
+ 
+-InfoExpression::InfoExpression(const std::string &expression, int context, unsigned int& refreshCounter)
+-: InfoBool(expression, context, refreshCounter)
++void InfoExpression::Initialize()
+ {
+-  if (!Parse(expression))
++  if (!Parse(m_expression))
+   {
+-    CLog::Log(LOGERROR, "Error parsing boolean expression %s", expression.c_str());
++    CLog::Log(LOGERROR, "Error parsing boolean expression %s", m_expression.c_str());
+     m_expression_tree = std::make_shared<InfoLeaf>(g_infoManager.Register("false", 0), false);
+   }
+ }
+diff --git a/xbmc/interfaces/info/InfoExpression.h b/xbmc/interfaces/info/InfoExpression.h
+index ad70474d45b6..589e0d814a85 100644
+--- a/xbmc/interfaces/info/InfoExpression.h
++++ b/xbmc/interfaces/info/InfoExpression.h
+@@ -34,8 +34,9 @@ namespace INFO
+ class InfoSingle : public InfoBool
+ {
+ public:
+-  InfoSingle(const std::string &condition, int context, unsigned int& refreshCounter);
+-  virtual ~InfoSingle() {};
++  InfoSingle(const std::string &expression, int context, unsigned int &refreshCounter)
++    : InfoBool(expression, context, refreshCounter) {};
++  virtual void Initialize() override;
+ 
+   virtual void Update(const CGUIListItem *item);
+ private:
+@@ -47,9 +48,12 @@ class InfoSingle : public InfoBool
+ class InfoExpression : public InfoBool
+ {
+ public:
+-  InfoExpression(const std::string &expression, int context, unsigned int& refreshCounter);
++  InfoExpression(const std::string &expression, int context, unsigned int &refreshCounter)
++    : InfoBool(expression, context, refreshCounter) {};
+   virtual ~InfoExpression() {};
+ 
++  virtual void Initialize() override;
++
+   virtual void Update(const CGUIListItem *item);
+ private:
+   typedef enum
+
+From 17473572119d8ef5536f9e990c8d826d788b0869 Mon Sep 17 00:00:00 2001
+From: peak3d <pfau@peak3d.de>
+Date: Wed, 14 Jun 2017 16:17:35 +0200
+Subject: [PATCH 2/6] GUIWindowSlideShow: MarkDirtyRegion if new Image is
+ loaded
+
+---
+ xbmc/pictures/GUIWindowSlideShow.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/pictures/GUIWindowSlideShow.cpp b/xbmc/pictures/GUIWindowSlideShow.cpp
+index a4008b1da56a..ea5fb8e71828 100644
+--- a/xbmc/pictures/GUIWindowSlideShow.cpp
++++ b/xbmc/pictures/GUIWindowSlideShow.cpp
+@@ -485,8 +485,8 @@ void CGUIWindowSlideShow::Process(unsigned int currentTime, CDirtyRegionList &re
+       int maxWidth, maxHeight;
+ 
+       GetCheckedSize((float)res.iWidth * m_fZoom,
+-                     (float)res.iHeight * m_fZoom,
+-                     maxWidth, maxHeight);
++        (float)res.iHeight * m_fZoom,
++        maxWidth, maxHeight);
+       m_pBackgroundLoader->LoadPic(m_iCurrentPic, m_iCurrentSlide, picturePath, maxWidth, maxHeight);
+       m_iLastFailedNextSlide = -1;
+       m_bLoadNextPic = false;
+@@ -1143,6 +1143,7 @@ void CGUIWindowSlideShow::OnLoadPic(int iPic, int iSlideNumber, const std::strin
+     // release the texture, and try and reload this pic from scratch
+     m_bErrorMessage = true;
+   }
++  MarkDirtyRegion();
+ }
+ 
+ void CGUIWindowSlideShow::Shuffle()
+
+From 1a634f5ce2022dbfde6bf9516e6f4630424cab54 Mon Sep 17 00:00:00 2001
+From: peak3d <pfau@peak3d.de>
+Date: Mon, 19 Jun 2017 22:56:28 +0200
+Subject: [PATCH 3/6] Prevent GUIListContainer to be treated as GUIControlGroup
+ (wrong type cast)
+
+---
+ xbmc/guilib/CMakeLists.txt       |   2 +
+ xbmc/guilib/GUIControlGroup.cpp  |  95 ++-------------------------------
+ xbmc/guilib/GUIControlGroup.h    |  21 +-------
+ xbmc/guilib/GUIControlLookup.cpp | 110 +++++++++++++++++++++++++++++++++++++++
+ xbmc/guilib/GUIControlLookup.h   |  62 ++++++++++++++++++++++
+ 5 files changed, 181 insertions(+), 109 deletions(-)
+ create mode 100644 xbmc/guilib/GUIControlLookup.cpp
+ create mode 100644 xbmc/guilib/GUIControlLookup.h
+
+diff --git a/xbmc/guilib/CMakeLists.txt b/xbmc/guilib/CMakeLists.txt
+index 80dbc0d79f01..e77934e0c8db 100644
+--- a/xbmc/guilib/CMakeLists.txt
++++ b/xbmc/guilib/CMakeLists.txt
+@@ -14,6 +14,7 @@ set(SOURCES DDSImage.cpp
+             GUIControlFactory.cpp
+             GUIControlGroup.cpp
+             GUIControlGroupList.cpp
++            GUIControlLookup.cpp
+             GUIControlProfiler.cpp
+             GUIDialog.cpp
+             GUIEditControl.cpp
+@@ -94,6 +95,7 @@ set(HEADERS DDSImage.h
+             GUIControlGroup.h
+             GUIControlGroupList.h
+             GUIControlProfiler.h
++            GUIControlLookup.h
+             GUIDialog.h
+             GUIEditControl.h
+             GUIFadeLabelControl.h
+diff --git a/xbmc/guilib/GUIControlGroup.cpp b/xbmc/guilib/GUIControlGroup.cpp
+index 525512a0ddfd..d37af9ddfbf1 100644
+--- a/xbmc/guilib/GUIControlGroup.cpp
++++ b/xbmc/guilib/GUIControlGroup.cpp
+@@ -35,7 +35,7 @@ CGUIControlGroup::CGUIControlGroup()
+ }
+ 
+ CGUIControlGroup::CGUIControlGroup(int parentID, int controlID, float posX, float posY, float width, float height)
+-: CGUIControl(parentID, controlID, posX, posY, width, height)
++: CGUIControlLookup(parentID, controlID, posX, posY, width, height)
+ {
+   m_defaultControl = 0;
+   m_defaultAlways = false;
+@@ -45,7 +45,7 @@ CGUIControlGroup::CGUIControlGroup(int parentID, int controlID, float posX, floa
+ }
+ 
+ CGUIControlGroup::CGUIControlGroup(const CGUIControlGroup &from)
+-: CGUIControl(from)
++: CGUIControlLookup(from)
+ {
+   m_defaultControl = from.m_defaultControl;
+   m_defaultAlways = from.m_defaultAlways;
+@@ -402,31 +402,6 @@ void CGUIControlGroup::UnfocusFromPoint(const CPoint &point)
+   CGUIControl::UnfocusFromPoint(point);
+ }
+ 
+-CGUIControl *CGUIControlGroup::GetControl(int iControl, std::vector<CGUIControl*> *idCollector)
+-{
+-  if (idCollector)
+-    idCollector->clear();
+-
+-  CGUIControl* pPotential(nullptr);
+-
+-  LookupMap::const_iterator first = m_lookup.find(iControl);
+-  if (first != m_lookup.end())
+-  {
+-    LookupMap::const_iterator last = m_lookup.upper_bound(iControl);
+-    for (LookupMap::const_iterator i = first; i != last; ++i)
+-    {
+-      CGUIControl *control = i->second;
+-      if (control->IsVisible())
+-        return control;
+-      else if (idCollector)
+-        idCollector->push_back(control);
+-      else if (!pPotential)
+-        pPotential = control;
+-    }
+-  }
+-  return pPotential;
+-}
+-
+ int CGUIControlGroup::GetFocusedControlID() const
+ {
+   if (m_focusedControl) return m_focusedControl;
+@@ -441,7 +416,8 @@ CGUIControl *CGUIControlGroup::GetFocusedControl() const
+   if (m_focusedControl)
+   {
+     // we may have multiple controls with same id - we pick first that has focus
+-    std::pair<LookupMap::const_iterator, LookupMap::const_iterator> range = m_lookup.equal_range(m_focusedControl);
++    std::pair<LookupMap::const_iterator, LookupMap::const_iterator> range = GetLookupControls(m_focusedControl);
++
+     for (LookupMap::const_iterator i = range.first; i != range.second; ++i)
+     {
+       if (i->second->HasFocus())
+@@ -499,67 +475,6 @@ void CGUIControlGroup::AddControl(CGUIControl *control, int position /* = -1*/)
+   SetInvalid();
+ }
+ 
+-void CGUIControlGroup::AddLookup(CGUIControl *control)
+-{
+-  if (control->IsGroup())
+-  { // first add all the subitems of this group (if they exist)
+-    const LookupMap map = ((CGUIControlGroup *)control)->GetLookup();
+-    for (const auto &i : map)
+-      m_lookup.insert(m_lookup.upper_bound(i.first), std::make_pair(i.first, i.second));
+-  }
+-  if (control->GetID())
+-    m_lookup.insert(m_lookup.upper_bound(control->GetID()), std::make_pair(control->GetID(), control));
+-  // ensure that our size is what it should be
+-  if (m_parentControl)
+-    ((CGUIControlGroup *)m_parentControl)->AddLookup(control);
+-}
+-
+-void CGUIControlGroup::RemoveLookup(CGUIControl *control)
+-{
+-  if (control->IsGroup())
+-  { // remove the group's lookup
+-    const LookupMap &map = ((CGUIControlGroup *)control)->GetLookup();
+-    for (const auto &i : map)
+-    { // remove this control
+-      for (LookupMap::iterator it = m_lookup.begin(); it != m_lookup.end(); ++it)
+-      {
+-        if (i.second == it->second)
+-        {
+-          m_lookup.erase(it);
+-          break;
+-        }
+-      }
+-    }
+-  }
+-  // remove the actual control
+-  if (control->GetID())
+-  {
+-    for (LookupMap::iterator it = m_lookup.begin(); it != m_lookup.end(); ++it)
+-    {
+-      if (control == it->second)
+-      {
+-        m_lookup.erase(it);
+-        break;
+-      }
+-    }
+-  }
+-  if (m_parentControl)
+-    ((CGUIControlGroup *)m_parentControl)->RemoveLookup(control);
+-}
+-
+-bool CGUIControlGroup::IsValidControl(const CGUIControl *control) const
+-{
+-  if (control->GetID())
+-  {
+-    for (const auto &i : m_lookup)
+-    {
+-      if (control == i.second)
+-        return true;
+-    }
+-  }
+-  return false;
+-}
+-
+ bool CGUIControlGroup::InsertControl(CGUIControl *control, const CGUIControl *insertPoint)
+ {
+   // find our position
+@@ -619,7 +534,7 @@ void CGUIControlGroup::ClearAll()
+   }
+   m_focusedControl = 0;
+   m_children.clear();
+-  m_lookup.clear();
++  ClearLookup();
+   SetInvalid();
+ }
+ 
+diff --git a/xbmc/guilib/GUIControlGroup.h b/xbmc/guilib/GUIControlGroup.h
+index 44e1a5e03f95..f43c9e9f13cf 100644
+--- a/xbmc/guilib/GUIControlGroup.h
++++ b/xbmc/guilib/GUIControlGroup.h
+@@ -27,13 +27,13 @@
+ 
+ #include <vector>
+ 
+-#include "GUIControl.h"
++#include "GUIControlLookup.h"
+ 
+ /*!
+  \ingroup controls
+  \brief group of controls, useful for remembering last control + animating/hiding together
+  */
+-class CGUIControlGroup : public CGUIControl
++class CGUIControlGroup : public CGUIControlLookup
+ {
+ public:
+   CGUIControlGroup();
+@@ -67,7 +67,6 @@ class CGUIControlGroup : public CGUIControl
+ 
+   int GetFocusedControlID() const;
+   CGUIControl *GetFocusedControl() const;
+-  virtual CGUIControl *GetControl(int id, std::vector<CGUIControl*> *idCollector = nullptr);
+   virtual CGUIControl *GetFirstFocusableControl(int id);
+ 
+   virtual void AddControl(CGUIControl *control, int position = -1);
+@@ -85,15 +84,6 @@ class CGUIControlGroup : public CGUIControl
+   virtual void DumpTextureUse();
+ #endif
+ protected:
+-  /*!
+-   \brief Check whether a given control is valid
+-   Runs through controls and returns whether this control is valid.  Only functional
+-   for controls with non-zero id.
+-   \param control to check
+-   \return true if the control is valid, false otherwise.
+-   */
+-  bool IsValidControl(const CGUIControl *control) const;
+-
+   // sub controls
+   std::vector<CGUIControl *> m_children, m_idCollector;
+   typedef std::vector<CGUIControl *>::iterator iControls;
+@@ -101,13 +91,6 @@ class CGUIControlGroup : public CGUIControl
+   typedef std::vector<CGUIControl *>::reverse_iterator rControls;
+   typedef std::vector<CGUIControl *>::const_reverse_iterator crControls;
+ 
+-  // fast lookup by id
+-  typedef std::multimap<int, CGUIControl *> LookupMap;
+-  void AddLookup(CGUIControl *control);
+-  void RemoveLookup(CGUIControl *control);
+-  const LookupMap &GetLookup() const { return m_lookup; };
+-  LookupMap m_lookup;
+-
+   int  m_defaultControl;
+   bool m_defaultAlways;
+   int m_focusedControl;
+diff --git a/xbmc/guilib/GUIControlLookup.cpp b/xbmc/guilib/GUIControlLookup.cpp
+new file mode 100644
+index 000000000000..67dbc648659d
+--- /dev/null
++++ b/xbmc/guilib/GUIControlLookup.cpp
+@@ -0,0 +1,110 @@
++/*
++*      Copyright (C) 2017 Team XBMC
++*      http://xbmc.org
++*
++*  This Program is free software; you can redistribute it and/or modify
++*  it under the terms of the GNU General Public License as published by
++*  the Free Software Foundation; either version 2, or (at your option)
++*  any later version.
++*
++*  This Program is distributed in the hope that it will be useful,
++*  but WITHOUT ANY WARRANTY; without even the implied warranty of
++*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++*  GNU General Public License for more details.
++*
++*  You should have received a copy of the GNU General Public License
++*  along with XBMC; see the file COPYING.  If not, see
++*  <http://www.gnu.org/licenses/>.
++*
++*/
++
++#include "GUIControlLookup.h"
++
++CGUIControl *CGUIControlLookup::GetControl(int iControl, std::vector<CGUIControl*> *idCollector)
++{
++  if (idCollector)
++    idCollector->clear();
++
++  CGUIControl* pPotential(nullptr);
++
++  LookupMap::const_iterator first = m_lookup.find(iControl);
++  if (first != m_lookup.end())
++  {
++    LookupMap::const_iterator last = m_lookup.upper_bound(iControl);
++    for (LookupMap::const_iterator i = first; i != last; ++i)
++    {
++      CGUIControl *control = i->second;
++      if (control->IsVisible())
++        return control;
++      else if (idCollector)
++        idCollector->push_back(control);
++      else if (!pPotential)
++        pPotential = control;
++    }
++  }
++  return pPotential;
++}
++
++bool CGUIControlLookup::IsValidControl(const CGUIControl *control) const
++{
++  if (control->GetID())
++  {
++    for (const auto &i : m_lookup)
++    {
++      if (control == i.second)
++        return true;
++    }
++  }
++  return false;
++}
++
++void CGUIControlLookup::AddLookup(CGUIControl *control)
++{
++  CGUIControlLookup *lookupControl(dynamic_cast<CGUIControlLookup*>(control));
++  
++  if (lookupControl)
++  { // first add all the subitems of this group (if they exist)
++    const LookupMap &map(lookupControl->GetLookup());
++    for (const auto &i : map)
++      m_lookup.insert(m_lookup.upper_bound(i.first), std::make_pair(i.first, i.second));
++  }
++  if (control->GetID())
++    m_lookup.insert(m_lookup.upper_bound(control->GetID()), std::make_pair(control->GetID(), control));
++  // ensure that our size is what it should be
++  if (m_parentControl && (lookupControl = dynamic_cast<CGUIControlLookup*>(m_parentControl)))
++    lookupControl->AddLookup(control);
++}
++
++void CGUIControlLookup::RemoveLookup(CGUIControl *control)
++{
++  CGUIControlLookup *lookupControl(dynamic_cast<CGUIControlLookup*>(control));
++  if (lookupControl)
++  { // remove the group's lookup
++    const LookupMap &map(lookupControl->GetLookup());
++    for (const auto &i : map)
++    { // remove this control
++      for (LookupMap::iterator it = m_lookup.begin(); it != m_lookup.end(); ++it)
++      {
++        if (i.second == it->second)
++        {
++          m_lookup.erase(it);
++          break;
++        }
++      }
++    }
++  }
++  // remove the actual control
++  if (control->GetID())
++  {
++    for (LookupMap::iterator it = m_lookup.begin(); it != m_lookup.end(); ++it)
++    {
++      if (control == it->second)
++      {
++        m_lookup.erase(it);
++        break;
++      }
++    }
++  }
++  if (m_parentControl && (lookupControl = dynamic_cast<CGUIControlLookup*>(m_parentControl)))
++    lookupControl->RemoveLookup(control);
++}
+diff --git a/xbmc/guilib/GUIControlLookup.h b/xbmc/guilib/GUIControlLookup.h
+new file mode 100644
+index 000000000000..4234e47c344b
+--- /dev/null
++++ b/xbmc/guilib/GUIControlLookup.h
+@@ -0,0 +1,62 @@
++/*!
++\file GUIControlLookup.h
++\brief
++*/
++
++#pragma once
++
++/*
++*      Copyright (C) 2017 Team XBMC
++*      http://xbmc.org
++*
++*  This Program is free software; you can redistribute it and/or modify
++*  it under the terms of the GNU General Public License as published by
++*  the Free Software Foundation; either version 2, or (at your option)
++*  any later version.
++*
++*  This Program is distributed in the hope that it will be useful,
++*  but WITHOUT ANY WARRANTY; without even the implied warranty of
++*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++*  GNU General Public License for more details.
++*
++*  You should have received a copy of the GNU General Public License
++*  along with XBMC; see the file COPYING.  If not, see
++*  <http://www.gnu.org/licenses/>.
++*
++*/
++
++#include "GUIControl.h"
++
++class CGUIControlLookup : public CGUIControl
++{
++public:
++  CGUIControlLookup()
++    : CGUIControl() {};
++  CGUIControlLookup(int parentID, int controlID, float posX, float posY, float width, float height)
++    : CGUIControl(parentID, controlID, posX, posY, width, height) {};
++
++  virtual CGUIControl *GetControl(int id, std::vector<CGUIControl*> *idCollector = nullptr);
++protected:
++  typedef std::multimap<int, CGUIControl *> LookupMap;
++
++  /*!
++  \brief Check whether a given control is valid
++  Runs through controls and returns whether this control is valid.  Only functional
++  for controls with non-zero id.
++  \param control to check
++  \return true if the control is valid, false otherwise.
++  */
++  bool IsValidControl(const CGUIControl *control) const;
++  std::pair<LookupMap::const_iterator, LookupMap::const_iterator> GetLookupControls(int controlId) const
++  {
++    return m_lookup.equal_range(controlId);
++  };
++
++  // fast lookup by id
++  void AddLookup(CGUIControl *control);
++  void RemoveLookup(CGUIControl *control);
++  const LookupMap &GetLookup() const { return m_lookup; };
++  void ClearLookup() { m_lookup.clear(); };
++private:
++  LookupMap m_lookup;
++};
+
+From 7d0cd64ad9c78247373a6833c8bce4221a823bb4 Mon Sep 17 00:00:00 2001
+From: peak3d <pfau@peak3d.de>
+Date: Tue, 20 Jun 2017 16:35:17 +0200
+Subject: [PATCH 4/6] formatting / one more wrong type cast fixed
+
+---
+ xbmc/addons/GUIDialogAddonInfo.cpp |  2 +-
+ xbmc/guilib/GUIControlGroup.cpp    |  7 ++---
+ xbmc/guilib/GUIControlLookup.cpp   | 47 ++++++++++++++++++++-------------
+ xbmc/guilib/GUIControlLookup.h     | 53 ++++++++++++++++++--------------------
+ xbmc/guilib/GUILabel.h             |  2 +-
+ 5 files changed, 58 insertions(+), 53 deletions(-)
+
+diff --git a/xbmc/addons/GUIDialogAddonInfo.cpp b/xbmc/addons/GUIDialogAddonInfo.cpp
+index bffcfe41aeb9..68ca50d6d96e 100644
+--- a/xbmc/addons/GUIDialogAddonInfo.cpp
++++ b/xbmc/addons/GUIDialogAddonInfo.cpp
+@@ -481,7 +481,7 @@ bool CGUIDialogAddonInfo::SetItem(const CFileItemPtr& item)
+   if (!item || !item->HasAddonInfo())
+     return false;
+ 
+-  m_item = CFileItemPtr(new CFileItem(*item));
++  m_item = std::make_shared<CFileItem>(*item);
+   m_localAddon.reset();
+   CAddonMgr::GetInstance().GetAddon(item->GetAddonInfo()->ID(), m_localAddon, ADDON_UNKNOWN, false);
+   return true;
+diff --git a/xbmc/guilib/GUIControlGroup.cpp b/xbmc/guilib/GUIControlGroup.cpp
+index d37af9ddfbf1..d9f4366f6761 100644
+--- a/xbmc/guilib/GUIControlGroup.cpp
++++ b/xbmc/guilib/GUIControlGroup.cpp
+@@ -522,11 +522,8 @@ bool CGUIControlGroup::RemoveControl(const CGUIControl *control)
+ void CGUIControlGroup::ClearAll()
+ {
+   // first remove from the lookup table
+-  if (m_parentControl)
+-  {
+-    for (auto *control : m_children)
+-      ((CGUIControlGroup *)m_parentControl)->RemoveLookup(control);
+-  }
++  RemoveLookup();
++
+   // and delete all our children
+   for (auto *control : m_children)
+   {
+diff --git a/xbmc/guilib/GUIControlLookup.cpp b/xbmc/guilib/GUIControlLookup.cpp
+index 67dbc648659d..a1dbe957be62 100644
+--- a/xbmc/guilib/GUIControlLookup.cpp
++++ b/xbmc/guilib/GUIControlLookup.cpp
+@@ -1,22 +1,22 @@
+ /*
+-*      Copyright (C) 2017 Team XBMC
+-*      http://xbmc.org
+-*
+-*  This Program is free software; you can redistribute it and/or modify
+-*  it under the terms of the GNU General Public License as published by
+-*  the Free Software Foundation; either version 2, or (at your option)
+-*  any later version.
+-*
+-*  This Program is distributed in the hope that it will be useful,
+-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-*  GNU General Public License for more details.
+-*
+-*  You should have received a copy of the GNU General Public License
+-*  along with XBMC; see the file COPYING.  If not, see
+-*  <http://www.gnu.org/licenses/>.
+-*
+-*/
++ *      Copyright (C) 2017 Team XBMC
++ *      http://xbmc.org
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with XBMC; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
+ 
+ #include "GUIControlLookup.h"
+ 
+@@ -108,3 +108,14 @@ void CGUIControlLookup::RemoveLookup(CGUIControl *control)
+   if (m_parentControl && (lookupControl = dynamic_cast<CGUIControlLookup*>(m_parentControl)))
+     lookupControl->RemoveLookup(control);
+ }
++
++void CGUIControlLookup::RemoveLookup()
++{
++  CGUIControlLookup *lookupControl;
++  if (m_parentControl && (lookupControl = dynamic_cast<CGUIControlLookup*>(m_parentControl)))
++  {
++    const LookupMap map(m_lookup);
++    for (const auto &i : map)
++      lookupControl->RemoveLookup(i.second);
++  }
++}
+diff --git a/xbmc/guilib/GUIControlLookup.h b/xbmc/guilib/GUIControlLookup.h
+index 4234e47c344b..1d610eeb4f8a 100644
+--- a/xbmc/guilib/GUIControlLookup.h
++++ b/xbmc/guilib/GUIControlLookup.h
+@@ -1,39 +1,35 @@
+-/*!
+-\file GUIControlLookup.h
+-\brief
+-*/
++/*
++ *      Copyright (C) 2017 Team XBMC
++ *      http://xbmc.org
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with XBMC; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
+ 
+ #pragma once
+ 
+-/*
+-*      Copyright (C) 2017 Team XBMC
+-*      http://xbmc.org
+-*
+-*  This Program is free software; you can redistribute it and/or modify
+-*  it under the terms of the GNU General Public License as published by
+-*  the Free Software Foundation; either version 2, or (at your option)
+-*  any later version.
+-*
+-*  This Program is distributed in the hope that it will be useful,
+-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+-*  GNU General Public License for more details.
+-*
+-*  You should have received a copy of the GNU General Public License
+-*  along with XBMC; see the file COPYING.  If not, see
+-*  <http://www.gnu.org/licenses/>.
+-*
+-*/
+-
+ #include "GUIControl.h"
+ 
+ class CGUIControlLookup : public CGUIControl
+ {
+ public:
+   CGUIControlLookup()
+-    : CGUIControl() {};
++    : CGUIControl() {}
+   CGUIControlLookup(int parentID, int controlID, float posX, float posY, float width, float height)
+-    : CGUIControl(parentID, controlID, posX, posY, width, height) {};
++    : CGUIControl(parentID, controlID, posX, posY, width, height) {}
++  virtual ~CGUIControlLookup(void) {}
+ 
+   virtual CGUIControl *GetControl(int id, std::vector<CGUIControl*> *idCollector = nullptr);
+ protected:
+@@ -55,8 +51,9 @@ class CGUIControlLookup : public CGUIControl
+   // fast lookup by id
+   void AddLookup(CGUIControl *control);
+   void RemoveLookup(CGUIControl *control);
+-  const LookupMap &GetLookup() const { return m_lookup; };
+-  void ClearLookup() { m_lookup.clear(); };
++  void RemoveLookup();
++  const LookupMap &GetLookup() const { return m_lookup; }
++  void ClearLookup() { m_lookup.clear(); }
+ private:
+   LookupMap m_lookup;
+ };
+diff --git a/xbmc/guilib/GUILabel.h b/xbmc/guilib/GUILabel.h
+index eead41924a2d..007fccb14ea4 100644
+--- a/xbmc/guilib/GUILabel.h
++++ b/xbmc/guilib/GUILabel.h
+@@ -245,5 +245,5 @@ class CGUILabel
+   CRect          m_maxRect;      ///< maximum sizing of text
+   bool           m_invalid;      ///< if true, the label needs recomputing
+   COLOR          m_color;        ///< color to render text \sa SetColor, GetColor
+-  unsigned int   m_maxScrollLoops = ~0;
++  unsigned int   m_maxScrollLoops = ~0U;
+ };
+
+From 44a1f492cde55d3191ccece07fc3e104f975451e Mon Sep 17 00:00:00 2001
+From: peak3d <pfau@peak3d.de>
+Date: Tue, 20 Jun 2017 23:43:02 +0200
+Subject: [PATCH 5/6] Use dynamic_cast instead IsGroup because GUIListContainer
+ are Group as well
+
+---
+ xbmc/guilib/GUIControlGroup.cpp | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
+
+diff --git a/xbmc/guilib/GUIControlGroup.cpp b/xbmc/guilib/GUIControlGroup.cpp
+index d9f4366f6761..28bf8317f9a5 100644
+--- a/xbmc/guilib/GUIControlGroup.cpp
++++ b/xbmc/guilib/GUIControlGroup.cpp
+@@ -431,11 +431,12 @@ CGUIControl *CGUIControlGroup::GetFocusedControl() const
+     // Avoid calling HasFocus() on control group as it will (possibly) recursively
+     // traverse entire group tree just to check if there is focused control.
+     // We are recursively traversing it here so no point in doing it twice.
+-    if (control->IsGroup())
++    CGUIControlGroup *groupControl(dynamic_cast<CGUIControlGroup*>(control));
++    if (groupControl)
+     {
+-      CGUIControl* focusedControl = ((CGUIControlGroup *)control)->GetFocusedControl();
++      CGUIControl* focusedControl = groupControl->GetFocusedControl();
+       if (focusedControl)
+-        return (CGUIControl *)focusedControl;
++        return focusedControl;
+     }
+     else if (control->HasFocus())
+       return (CGUIControl *)control;
+@@ -450,9 +451,9 @@ CGUIControl *CGUIControlGroup::GetFirstFocusableControl(int id)
+   if (id && id == (int) GetID()) return this; // we're focusable and they want us
+   for (auto *pControl : m_children)
+   {
+-    if (pControl->IsGroup())
++    CGUIControlGroup *group(dynamic_cast<CGUIControlGroup*>(pControl));
++    if (group)
+     {
+-      CGUIControlGroup *group = (CGUIControlGroup *)pControl;
+       CGUIControl *control = group->GetFirstFocusableControl(id);
+       if (control) return control;
+     }
+@@ -481,7 +482,8 @@ bool CGUIControlGroup::InsertControl(CGUIControl *control, const CGUIControl *in
+   for (unsigned int i = 0; i < m_children.size(); i++)
+   {
+     CGUIControl *child = m_children[i];
+-    if (child->IsGroup() && ((CGUIControlGroup *)child)->InsertControl(control, insertPoint))
++    CGUIControlGroup *group(dynamic_cast<CGUIControlGroup*>(child));
++    if (group && group->InsertControl(control, insertPoint))
+       return true;
+     else if (child == insertPoint)
+     {
+@@ -506,7 +508,8 @@ bool CGUIControlGroup::RemoveControl(const CGUIControl *control)
+   for (iControls it = m_children.begin(); it != m_children.end(); ++it)
+   {
+     CGUIControl *child = *it;
+-    if (child->IsGroup() && ((CGUIControlGroup *)child)->RemoveControl(control))
++    CGUIControlGroup *group(dynamic_cast<CGUIControlGroup*>(child));
++    if (group && group->RemoveControl(control))
+       return true;
+     if (control == child)
+     {
+
+From a020e3d44719d3fd94856bd78cd4647af016518a Mon Sep 17 00:00:00 2001
+From: peak3d <pfau@peak3d.de>
+Date: Thu, 22 Jun 2017 18:00:46 +0200
+Subject: [PATCH 6/6] Overwrite copy constructor to avoid cloning m_lookup
+
+---
+ xbmc/guilib/GUIControlLookup.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/xbmc/guilib/GUIControlLookup.h b/xbmc/guilib/GUIControlLookup.h
+index 1d610eeb4f8a..f906336a870c 100644
+--- a/xbmc/guilib/GUIControlLookup.h
++++ b/xbmc/guilib/GUIControlLookup.h
+@@ -29,6 +29,8 @@ class CGUIControlLookup : public CGUIControl
+     : CGUIControl() {}
+   CGUIControlLookup(int parentID, int controlID, float posX, float posY, float width, float height)
+     : CGUIControl(parentID, controlID, posX, posY, width, height) {}
++  CGUIControlLookup(const CGUIControlLookup &from)
++    : CGUIControl(from) {}
+   virtual ~CGUIControlLookup(void) {}
+ 
+   virtual CGUIControl *GetControl(int id, std::vector<CGUIControl*> *idCollector = nullptr);

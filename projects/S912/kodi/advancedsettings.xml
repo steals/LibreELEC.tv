@@ -4,10 +4,6 @@
   <cputempcommand>cputemp</cputempcommand>
   <gputempcommand>cputemp</gputempcommand>
 
-  <samba>
-    <clienttimeout>30</clienttimeout>
-  </samba>
-
   <gui>
    <algorithmdirtyregions>1</algorithmdirtyregions>
   </gui>
