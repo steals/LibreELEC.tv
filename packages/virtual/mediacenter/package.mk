@@ -103,7 +103,7 @@ if [ "$MEDIACENTER" = "kodi" ]; then
   if [ "${_ADDONS_OTHER}" = "yes" ]; then
     _add_binary_addon "inputstream.adaptive"
     _add_binary_addon "inputstream.smoothstream"
-    _add_binary_addon "inputstream.rtmp"
+#    _add_binary_addon "inputstream.rtmp"
     _add_binary_addon "imagedecoder.raw"
     _add_binary_addon "vfs.rar"
   fi

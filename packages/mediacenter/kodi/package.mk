@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="kodi"
-PKG_VERSION="355c8ac"
+PKG_VERSION="eea53e6"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -332,6 +332,12 @@ post_makeinstall_target() {
   fi
 
   debug_strip $INSTALL/usr/lib/kodi/kodi.bin
+
+  case $PROJECT in
+    S805|S905|S912)
+      cp $PKG_DIR/scripts/aml-hdmimonitor.sh $INSTALL/usr/lib/kodi/aml-hdmimonitor.sh
+      ;;
+  esac
 }
 
 post_install() {
@@ -344,4 +350,10 @@ post_install() {
   enable_service kodi-waitonnetwork.service
   enable_service kodi.service
   enable_service kodi-lirc-suspend.service
+
+  case $PROJECT in
+    S805|S905|S912)
+      enable_service kodi-aml-hdmimonitor.service
+      ;;
+  esac
 }
