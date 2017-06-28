@@ -31,7 +31,7 @@
     KERNEL_TARGET="Image.lzo"
 
   # Kernel extra targets to build gxm_q200_2G_minix_neo_u9.dtb
-    KERNEL_UBOOT_EXTRA_TARGET="gxm_q200_2G_minix_neo_u9.dtb gxm_q201_1g.dtb gxm_q200_2g.dtb gxm_q201_2g.dtb"
+    KERNEL_UBOOT_EXTRA_TARGET="gxm_q201_1g.dtb gxm_q200_3g.dtb gxm_q201_3g.dtb"
 
   # Build Android kernel image using mkbootimg
     BUILD_ANDROID_BOOTIMG="yes"
@@ -47,8 +47,8 @@
 
   # Kernel to use. values can be:
     LINUX="custom"
-    CUSTOM_VERSION="9.0.0.Nougat-WIP"
-    KERNEL_VERSION="b4ca92d"
+    CUSTOM_VERSION="9.0.0.Nougat-3.14"
+    KERNEL_VERSION="c89478b"
     KERNEL_URL="https://github.com/amillogical/linux-amlogic/archive/$KERNEL_VERSION.tar.gz"
     KERNEL_SOURCE_DIR="linux-amlogic-$KERNEL_VERSION*"
     KERNEL_PATCH_DIRS="amlogic-3.14"
@@ -95,13 +95,13 @@
     KODIPLAYER_DRIVER="libamcodec"
 
   # Modules to install in initramfs for early boot
-    INITRAMFS_MODULES="dwc_otg dwc3 font softcursor bitblit fbcon"
+    INITRAMFS_MODULES="dwc_otg font softcursor bitblit fbcon"
 
   # additional drivers to install:
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
-  # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2 RTL8192CU RTL8192DU RTL8192EU RTL8812AU mt7601u-aml mt7601u-aml mt7603u-aml"
-    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU gpu-aml qca9377-aml media_build mt7601u-aml mt7603u-aml"
+  # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2 RTL8192CU RTL8192DU RTL8192EU RTL8812AU qca9377-aml media_build mt7601u-aml mt7603u-aml gpu-aml-t8xx"
+    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU qca9377-aml media_build mt7601u-aml mt7603u-aml gpu-aml-t8xx"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
