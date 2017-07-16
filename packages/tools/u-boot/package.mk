@@ -152,8 +152,8 @@ makeinstall_target() {
       ;;
     Odroid_C1)
       cp -PRv $PKG_DIR/scripts/update-c1.sh $INSTALL/usr/share/bootloader/update.sh
-      cp -PRv $ROOT/$PKG_BUILD/sd_fuse/bl1.bin.hardkernel $INSTALL/usr/share/bootloader/bl1
-      cp -PRv $ROOT/$PKG_BUILD/sd_fuse/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
+      cp -PRv $PKG_BUILD/sd_fuse/bl1.bin.hardkernel $INSTALL/usr/share/bootloader/bl1
+      cp -PRv $PKG_BUILD/sd_fuse/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
       if [ -f $PROJECT_DIR/$PROJECT/bootloader/boot.ini.new ]; then
         cp -PRv $PROJECT_DIR/$PROJECT/bootloader/boot.ini.new $INSTALL/usr/share/bootloader
       fi
