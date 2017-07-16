@@ -1,0 +1,31 @@
+From ce8274d4e29ebf7058ae51ca535aa5eec9902c7a Mon Sep 17 00:00:00 2001
+From: rbuehlma <rene@buehlmann.net>
+Date: Mon, 13 Mar 2017 13:54:15 +0100
+Subject: [PATCH] Add some missing Lirc mappings for MCE-Remotes (#11828)
+
+---
+ system/Lircmap.xml | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/system/Lircmap.xml b/system/Lircmap.xml
+index faf1f72..022ebb9 100644
+--- a/system/Lircmap.xml
++++ b/system/Lircmap.xml
+@@ -87,6 +87,7 @@
+ 		<myvideo>KEY_VIDEO</myvideo>
+ 		<mymusic>KEY_AUDIO</mymusic>
+ 		<livetv>LiveTV</livetv>
++		<livetv>KEY_TV</livetv>
+ 		<guide>KEY_EPG</guide>
+ 		<one>KEY_1</one>
+ 		<two>KEY_2</two>
+@@ -105,6 +106,9 @@
+ 		<menu>KEY_DVD</menu>
+ 		<clear>KEY_CLEAR</clear>
+ 		<enter>KEY_ENTER</enter>
++		<star>KEY_NUMERIC_STAR</star>
++		<hash>KEY_NUMERIC_POUND</hash>
++		<info>KEY_INFO</info>
+ 	</remote>
+ 	
+ 	<remote device="XboxDVDDongle">
