@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="kodi"
-PKG_VERSION="147cec4"
+PKG_VERSION="cc1f21c"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.kodi.tv"
@@ -30,6 +30,11 @@ PKG_LONGDESC="Kodi Media Center (which was formerly named Xbox Media Center or X
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
+
+if [ "$TARGET_ARCH" = "arm" ]; then
+  CFLAGS="$CFLAGS -mthumb"
+  CXXFLAGS="$CXXFLAGS -mthumb"
+fi
 
 PKG_CMAKE_SCRIPT="$PKG_BUILD/project/cmake/CMakeLists.txt"
 
