@@ -57,7 +57,7 @@
     KERNEL_MAKE_EXTRACMD="dtbs"
 
   # Kernel to use. values can be:
-    CUSTOM_VERSION="8.0.4a"
+    CUSTOM_VERSION="8.0.4b"
     LINUX="custom"
     KERNEL_VERSION="3eeaf4f"
     KERNEL_SOURCE_DIR="linux-C1-$KERNEL_VERSION*"
