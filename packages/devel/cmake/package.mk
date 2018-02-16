@@ -29,6 +29,8 @@ PKG_LONGDESC="CMake is used to control the software compilation process using si
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
+PKG_USE_MESON="no"
+PKG_USE_NINJA="no"
 
 configure_host() {
   ../configure --prefix=$TOOLCHAIN \
