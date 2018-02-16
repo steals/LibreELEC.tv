@@ -31,6 +31,7 @@ PKG_LONGDESC="Kodi Media Center (which was formerly named Xbox Media Center or X
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
+PKG_USE_NINJA="no"
 
 if [ "$TARGET_ARCH" = "arm" ]; then
   CFLAGS="$CFLAGS -mthumb"
