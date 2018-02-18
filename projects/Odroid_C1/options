@@ -59,9 +59,12 @@
   # Kernel to use. values can be:
     CUSTOM_VERSION="8.0.4b"
     LINUX="custom"
-    KERNEL_VERSION="3eeaf4f"
-    KERNEL_SOURCE_DIR="linux-C1-$KERNEL_VERSION*"
-    KERNEL_URL="https://github.com/wrxtasy/linux-C1/archive/$KERNEL_VERSION.tar.gz"
+    KERNEL_VERSION="c3b179b"
+    #KERNEL_VERSION="3eeaf4f"
+    #KERNEL_SOURCE_DIR="linux-C1-$KERNEL_VERSION*"
+    KERNEL_SOURCE_DIR="linux-$KERNEL_VERSION*"
+    #KERNEL_URL="https://github.com/wrxtasy/linux-C1/archive/$KERNEL_VERSION.tar.gz"
+    KERNEL_URL="https://github.com/steals/linux/archive/$KERNEL_VERSION.tar.gz"
 
 ################################################################################
 # setup build defaults
@@ -113,7 +116,8 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2 RTL8188EU"
-    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU"
+    ADDITIONAL_DRIVERS=""
+    #ADDITIONAL_DRIVERS="MT7601 RTL8192CU RTL8192DU RTL8192EU RTL8812AU"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
