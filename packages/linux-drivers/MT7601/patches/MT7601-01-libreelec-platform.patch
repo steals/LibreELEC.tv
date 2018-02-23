@@ -1,0 +1,81 @@
+diff --git a/src/Makefile b/src/Makefile
+index dfe1283..dbce54f 100755
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -27,7 +27,7 @@ include $(RT28xx_DIR)/os/linux/config.mk
+ RTMP_SRC_DIR = $(RT28xx_DIR)/RT$(MODULE)
+ 
+ #PLATFORM: Target platform
+-PLATFORM = PC
++#PLATFORM = PC
+ #PLATFORM = 5VT
+ #PLATFORM = IKANOS_V160
+ #PLATFORM = IKANOS_V180
+@@ -64,6 +64,7 @@ PLATFORM = PC
+ #PLATFORM = UBICOM_IPX8
+ #PLATFORM = INTELP6
+ #PLATFORM = MSTARTV
++PLATFORM = LibreElec
+ 
+ #APSOC
+ ifeq ($(MODULE),3050)
+@@ -101,6 +102,14 @@ MODULE = $(shell pwd | sed "s/.*\///" ).o
+ export MODULE
+ endif
+ 
++$(info $$PLATFORM is [${PLATFORM}])
++ifeq ($(PLATFORM),LibreElec)
++ARCH = arm
++LINUX_SRC = 
++LINUX_SRC_MODULE =
++CROSS_COMPILE = 
++endif
++
+ ifeq ($(PLATFORM),5VT)
+ LINUX_SRC = /home/ralink-2860-sdk-5vt-distribution/linux-2.6.17
+ CROSS_COMPILE = /opt/crosstool/uClibc_v5te_le_gcc_4_1_1/bin/arm-linux-
+@@ -346,7 +355,7 @@ THREADX:
+ 
+ LINUX:
+ ifneq (,$(findstring 2.4,$(LINUX_SRC)))
+-
++$(info 2.4 kernel)
+ ifeq ($(OSABL),YES)
+ 	cp -f os/linux/Makefile.4.util $(RT28xx_DIR)/os/linux/Makefile
+ 	$(MAKE) -C $(RT28xx_DIR)/os/linux/
+@@ -390,7 +399,6 @@ ifeq ($(OSABL),YES)
+ 	cp -f os/linux/Makefile.6.util $(RT28xx_DIR)/os/linux/Makefile
+ 	$(MAKE) -C $(LINUX_SRC) SUBDIRS=$(RT28xx_DIR)/os/linux modules
+ endif
+-
+ 	cp -f os/linux/Makefile.6 $(RT28xx_DIR)/os/linux/Makefile
+ ifeq ($(PLATFORM),DM6446)
+ 	$(MAKE)  ARCH=arm CROSS_COMPILE=arm_v5t_le- -C  $(LINUX_SRC) SUBDIRS=$(RT28xx_DIR)/os/linux modules
+@@ -398,9 +406,14 @@ else
+ ifeq ($(PLATFORM),FREESCALE8377)
+ 	$(MAKE) ARCH=powerpc CROSS_COMPILE=$(CROSS_COMPILE) -C  $(LINUX_SRC) SUBDIRS=$(RT28xx_DIR)/os/linux modules
+ else
++ifeq ($(PLATFORM),LibreElec)
++	$(MAKE) ARCH=arm CROSS_COMPILE=$(CROSS_COMPILE) -C $(LINUX_SRC) SUBDIRS=$(RT28xx_DIR)/os/linux modules
++else
+ 	$(MAKE) -C $(LINUX_SRC) SUBDIRS=$(RT28xx_DIR)/os/linux modules
+ endif
+ endif
++endif
++
+ 
+ ifeq ($(OSABL),YES)
+ 	cp -f os/linux/Makefile.6.netif $(RT28xx_DIR)/os/linux/Makefile
+diff --git a/src/os/linux/config.mk b/src/os/linux/config.mk
+index 531b00e..0a76f9b 100755
+--- a/src/os/linux/config.mk
++++ b/src/os/linux/config.mk
+@@ -1178,3 +1178,8 @@ ifeq ($(PLATFORM),RALINK_3352)
+ CFLAGS := -D__KERNEL__ -I$(LINUX_SRC)/include/asm-mips/mach-generic -I$(LINUX_SRC)/include -Wall -Wstrict-prototypes -Wno-trigraphs -O2 -fno-strict-aliasing -fno-common -fomit-frame-pointer -G 0 -mno-abicalls -fno-pic -pipe  -finline-limit=100000 -march=mips2 -mabi=32 -Wa,--trap -DLINUX -nostdinc -iwithprefix include $(WFLAGS)
+ export CFLAGS
+ endif
++
++ifeq ($(PLATFORM),LibreElec)
++    EXTRA_CFLAGS := $(WFLAGS) -I$(RT28xx_DIR)/include
++    export EXTRA_CFLAGS
++endif
