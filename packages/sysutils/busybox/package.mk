@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="busybox"
-PKG_VERSION="1.25.1"
+PKG_VERSION="1.27.2"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.busybox.net"
@@ -44,6 +44,21 @@ PKG_MAKE_OPTS_INIT="ARCH=$TARGET_ARCH \
                     KBUILD_VERBOSE=1 \
                     install"
 
+# F2FS support
+  if [ "$F2FS_SUPPORT" = "yes" ] ; then
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET f2fs-tools"
+  fi
+
+# BTRFS support
+  if [ "$BTRFS_SUPPORT" = "yes" ] ; then
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET btrfs-progs-system"
+  fi
+
+# XFS support
+  if [ "$XFS_SUPPORT" = "yes" ] ; then
+    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET xfsprogs"
+  fi
+
 # nano text editor
   if [ "$NANO_EDITOR" = "yes" ]; then
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET nano"
@@ -65,6 +80,9 @@ if [ -f $PROJECT_DIR/$PROJECT/busybox/busybox-init.conf ]; then
 else
   BUSYBOX_CFG_FILE_INIT=$PKG_DIR/config/busybox-init.conf
 fi
+
+# dont build parallel
+MAKEFLAGS=-j1
 
 pre_build_target() {
   mkdir -p $PKG_BUILD/.$TARGET_NAME
@@ -158,7 +176,6 @@ makeinstall_target() {
     cp $PKG_DIR/scripts/createlog $INSTALL/usr/bin/
     cp $PKG_DIR/scripts/lsb_release $INSTALL/usr/bin/
     cp $PKG_DIR/scripts/apt-get $INSTALL/usr/bin/
-    cp $PKG_DIR/scripts/passwd $INSTALL/usr/bin/
     cp $PKG_DIR/scripts/sudo $INSTALL/usr/bin/
     cp $PKG_DIR/scripts/pastebinit $INSTALL/usr/bin/
     ln -sf pastebinit $INSTALL/usr/bin/paste
@@ -174,9 +191,6 @@ makeinstall_target() {
     cp $PKG_DIR/config/inputrc $INSTALL/etc
     cp $PKG_DIR/config/httpd.conf $INSTALL/etc
     cp $PKG_DIR/config/suspend-modules.conf $INSTALL/etc
-
-  mkdir -p $INSTALL/usr/config/sysctl.d
-    cp $PKG_DIR/config/transmission.conf $INSTALL/usr/config/sysctl.d
 
   # /etc/fstab is needed by...
     touch $INSTALL/etc/fstab
