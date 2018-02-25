@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="fontconfig"
-PKG_VERSION="2.12.1"
+PKG_VERSION="2.12.6"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.fontconfig.org"

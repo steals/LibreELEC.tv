@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="binutils"
-PKG_VERSION="2.27"
+PKG_VERSION="2.30"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.gnu.org/software/binutils/"
@@ -46,6 +46,8 @@ PKG_CONFIGURE_OPTS_HOST="--target=$TARGET_NAME \
                          --enable-lto \
                          --disable-nls"
 
+PKG_CONFIGURE_OPTS_TARGET="--enable-shared=no"
+
 pre_configure_host() {
   unset CPPFLAGS
   unset CFLAGS
@@ -58,7 +60,19 @@ make_host() {
   make
 }
 
+make_target() {
+  make configure-host
+  make -C libiberty
+  make -C bfd
+  make -C binutils ar
+}
+
 makeinstall_host() {
   cp -v ../include/libiberty.h $SYSROOT_PREFIX/usr/include
   make install
+}
+
+makeinstall_target() {
+  mkdir -p $INSTALL/usr/bin
+  cp binutils/ar $INSTALL/usr/bin
 }
