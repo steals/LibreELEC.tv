@@ -57,7 +57,7 @@
     KERNEL_MAKE_EXTRACMD="dtbs"
 
   # Kernel to use. values can be:
-    CUSTOM_VERSION="8.0.4a"
+    CUSTOM_VERSION="8.2.5"
     LINUX="custom"
     KERNEL_VERSION="3eeaf4f"
     KERNEL_SOURCE_DIR="linux-C1-$KERNEL_VERSION*"
@@ -113,7 +113,7 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2 RTL8188EU"
-    ADDITIONAL_DRIVERS="RTL8192CU RTL8192DU RTL8192EU RTL8812AU"
+    ADDITIONAL_DRIVERS="MT7601 RTL8192CU RTL8192DU RTL8192EU RTL8812AU"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
