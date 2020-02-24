@@ -1,0 +1,15 @@
+diff --git a/src/include/os/rt_linux.h b/src/include/os/rt_linux.h
+index 154eb73..2c68208 100755
+--- a/src/include/os/rt_linux.h
++++ b/src/include/os/rt_linux.h
+@@ -286,8 +286,8 @@ typedef struct _OS_FS_INFO_
+ 	int				fsuid;
+ 	int				fsgid;
+ #else
+-	kuid_t				fsuid;
+-	kgid_t				fsgid;
++	int				fsuid;
++	int				fsgid;
+ #endif
+ 	mm_segment_t	fs;
+ } OS_FS_INFO;

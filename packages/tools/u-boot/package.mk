@@ -76,7 +76,7 @@ make_target() {
   done
 
   for UBOOT_TARGET in $UBOOT_CONFIG; do
-    if [ "$UBOOT_VERSION" = "hardkernel" -o "$UBOOT_VERSION" = "lepotato" ]; then
+    if [ "$PROJECT" = "Odroid_C2" ]; then
       export PATH=$TOOLCHAIN/lib/gcc-linaro-aarch64-elf/bin/:$TOOLCHAIN/lib/gcc-linaro-arm-eabi/bin/:$PATH
       CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make mrproper
       CROSS_COMPILE=aarch64-elf- ARCH=arm CFLAGS="" LDFLAGS="" make $UBOOT_TARGET
@@ -140,28 +140,10 @@ makeinstall_target() {
 
   cp -PR $PROJECT_DIR/$PROJECT/bootloader/uEnv*.txt $INSTALL/usr/share/bootloader 2>/dev/null || :
 
-  case $UBOOT_VERSION in
-    hardkernel)
+  case $PROJECT in
+    Odroid_C2)
       cp -PRv $PKG_DIR/scripts/update-c2.sh $INSTALL/usr/share/bootloader/update.sh
       cp -PRv $PKG_BUILD/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
-      if [ -f $PROJECT_DIR/$PROJECT/bootloader/boot.ini ]; then
-        cp -PRv $PROJECT_DIR/$PROJECT/bootloader/boot.ini $INSTALL/usr/share/bootloader
-      fi
-      if [ -f $PROJECT_DIR/$PROJECT/bootloader/C2/boot.ini ]; then
-        cp -PRv $PROJECT_DIR/$PROJECT/bootloader/C2/boot.ini $INSTALL/usr/share/bootloader
-      fi
-      if [ -f $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz ]; then
-        cp -PRv $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz $INSTALL/usr/share/bootloader
-      elif [ -f $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz ]; then
-        cp -PRv $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz $INSTALL/usr/share/bootloader
-      fi
-      ;;
-    lepotato)
-      mv -v $PKG_BUILD/fip/gxl/u-boot.bin.sd.bin $PKG_BUILD/u-boot.bin
-      cp -PRv $PKG_BUILD/u-boot.bin $INSTALL/usr/share/bootloader/u-boot
-      if [ -f $PROJECT_DIR/$PROJECT/bootloader/LePotato/boot.ini ]; then
-        cp -PRv $PROJECT_DIR/$PROJECT/bootloader/LePotato/boot.ini $INSTALL/usr/share/bootloader
-      fi
       if [ -f $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz ]; then
         cp -PRv $PROJECT_DIR/$PROJECT/splash/boot-logo.bmp.gz $INSTALL/usr/share/bootloader
       elif [ -f $DISTRO_DIR/$DISTRO/splash/boot-logo.bmp.gz ]; then
