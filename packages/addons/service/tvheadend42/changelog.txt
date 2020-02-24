@@ -1,5 +1,6 @@
 113
-- update to 4.2.5
+- update to 4.2.6-7
+- full transcoding support
 
 112
 - update to 4.2.3-20

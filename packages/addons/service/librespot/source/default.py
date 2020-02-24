@@ -29,7 +29,6 @@ import xbmcgui
 PORT = '6666'
 SINK = 'librespot_sink'
 
-
 def suspendSink(bit):
    subprocess.call(['pactl', 'suspend-sink', SINK, bit])
 
@@ -66,6 +65,8 @@ class Controller(threading.Thread):
                self.player.play()
             elif command[0] == 'stop':
                self.player.stop()
+            elif command[0] == 'pause':
+               self.player.pause()
       try:
          os.unlink(self.FIFO)
       except OSError:
@@ -103,10 +104,15 @@ class Player(xbmc.Player):
       if not self.isPlaying() and xbmcaddon.Addon().getSetting('ls_O') == 'Kodi':
          suspendSink('0')
          listitem = xbmcgui.ListItem(xbmcaddon.Addon().getAddonInfo('name'))
+         listitem.addStreamInfo('audio',{'codec': 'mp3'})
          listitem.setArt({'thumb': xbmcaddon.Addon().getAddonInfo('icon')})
          super(Player, self).play(self.ITEM, listitem)
          del listitem
          xbmcgui.Window(12006).show()
+
+   def pause(self):
+      if self.isPlaying() and self.getPlayingFile() == self.ITEM:
+         super(Player, self).pause()
 
    def stop(self):
       suspendSink('1')

@@ -29,10 +29,10 @@ if [ "$UBOOT_VERSION" = "imx6-cuboxi" ]; then
 elif [ "$UBOOT_VERSION" = "hardkernel" ]; then
     PKG_SITE="https://github.com/hardkernel/u-boot"
   if [ "$PROJECT" = "Odroid_C1" ]; then
-    PKG_VERSION="86125f8"
+    PKG_VERSION="b7b8dc2"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-arm-none-eabi:host"
   elif [ "$PROJECT" = "Odroid_C2" ]; then
-    PKG_VERSION="6e4e886"
+    PKG_VERSION="095fbe"
     PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET gcc-linaro-aarch64-elf:host gcc-linaro-arm-eabi:host"
   fi
     PKG_URL="https://github.com/hardkernel/u-boot/archive/$PKG_VERSION.tar.gz"
