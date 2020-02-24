@@ -56,7 +56,7 @@ ORIGIN_URL="$(git remote -v | awk '$1 == "origin" { print $2 }' | head -1 | sed 
 if [ "$OFFICIAL" = "yes" ]; then
   LIBREELEC_BUILD="official"
 else
-  LIBREELEC_BUILD="WRXTASY"
+  LIBREELEC_BUILD="community"
 fi
 
 if [ -n "$CUSTOM_VERSION" ]; then
