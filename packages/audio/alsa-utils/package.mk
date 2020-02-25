@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="alsa-utils"
-PKG_VERSION="1.1.4"
+PKG_VERSION="1.1.8"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.alsa-project.org/"
@@ -45,6 +45,10 @@ post_makeinstall_target() {
   rm -rf $INSTALL/usr/share/alsa/speaker-test
   rm -rf $INSTALL/usr/share/sounds
   rm -rf $INSTALL/usr/lib/systemd/system
+
+# install sample asound.conf
+  mkdir -p $INSTALL/usr/config
+  cp $PKG_DIR/config/* $INSTALL/usr/config/
 
 # remove default udev rule to restore mixer configs, we install our own.
 # so we avoid resetting our soundconfig
