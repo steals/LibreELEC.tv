@@ -59,9 +59,12 @@
   # Kernel to use. values can be:
     CUSTOM_VERSION="8.2.5a"
     LINUX="custom"
-    KERNEL_VERSION="3eeaf4f"
-    KERNEL_SOURCE_DIR="linux-C1-$KERNEL_VERSION*"
-    KERNEL_URL="https://github.com/wrxtasy/linux-C1/archive/$KERNEL_VERSION.tar.gz"
+    #KERNEL_VERSION="3eeaf4f" #wrxtasy
+    KERNEL_VERSION="bb2990d" #hardkernel
+    #KERNEL_VERSION="aec25f6" #steals
+    KERNEL_SOURCE_DIR="linux-$KERNEL_VERSION*"
+    KERNEL_URL="https://github.com/hardkernel/linux/archive/$KERNEL_VERSION.tar.gz"
+    #KERNEL_URL="https://github.com/wrxtasy/linux-C1/archive/$KERNEL_VERSION.tar.gz"
 
 ################################################################################
 # setup build defaults
@@ -113,7 +116,7 @@
   # for a list of additinoal drivers see packages/linux-drivers
   # Space separated list is supported,
   # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2 RTL8188EU"
-    ADDITIONAL_DRIVERS="MT7601 RTL8192CU RTL8192DU RTL8192EU RTL8812AU"
+    ADDITIONAL_DRIVERS="MT7601"
 
   # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
   # Space separated list is supported,
@@ -129,11 +132,15 @@
   # build with installer (yes / no)
     INSTALLER_SUPPORT="no"
 
+ # extra build dependeices
+    EXTRA_DEPS="mkimage"
+    EXTRA_DEPS_PKG="u-boot-tools"
+
   # kernel image name
-    KERNEL_NAME="KERNEL"
+    KERNEL_NAME="kernel.img"
 
   # set the addon dirs
-    ADDON_PATH="$ADDON_VERSION/WeTek_Play/$TARGET_ARCH"
+    ADDON_PATH="http://kszaq.libreelec.tv/addons"
     ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
 
   # build and install CEC adapter support (yes / no)
@@ -141,3 +148,10 @@
 
   # build and install CEC framework support (yes / no)
     CEC_FRAMEWORK_SUPPORT="no"
+
+  # additional packages to install:
+  # Space separated list is supported,
+  # e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
+    ADDITIONAL_PACKAGES="autoscript-amlogic"
+
+   OEM_SUPPORT="yes"
