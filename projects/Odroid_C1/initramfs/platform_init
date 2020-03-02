@@ -85,7 +85,7 @@ echo 0 > /sys/class/graphics/fb1/blank
 echo 1,2 > /proc/irq/40/smp_affinity_list
 
 # Extinguish Blue Disco Kernel LED
-echo none > /sys/class/leds/blue:heartbeat/trigger
+#echo none > /sys/class/leds/blue:heartbeat/trigger
 
 # Include deinterlacer into default VFM map
 echo rm default > /sys/class/vfm/map
