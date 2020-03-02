@@ -12,8 +12,8 @@ Subject: [PATCH] GPU: Mali turbo test
 
 diff --git a/drivers/amlogic/gpu/mali/Kbuild b/drivers/amlogic/gpu/mali/Kbuild
 index c3d4cc4..26dffdf 100644
---- a/drivers/amlogic/gpu/mali/Kbuild
-+++ b/drivers/amlogic/gpu/mali/Kbuild
+--- a/drivers/gpu/arm/mali/Kbuild
++++ b/drivers/gpu/arm/mali/Kbuild
 @@ -41,7 +41,7 @@ endif
  
  OS_MEMORY_KERNEL_BUFFER_SIZE_IN_MB ?= 16
@@ -25,8 +25,8 @@ index c3d4cc4..26dffdf 100644
  
 diff --git a/drivers/amlogic/gpu/mali/common/mali_executor.c b/drivers/amlogic/gpu/mali/common/mali_executor.c
 index 346285e..165655b 100644
---- a/drivers/amlogic/gpu/mali/common/mali_executor.c
-+++ b/drivers/amlogic/gpu/mali/common/mali_executor.c
+--- a/drivers/gpu/arm/mali/common/mali_executor.c
++++ b/drivers/gpu/arm/mali/common/mali_executor.c
 @@ -101,7 +101,7 @@ static u32 num_physical_pp_cores_total = 0;
  static u32 num_physical_pp_cores_enabled = 0;
  
@@ -38,8 +38,8 @@ index 346285e..165655b 100644
  static _mali_osk_wait_queue_t *executor_working_wait_queue = NULL;
 diff --git a/drivers/amlogic/gpu/mali/platform/meson_m450/platform_m8b.c b/drivers/amlogic/gpu/mali/platform/meson_m450/platform_m8b.c
 index 7ab17d2..92acae0 100644
---- a/drivers/amlogic/gpu/mali/platform/meson_m450/platform_m8b.c
-+++ b/drivers/amlogic/gpu/mali/platform/meson_m450/platform_m8b.c
+--- a/drivers/gpu/arm/mali/platform/meson_m450/platform_m8b.c
++++ b/drivers/gpu/arm/mali/platform/meson_m450/platform_m8b.c
 @@ -32,9 +32,9 @@
   *
   */
@@ -66,8 +66,8 @@ index 7ab17d2..92acae0 100644
      .clk_sample = mali_dvfs_clk_sample, /* freqency table for show. */
 diff --git a/drivers/amlogic/gpu/mali/platform/meson_m450/scaling.c b/drivers/amlogic/gpu/mali/platform/meson_m450/scaling.c
 index d81a88d..e1ebb43 100644
---- a/drivers/amlogic/gpu/mali/platform/meson_m450/scaling.c
-+++ b/drivers/amlogic/gpu/mali/platform/meson_m450/scaling.c
+--- a/drivers/gpu/arm/mali/platform/meson_m450/scaling.c
++++ b/drivers/gpu/arm/mali/platform/meson_m450/scaling.c
 @@ -32,7 +32,7 @@ static int lastStep;
  static struct work_struct wq_work;
  static mali_plat_info_t* pmali_plat = NULL;
