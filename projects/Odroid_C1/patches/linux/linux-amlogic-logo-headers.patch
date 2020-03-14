@@ -1,0 +1,961 @@
+diff --git a/include/linux/amlogic/logo/amlogo_log.h b/include/linux/amlogic/logo/amlogo_log.h
+old mode 100644
+new mode 100755
+index 532c752c..4aa9ce9b
+--- a/include/linux/amlogic/logo/amlogo_log.h
++++ b/include/linux/amlogic/logo/amlogo_log.h
+@@ -1,27 +1,26 @@
+-#ifndef  AMLOGO_LOG_H
+-#define AMLOGO_LOG_H
+-
+-#define DEBUG
+-#ifdef  DEBUG
+-#define  AMLOG   1
+-#define LOG_LEVEL_VAR amlog_level_logo
+-#define LOG_MASK_VAR amlog_mask_logo
+-#endif
+-
+-#define  	LOG_LEVEL_MAX 	0xf
+-#define	LOG_MASK_ALL	0x0
+-
+-#define  	LOG_LEVEL_HIGH    		0x00f
+-#define	LOG_LEVEL_1				0x001
+-#define 	LOG_LEVEL_LOW			0x000
+-
+-#define LOG_LEVEL_DESC \
+-"[0x00]LOW[0X01]LEVEL1[0xf]HIGH"	
+-#define	LOG_MASK_LOADER		0x001
+-#define	LOG_MASK_PARSER		0x002
+-#define	LOG_MASK_DEVICE			0x004
+-#define	LOG_MASK_DESC \
+-"[01]LOADER[02]PARSER[04]DEVICE"	
+-
+-#endif
+-
++#ifndef  AMLOGO_LOG_H
++#define AMLOGO_LOG_H
++
++#define DEBUG
++#ifdef  DEBUG
++#define  AMLOG   1
++#define LOG_LEVEL_VAR amlog_level_logo
++#define LOG_MASK_VAR amlog_mask_logo
++#endif
++
++#define  	LOG_LEVEL_MAX 	0xf
++#define	LOG_MASK_ALL	0x0
++
++#define  	LOG_LEVEL_HIGH    		0x00f
++#define	LOG_LEVEL_1				0x001
++#define 	LOG_LEVEL_LOW			0x000
++
++#define LOG_LEVEL_DESC \
++"[0x00]LOW[0X01]LEVEL1[0xf]HIGH"
++#define	LOG_MASK_LOADER		0x001
++#define	LOG_MASK_PARSER		0x002
++#define	LOG_MASK_DEVICE			0x004
++#define	LOG_MASK_DESC \
++"[01]LOADER[02]PARSER[04]DEVICE"
++
++#endif
+diff --git a/include/linux/amlogic/logo/bmp_parser.h b/include/linux/amlogic/logo/bmp_parser.h
+old mode 100644
+new mode 100755
+index c9ff6262..a810c792
+--- a/include/linux/amlogic/logo/bmp_parser.h
++++ b/include/linux/amlogic/logo/bmp_parser.h
+@@ -1,27 +1,27 @@
+-#ifndef  BMP_PARSER_H_
+-#define BMP_PARSER_H_
+-
+-//parser
+-#define  U32   		unsigned int 
+-#define  U16   		unsigned short 
+-#define  U8			unsigned char
+-#define  INT32		int
+-#define	INT16		short
+-#define  UINT8 		U8
+-#define  UINT16		U16
+-#define  UINT32		U32
++#ifndef  BMP_PARSER_H_
++#define BMP_PARSER_H_
++
++//parser
++#define  U32   		unsigned int
++#define  U16   		unsigned short
++#define  U8			unsigned char
++#define  INT32		int
++#define	INT16		short
++#define  UINT8 		U8
++#define  UINT16		U16
++#define  UINT32		U32
+ #pragma pack(1)
+ typedef struct tagBITMAPFILEHEADER
+ {
+ 	U16	bfType;  //BM
+-	U32 bfSize;   //file size 
++	U32 bfSize;   //file size
+ 	U16	bfReserved1;  //0
+ 	U16	bfReserved2;  //0
+-	U32 bfOffBits;  	//bitmap data offset to  file header	
++	U32 bfOffBits;  	//bitmap data offset to  file header
+ } BITMAPFILEHEADER;
+ 
+ typedef struct tagBITMAPINFOHEADER{
+-	U32 biSize;  //this structure occupy size 
++	U32 biSize;  //this structure occupy size
+ 	U32	biWidth; //bitmap width (pixel unit)
+ 	U32 biHeight; //bitmap height (pixel unit)
+ 	U16 biPlanes; // 1
+@@ -29,22 +29,22 @@ typedef struct tagBITMAPINFOHEADER{
+ 			// 4(16color) 8(256 color) 24(true color)
+ 	U32 biCompression; // bitmap compresstion type must be one of 0 (uncompress)
+ 					  // 1(BI_RLE8) 2(BI_RLE4)
+-	U32 biSizeImage; 	// bitmap size 
++	U32 biSizeImage; 	// bitmap size
+ 	U32	biXPelsPerMeter; //bitmap horizontal resolution.
+ 	U32	biYPelsPerMeter; //bitmap vertical resolution.
+ 	U32 biClrUsed;	//bitmap used color number.
+ 	U32 biClrImportant;//bitmap most important color number during display process.
+ } BITMAPINFOHEADER;
+-#pragma pack()
+-
+-typedef  struct {
+-	BITMAPFILEHEADER *bmp_file_header;
+-	BITMAPINFOHEADER *bmp_info_header;
+-}bmp_header_t;
+-
+-static int bmp_init(logo_object_t *logo) ;
+-static  int  bmp_decode(logo_object_t *plogo);
+-static int  bmp_deinit(logo_object_t *plogo);
+-
+-
+-#endif
++#pragma pack()
++
++typedef  struct {
++	BITMAPFILEHEADER *bmp_file_header;
++	BITMAPINFOHEADER *bmp_info_header;
++}bmp_header_t;
++
++static int bmp_init(logo_object_t *logo) ;
++static  int  bmp_decode(logo_object_t *plogo);
++static int  bmp_deinit(logo_object_t *plogo);
++
++
++#endif
+diff --git a/include/linux/amlogic/logo/dev_ge2d.h b/include/linux/amlogic/logo/dev_ge2d.h
+old mode 100644
+new mode 100755
+index 935cb1fb..cedea82d
+--- a/include/linux/amlogic/logo/dev_ge2d.h
++++ b/include/linux/amlogic/logo/dev_ge2d.h
+@@ -1,17 +1,17 @@
+-#ifndef  DEV_GE2D_H
+-#define DEV_GE2D_H
+-#include <linux/amlogic/amports/canvas.h>
+-#include <linux/amlogic/ge2d/ge2d.h> 
+-typedef  struct {
+-	rectangle_t  src_rect;
+-	rectangle_t  dst_rect;
+-	unsigned int		color;
+-}src_dst_info_t;
+-
+-#define		CMD_FILLRECT			0x1
+-#define		CMD_BITBLT				0x2
+-#define		CMD_STRETCH_BLIT		0x3
+-
+-extern ge2d_context_t*	dev_ge2d_setup(void* para);
+-extern int	dev_ge2d_cmd(ge2d_context_t *context ,int  cmd,src_dst_info_t  *info);
+-#endif
++#ifndef  DEV_GE2D_H
++#define DEV_GE2D_H
++#include <linux/amlogic/amports/canvas.h>
++#include <linux/amlogic/ge2d/ge2d.h>
++typedef  struct {
++	rectangle_t  src_rect;
++	rectangle_t  dst_rect;
++	unsigned int		color;
++}src_dst_info_t;
++
++#define		CMD_FILLRECT			0x1
++#define		CMD_BITBLT				0x2
++#define		CMD_STRETCH_BLIT		0x3
++
++extern ge2d_context_t*	dev_ge2d_setup(void* para);
++extern int	dev_ge2d_cmd(ge2d_context_t *context ,int  cmd,src_dst_info_t  *info);
++#endif
+diff --git a/include/linux/amlogic/logo/err_code.h b/include/linux/amlogic/logo/err_code.h
+old mode 100644
+new mode 100755
+index 587ec791..c9f11d01
+--- a/include/linux/amlogic/logo/err_code.h
++++ b/include/linux/amlogic/logo/err_code.h
+@@ -1,25 +1,24 @@
+-#ifndef  ERR_CODE_H_
+-#define ERR_CODE_H_
+-
+-#define   TRUE		1
+-#define	FALSE		0
+-#define	SUCCESS	0
+-#define	FAIL		1
+-
+-
+-#define	LOGO_PARA_UNPARSED	0x30001
+-//parser
+-
+-#define    ENOPARSER				0x10001	
+-#define    PARSER_FOUND			0x10002
+-#define    PARSER_UNFOUND		0x10003	
+-#define 	PARSER_DECODE_FAIL	0x10004
+-
+-//dev
+-#define  	EDEV_NO_TRANSFER_NEED 	0x20001
+-#define    OUTPUT_DEV_FOUND			0x20002
+-#define 	OUTPUT_DEV_UNFOUND	 	0x20003
+-#define	OUTPUT_DEV_SETUP_FAIL		0x20004
+-#define	OUTPUT_DEV_GE2D_SETUP_FAIL	0x20005
+-#endif
+-
++#ifndef  ERR_CODE_H_
++#define ERR_CODE_H_
++
++#define   TRUE		1
++#define	FALSE		0
++#define	SUCCESS	0
++#define	FAIL		1
++
++
++#define	LOGO_PARA_UNPARSED	0x30001
++//parser
++
++#define    ENOPARSER				0x10001
++#define    PARSER_FOUND			0x10002
++#define    PARSER_UNFOUND		0x10003
++#define 	PARSER_DECODE_FAIL	0x10004
++
++//dev
++#define  	EDEV_NO_TRANSFER_NEED 	0x20001
++#define    OUTPUT_DEV_FOUND			0x20002
++#define 	OUTPUT_DEV_UNFOUND	 	0x20003
++#define	OUTPUT_DEV_SETUP_FAIL		0x20004
++#define	OUTPUT_DEV_GE2D_SETUP_FAIL	0x20005
++#endif
+diff --git a/include/linux/amlogic/logo/jpeg_parser.h b/include/linux/amlogic/logo/jpeg_parser.h
+old mode 100644
+new mode 100755
+index 363251e5..7cca38e4
+--- a/include/linux/amlogic/logo/jpeg_parser.h
++++ b/include/linux/amlogic/logo/jpeg_parser.h
+@@ -1,17 +1,17 @@
+-#ifndef  JPEG_PARSER_H_
+-#define JPEG_PARSER_H_
+-
+-
+-
+-#define JPEG_INFO               	AV_SCRATCH_0
+-#define JPEG_PIC_WIDTH          AV_SCRATCH_1
+-#define JPEG_PIC_HEIGHT         AV_SCRATCH_2
+-#define PADDINGSIZE		1024
++#ifndef  JPEG_PARSER_H_
++#define JPEG_PARSER_H_
++
++
++
++#define JPEG_INFO               	AV_SCRATCH_0
++#define JPEG_PIC_WIDTH          AV_SCRATCH_1
++#define JPEG_PIC_HEIGHT         AV_SCRATCH_2
++#define PADDINGSIZE		1024
+ #define JPEG_TAG		0xff
+ #define JPEG_TAG_SOI	0xd8
+-#define JPEG_TAG_SOF0	0xc0
+-#define JPEG_TAG_EOI		0xd9
+-#define JPEG_TAG_SOS		0xda
++#define JPEG_TAG_SOF0	0xc0
++#define JPEG_TAG_EOI		0xd9
++#define JPEG_TAG_SOS		0xda
+ #define MREG_DECODE_PARAM   AV_SCRATCH_2 /* bit 0-3: pico_addr_mode */
+                                          /* bit 15-4: reference height */
+ #define MREG_TO_AMRISC      AV_SCRATCH_8
+@@ -19,22 +19,22 @@
+ 
+ #define PICINFO_BUF_IDX_MASK        0x0007
+ #define PICINFO_INTERLACE           0x0020
+-#define PICINFO_INTERLACE_TOP       0x0010
+-
+-#define  JPEG_INVALID_FILE_SIZE	 0x2000000 
++#define PICINFO_INTERLACE_TOP       0x0010
++
++#define  JPEG_INVALID_FILE_SIZE	 0x2000000
+ enum {
+ 	PIC_NA = 0,
+ 	PIC_DECODED = 1,
+ 	PIC_FETCHED = 2
+-};
+-typedef  struct {
+-	vframe_t  	vf;
+-	volatile u32 	state;
+-	u32 __iomem*	vaddr;
+-	u32  canvas_index;
+-	
+-}jpeg_private_t;
+-static int jpeg_init(logo_object_t *logo) ;
+-static  int  jpeg_decode(logo_object_t *plogo);
+-static int jpeg_deinit(logo_object_t *plogo);
+-#endif 
++};
++typedef  struct {
++	vframe_t  	vf;
++	volatile u32 	state;
++	u32 __iomem*	vaddr;
++	u32  canvas_index;
++
++}jpeg_private_t;
++static int jpeg_init(logo_object_t *logo) ;
++static  int  jpeg_decode(logo_object_t *plogo);
++static int jpeg_deinit(logo_object_t *plogo);
++#endif
+diff --git a/include/linux/amlogic/logo/loader.h b/include/linux/amlogic/logo/loader.h
+old mode 100644
+new mode 100755
+index 9281e11f..e3fec6c0
+--- a/include/linux/amlogic/logo/loader.h
++++ b/include/linux/amlogic/logo/loader.h
+@@ -1,32 +1,32 @@
+-#ifndef LOADER_H
+-#define LOADER_H
+-#include "logo.h"
+-
+-#define  INVALID_INFO   		0xffffffff
+-#define  LOGO_DBG_ENABLE	0x10000001
+-#define  LOGO_PROGRESS_ENABLE	0x10000002
+-#define  LOGO_LOADED		0x10000003
+-#define  LOGO_NEEDSCALER		0x10000004
+-#define  PLATFORM_DEVICE_OSD		"apollofb"
+-#define  PLATFORM_DEVICE_VID		"amstream"
+-
+-#define  	PARA_FIRST_GROUP_START   	1
+-#define  	PARA_SECOND_GROUP_START 	5
+-#define	    PARA_THIRD_GROUP_START	18+7
+-#define    PARA_FOURTH_GROUP_START  21+7
+-#define    PARA_FIFTH_GROUP_START  	22+7
+-#define    PARA_SIXTH_GROUP_START	23+7
+-#define    PARA_END					23+7
+-
+-typedef  struct {
+-	char *name;
+-	int   info;	
+-	u32   prev_idx;
+-	u32   next_idx;
+-	u32   cur_group_start;
+-	u32   cur_group_end;
+-}para_info_pair_t;
+-
+-
+-
+-#endif
++#ifndef LOADER_H
++#define LOADER_H
++#include "logo.h"
++
++#define  INVALID_INFO   		0xffffffff
++#define  LOGO_DBG_ENABLE	0x10000001
++#define  LOGO_PROGRESS_ENABLE	0x10000002
++#define  LOGO_LOADED		0x10000003
++#define  LOGO_NEEDSCALER		0x10000004
++#define  PLATFORM_DEVICE_OSD		"apollofb"
++#define  PLATFORM_DEVICE_VID		"amstream"
++
++#define  	PARA_FIRST_GROUP_START   	1
++#define  	PARA_SECOND_GROUP_START 	5
++#define    PARA_THIRD_GROUP_START	22+7
++#define    PARA_FOURTH_GROUP_START  25+7
++#define    PARA_FIFTH_GROUP_START  	26+7
++#define    PARA_SIXTH_GROUP_START	27+7
++#define    PARA_END					27+7
++
++typedef  struct {
++	char *name;
++	int   info;
++	u32   prev_idx;
++	u32   next_idx;
++	u32   cur_group_start;
++	u32   cur_group_end;
++}para_info_pair_t;
++
++
++
++#endif
+diff --git a/include/linux/amlogic/logo/logo.h b/include/linux/amlogic/logo/logo.h
+old mode 100644
+new mode 100755
+index 74e4bec0..0e5409a5
+--- a/include/linux/amlogic/logo/logo.h
++++ b/include/linux/amlogic/logo/logo.h
+@@ -1,70 +1,70 @@
+-#ifndef LOGO_H
+-#define LOGO_H
+-#include <linux/kernel.h>
+-#include <linux/types.h>
+-#include <linux/ctype.h>
+-#include <linux/interrupt.h>
+-#include <linux/list.h>
+-#include <linux/timer.h>
+-#include <linux/init.h>
+-#include <linux/platform_device.h>
+-#include <mach/am_regs.h>
+-#include <linux/ioport.h>
+-#include <linux/device.h>
+-#include <linux/amlogic/osd/osd.h>
+-#include <linux/amlogic/osd/osd_hw.h>
+-#include <linux/amlogic/vout/vinfo.h>
+-#include <linux/amlogic/vout/vout_notify.h>
+-#include "err_code.h"
+-#include "logo_base_type.h"
+-#include "logo_dev.h"
+-#include "logo_parser.h"
+-
+-
+-#undef  MODULE
+-/**************************************************************
+-************************ type define part ***************************
+-***************************************************************/
+-//loader 
+-
+-
+-
+-
+-
+-
+-/**************************************************************
+-************************ macro define part ************************
+-***************************************************************/
+-extern	logo_object_t  aml_logo; 
+-#define   TOLOWER(x) ((x) | 0x20)
+-
+-#define	LOGO_NAME	"aml_logo"
+-#define   dev_to_platformdev(dev)   (container_of((dev), struct platform_device,dev) )
+-extern struct bus_type platform_bus_type;
+-  	
+-typedef enum{
+-	VMODE_SETTED = 0,
+-	VMODE_NOT_SETTED,
+-}vmode_set_t;
+-
+-/***************************************************************
+-*********************  para define part  *****************************
+-****************************************************************/
+-
+-
+-
+-
+-
+-
+-/**************************************************************
+-************************ macro define part ************************
+-***************************************************************/
+-
+-extern  logo_object_t* get_current_logo_obj(void);
+-extern  vmode_t get_resolution_vmode(void);
+-extern  vmode_set_t get_current_mode_state(void);
+-extern int  register_logo_parser(logo_parser_t* logo_parser) ;
+-extern int  register_logo_output_dev(logo_output_dev_t* new_dev);
+-
+-
+-#endif
++#ifndef LOGO_H
++#define LOGO_H
++#include <linux/kernel.h>
++#include <linux/types.h>
++#include <linux/ctype.h>
++#include <linux/interrupt.h>
++#include <linux/list.h>
++#include <linux/timer.h>
++#include <linux/init.h>
++#include <linux/platform_device.h>
++#include <mach/am_regs.h>
++#include <linux/ioport.h>
++#include <linux/device.h>
++#include <linux/amlogic/osd/osd.h>
++#include <linux/amlogic/osd/osd_hw.h>
++#include <linux/amlogic/vout/vinfo.h>
++#include <linux/amlogic/vout/vout_notify.h>
++#include "err_code.h"
++#include "logo_base_type.h"
++#include "logo_dev.h"
++#include "logo_parser.h"
++
++
++#undef  MODULE
++/**************************************************************
++************************ type define part ***************************
++***************************************************************/
++//loader
++
++
++
++
++
++
++/**************************************************************
++************************ macro define part ************************
++***************************************************************/
++extern	logo_object_t  aml_logo;
++#define   TOLOWER(x) ((x) | 0x20)
++
++#define	LOGO_NAME	"aml_logo"
++#define   dev_to_platformdev(dev)   (container_of((dev), struct platform_device,dev) )
++extern struct bus_type platform_bus_type;
++
++typedef enum{
++	VMODE_SETTED = 0,
++	VMODE_NOT_SETTED,
++}vmode_set_t;
++
++/***************************************************************
++*********************  para define part  *****************************
++****************************************************************/
++
++
++
++
++
++
++/**************************************************************
++************************ macro define part ************************
++***************************************************************/
++
++extern  logo_object_t* get_current_logo_obj(void);
++extern  vmode_t get_resolution_vmode(void);
++extern  vmode_set_t get_current_mode_state(void);
++extern int  register_logo_parser(logo_parser_t* logo_parser) ;
++extern int  register_logo_output_dev(logo_output_dev_t* new_dev);
++
++
++#endif
+diff --git a/include/linux/amlogic/logo/logo_base_type.h b/include/linux/amlogic/logo/logo_base_type.h
+old mode 100644
+new mode 100755
+index 3c2faa19..d023d28a
+--- a/include/linux/amlogic/logo/logo_base_type.h
++++ b/include/linux/amlogic/logo/logo_base_type.h
+@@ -1,59 +1,59 @@
+-#ifndef  LOGO_BASE_TYPE_H
+-#define LOGO_BASE_TYPE_H
+-
+-
+-struct logo_output_dev;
+-struct logo_parser ;
+-typedef enum {
+-	DISP_MODE_ORIGIN,	//at top-left corner.
+-	DISP_MODE_CENTER,
+-	DISP_MODE_FULL_SCREEN
+-}logo_display_mode_t;
+-
+-typedef enum{
+-	LOGO_DEV_OSD0=0,
+-	LOGO_DEV_OSD1,
+-	LOGO_DEV_VID,
+-	LOGO_DEV_MEM,
+-	LOGO_DEV_MAX
+-}platform_dev_t;
+-
+-typedef enum  {
+-	SRC_TYPE_BMP=0,
+-	SRC_TYPE_JPG ,
+-	SRC_TYPE_PNG,
+-	MAX_PIC_TYPE,
+-}pic_type_t;
+-
+-typedef  struct {
+-	int  x;
+-	int  y;
+-	int  w;
+-	int  h;
+-}logo_rect_t;
+-typedef  struct {
+-	char  name[10];
+-	int    mem_start;
+-	int 	mem_end;
+-}platform_resource_t;
+-
+-struct logo_input_para{
+-	char *mem_addr;  //represent logo load addr .
+-	platform_dev_t  output_dev_type;
+-	logo_display_mode_t dis_mode; 
+-	vmode_t vout_mode;
+-	int	progress;
+-	int	loaded;
+-};
+-typedef struct logo_input_para logo_input_para_t ;
+-typedef  struct {
+-	char name[10];
+-	struct logo_input_para para;
+-	struct logo_output_dev *dev; 
+-	struct logo_parser  *parser;
+-	int	need_transfer;  //logo pic need transfer from parser output to
+-					   // logo output device.
+-	platform_resource_t platform_res[LOGO_DEV_MAX];				   
+-}logo_object_t;
+-
+-#endif
++#ifndef  LOGO_BASE_TYPE_H
++#define LOGO_BASE_TYPE_H
++
++
++struct logo_output_dev;
++struct logo_parser ;
++typedef enum {
++	DISP_MODE_ORIGIN,	//at top-left corner.
++	DISP_MODE_CENTER,
++	DISP_MODE_FULL_SCREEN
++}logo_display_mode_t;
++
++typedef enum{
++	LOGO_DEV_OSD0=0,
++	LOGO_DEV_OSD1,
++	LOGO_DEV_VID,
++	LOGO_DEV_MEM,
++	LOGO_DEV_MAX
++}platform_dev_t;
++
++typedef enum  {
++	SRC_TYPE_BMP=0,
++	SRC_TYPE_JPG ,
++	SRC_TYPE_PNG,
++	MAX_PIC_TYPE,
++}pic_type_t;
++
++typedef  struct {
++	int  x;
++	int  y;
++	int  w;
++	int  h;
++}logo_rect_t;
++typedef  struct {
++	char  name[10];
++	int    mem_start;
++	int 	mem_end;
++}platform_resource_t;
++
++struct logo_input_para{
++	char *mem_addr;  //represent logo load addr .
++	platform_dev_t  output_dev_type;
++	logo_display_mode_t dis_mode;
++	vmode_t vout_mode;
++	int	progress;
++	int	loaded;
++};
++typedef struct logo_input_para logo_input_para_t ;
++typedef  struct {
++	char name[10];
++	struct logo_input_para para;
++	struct logo_output_dev *dev;
++	struct logo_parser  *parser;
++	int	need_transfer;  //logo pic need transfer from parser output to
++					   // logo output device.
++	platform_resource_t platform_res[LOGO_DEV_MAX];
++}logo_object_t;
++
++#endif
+diff --git a/include/linux/amlogic/logo/logo_dev.h b/include/linux/amlogic/logo/logo_dev.h
+old mode 100644
+new mode 100755
+index eabfcd83..645eaa54
+--- a/include/linux/amlogic/logo/logo_dev.h
++++ b/include/linux/amlogic/logo/logo_dev.h
+@@ -1,54 +1,54 @@
+-#ifndef LOGO_DEV_H
+-#define LOGO_DEV_H
+-#include "logo_base_type.h"
+-#include <linux/amlogic/ge2d/ge2d.h>
+-typedef struct{
+-	logo_rect_t screen;
+-	int mem_start;
+-	int mem_end;
+-	int color_depth;
+-}dev_osd_t;
+-
+-typedef struct{
+-	logo_rect_t screen;
+-	int mem_start;
+-	int mem_end;
+-	u32 canvas_index;
+-}dev_vid_t;
+-
+-typedef union{
+-	dev_osd_t osd;
+-	dev_vid_t	  vid;
+-}output_dev_t;
+-
+-struct output_dev_op{
+-	int	(*init)(logo_object_t *);
+-	int  	(*transfer)(logo_object_t *);
+-	int  	(*enable)(int);
+-	int	(*deinit)(void);
+-};
+-typedef  struct output_dev_op output_dev_op_t;
+-struct logo_output_dev{
+-	platform_dev_t idx;
+-	logo_rect_t	 window;
+-	output_dev_t  output_dev;
+-	output_dev_op_t op;
+-	const vinfo_t		*vinfo;
+-	ge2d_context_t  *ge2d_context;
+-	int			hw_initialized;
+-};
+-typedef struct logo_output_dev logo_output_dev_t ;
+-
+-typedef  struct{
+-	logo_output_dev_t *dev;
+-	struct list_head  list;	
+-}output_dev_list_t;
+-
+-//function define 
+-extern int  setup_output_device(logo_object_t *plogo);
+-extern int dev_osd_setup(void);
+-extern int dev_vid_setup(void) ;
+-extern vmode_t get_current_cvbs_vmode(void);
+-extern vmode_t get_current_hdmi_vmode(void);
+-
+-#endif
++#ifndef LOGO_DEV_H
++#define LOGO_DEV_H
++#include "logo_base_type.h"
++#include <linux/amlogic/ge2d/ge2d.h>
++typedef struct{
++	logo_rect_t screen;
++	int mem_start;
++	int mem_end;
++	int color_depth;
++}dev_osd_t;
++
++typedef struct{
++	logo_rect_t screen;
++	int mem_start;
++	int mem_end;
++	u32 canvas_index;
++}dev_vid_t;
++
++typedef union{
++	dev_osd_t osd;
++	dev_vid_t	  vid;
++}output_dev_t;
++
++struct output_dev_op{
++	int	(*init)(logo_object_t *);
++	int  	(*transfer)(logo_object_t *);
++	int  	(*enable)(int);
++	int	(*deinit)(void);
++};
++typedef  struct output_dev_op output_dev_op_t;
++struct logo_output_dev{
++	platform_dev_t idx;
++	logo_rect_t	 window;
++	output_dev_t  output_dev;
++	output_dev_op_t op;
++	const vinfo_t		*vinfo;
++	ge2d_context_t  *ge2d_context;
++	int			hw_initialized;
++};
++typedef struct logo_output_dev logo_output_dev_t ;
++
++typedef  struct{
++	logo_output_dev_t *dev;
++	struct list_head  list;
++}output_dev_list_t;
++
++//function define
++extern int  setup_output_device(logo_object_t *plogo);
++extern int dev_osd_setup(void);
++extern int dev_vid_setup(void) ;
++extern vmode_t get_current_cvbs_vmode(void);
++extern vmode_t get_current_hdmi_vmode(void);
++
++#endif
+diff --git a/include/linux/amlogic/logo/logo_dev_osd.h b/include/linux/amlogic/logo/logo_dev_osd.h
+old mode 100644
+new mode 100755
+index c399ce33..0bda9ef6
+--- a/include/linux/amlogic/logo/logo_dev_osd.h
++++ b/include/linux/amlogic/logo/logo_dev_osd.h
+@@ -1,18 +1,18 @@
+-#ifndef  LOGO_DEV_OSD_H
+-#define LOGO_DEV_OSD_H
+-
+-#define DisableVideoLayer() \
+-    do { aml_clr_reg32_mask(P_VPP_MISC, \
+-	VPP_VD1_PREBLEND | VPP_VD1_POSTBLEND);  \
+-    } while (0)
+-
+-#ifdef CONFIG_AM_HDMI_ONLY
+-#define PARA_HDMI_ONLY    32
+-
+-typedef  struct {
+-	char *name;
+-	int   info;	
+-}hdmi_only_info_t;
+-#endif
+-
+-#endif
++#ifndef  LOGO_DEV_OSD_H
++#define LOGO_DEV_OSD_H
++
++#define DisableVideoLayer() \
++    do { aml_clr_reg32_mask(P_VPP_MISC, \
++	VPP_VD1_PREBLEND | VPP_VD1_POSTBLEND);  \
++    } while (0)
++
++#ifdef CONFIG_AM_HDMI_ONLY
++#define PARA_HDMI_ONLY    15
++
++typedef  struct {
++	char *name;
++	int   info;
++}hdmi_only_info_t;
++#endif
++
++#endif
+diff --git a/include/linux/amlogic/logo/logo_dev_vid.h b/include/linux/amlogic/logo/logo_dev_vid.h
+old mode 100644
+new mode 100755
+index b63e7961..e4f56636
+--- a/include/linux/amlogic/logo/logo_dev_vid.h
++++ b/include/linux/amlogic/logo/logo_dev_vid.h
+@@ -1,9 +1,8 @@
+-#ifndef  LOGO_DEV_VID_H
+-#define LOGO_DEV_VID_H
+-static int vid_init(logo_object_t *plogo);
+-static  int  vid_enable(int  enable);
+-static int vid_deinit(void);
+-static  int  vid_transfer(logo_object_t *plogo);
+-
+-#endif
+-
++#ifndef  LOGO_DEV_VID_H
++#define LOGO_DEV_VID_H
++static int vid_init(logo_object_t *plogo);
++static  int  vid_enable(int  enable);
++static int vid_deinit(void);
++static  int  vid_transfer(logo_object_t *plogo);
++
++#endif
+diff --git a/include/linux/amlogic/logo/logo_parser.h b/include/linux/amlogic/logo/logo_parser.h
+old mode 100644
+new mode 100755
+index b34fc6b4..abdc13c2
+--- a/include/linux/amlogic/logo/logo_parser.h
++++ b/include/linux/amlogic/logo/logo_parser.h
+@@ -1,56 +1,56 @@
+-#ifndef  LOGO_PARSER_H
+-#define  LOGO_PARSER_H
+-
+-//parser
+-typedef  struct {
+-	int  (*init)(logo_object_t *logo);
+-	int  (*decode)(logo_object_t *logo);
+-	int  (*deinit)(logo_object_t *logo);
+-	
+-}logo_parser_op_t;
+-
+-typedef  struct{
+-	int  color_depth;
+-}bmp_decoder_t;
+-
+-typedef  struct{
+-	u32  component;
+-	u32  out_canvas_index;
+-}jpg_decoder_t;
+-
+-typedef  union{
+-	bmp_decoder_t bmp;
+-	jpg_decoder_t	jpg;
+-}decoder_t;
+-
+-typedef  struct{
+-	unsigned int	width;
+-	unsigned int	height;
+-	unsigned int	color_info;
+-	int	size; //file size
+-}pic_info_t;
+-
+-struct logo_parser{
+-	char  name[10];
+-	logo_parser_op_t  op;
+-	char *output_addr;
+-	decoder_t  decoder;
+-	output_dev_t out_dev; //?maybe not useful
+-	pic_info_t	 logo_pic_info;
+-	void *priv;
+-};
+-typedef  struct logo_parser  logo_parser_t;
+-typedef  struct {
+-	logo_parser_t *parser;
+-	struct list_head  list;
+-}parser_list_t;
+-
+-/**************************************************************
+-************************ function define part ************************
+-***************************************************************/
+- extern int start_logo(void) ;
+- extern int exit_logo(logo_object_t *logo);
+- //all kind of parser setup .
+- extern int bmp_setup(void);
+- extern int jpeg_setup(void);
+-#endif
++#ifndef  LOGO_PARSER_H
++#define  LOGO_PARSER_H
++
++//parser
++typedef  struct {
++	int  (*init)(logo_object_t *logo);
++	int  (*decode)(logo_object_t *logo);
++	int  (*deinit)(logo_object_t *logo);
++
++}logo_parser_op_t;
++
++typedef  struct{
++	int  color_depth;
++}bmp_decoder_t;
++
++typedef  struct{
++	u32  component;
++	u32  out_canvas_index;
++}jpg_decoder_t;
++
++typedef  union{
++	bmp_decoder_t bmp;
++	jpg_decoder_t	jpg;
++}decoder_t;
++
++typedef  struct{
++	unsigned int	width;
++	unsigned int	height;
++	unsigned int	color_info;
++	int	size; //file size
++}pic_info_t;
++
++struct logo_parser{
++	char  name[10];
++	logo_parser_op_t  op;
++	char *output_addr;
++	decoder_t  decoder;
++	output_dev_t out_dev; //?maybe not useful
++	pic_info_t	 logo_pic_info;
++	void *priv;
++};
++typedef  struct logo_parser  logo_parser_t;
++typedef  struct {
++	logo_parser_t *parser;
++	struct list_head  list;
++}parser_list_t;
++
++/**************************************************************
++************************ function define part ************************
++***************************************************************/
++ extern int start_logo(void) ;
++ extern int exit_logo(logo_object_t *logo);
++ //all kind of parser setup .
++ extern int bmp_setup(void);
++ extern int jpeg_setup(void);
++#endif

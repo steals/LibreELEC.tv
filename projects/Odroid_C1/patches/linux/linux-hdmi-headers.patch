@@ -1,0 +1,2853 @@
+diff --git a/include/linux/amlogic/hdmi_tx/hdmi_common.h b/include/linux/amlogic/hdmi_tx/hdmi_common.h
+new file mode 100644
+index 00000000..3bccdd78
+--- /dev/null
++++ b/include/linux/amlogic/hdmi_tx/hdmi_common.h
+@@ -0,0 +1,457 @@
++#ifndef __HDMI_COMMON_H__
++#define __HDMI_COMMON_H__
++
++// HDMI VIC definitions
++typedef enum HDMI_Video_Type_ {
++// Refer to CEA 861-D
++    HDMI_Unkown = 0,
++    HDMI_640x480p60_4x3 = 1,
++    HDMI_720x480p60_4x3 = 2,
++    HDMI_720x480p60_16x9 = 3,
++    HDMI_1280x720p60_16x9 = 4,
++    HDMI_1920x1080i60_16x9 = 5,
++    HDMI_720x480i60_4x3 = 6,
++    HDMI_720x480i60_16x9 = 7,
++    HDMI_720x240p60_4x3 = 8,
++    HDMI_720x240p60_16x9 = 9,
++    HDMI_2880x480i60_4x3 = 10,
++    HDMI_2880x480i60_16x9 = 11,
++    HDMI_2880x240p60_4x3 = 12,
++    HDMI_2880x240p60_16x9 = 13,
++    HDMI_1440x480p60_4x3 = 14,
++    HDMI_1440x480p60_16x9 = 15,
++    HDMI_1920x1080p60_16x9 = 16,
++    HDMI_720x576p50_4x3 = 17,
++    HDMI_720x576p50_16x9 = 18,
++    HDMI_1280x720p50_16x9 = 19,
++    HDMI_1920x1080i50_16x9 = 20,
++    HDMI_720x576i50_4x3 = 21,
++    HDMI_720x576i50_16x9 = 22,
++    HDMI_720x288p_4x3 = 23,
++    HDMI_720x288p_16x9 = 24,
++    HDMI_2880x576i50_4x3 = 25,
++    HDMI_2880x576i50_16x9 = 26,
++    HDMI_2880x288p50_4x3 = 27,
++    HDMI_2880x288p50_16x9 = 28,
++    HDMI_1440x576p_4x3 = 29,
++    HDMI_1440x576p_16x9 = 30,
++    HDMI_1920x1080p50_16x9 = 31,
++    HDMI_1920x1080p24_16x9 = 32,
++    HDMI_1920x1080p25_16x9 = 33,
++    HDMI_1920x1080p30_16x9 = 34,
++    HDMI_2880x480p60_4x3 = 35,
++    HDMI_2880x480p60_16x9 = 36,
++    HDMI_2880x576p50_4x3 = 37,
++    HDMI_2880x576p50_16x9 = 38,
++    HDMI_1920x1080i_t1250_50_16x9 = 39,
++    HDMI_1920x1080i100_16x9 = 40,
++    HDMI_1280x720p100_16x9 = 41,
++    HDMI_720x576p100_4x3 = 42,
++    HDMI_720x576p100_16x9 = 43,
++    HDMI_720x576i100_4x3 = 44,
++    HDMI_720x576i100_16x9 = 45,
++    HDMI_1920x1080i120_16x9 = 46,
++    HDMI_1280x720p120_16x9 = 47,
++    HDMI_720x480p120_4x3 = 48,
++    HDMI_720x480p120_16x9 = 49,
++    HDMI_720X480i120_4x3 = 50,
++    HDMI_720X480i120_16x9 = 51,
++    HDMI_720x576p200_4x3 = 52,
++    HDMI_720x576p200_16x9 = 53,
++    HDMI_720x576i200_4x3 = 54,
++    HDMI_720x576i200_16x9 = 55,
++    HDMI_720x480p240_4x3 = 56,
++    HDMI_720x480p240_16x9 = 57,
++    HDMI_720x480i240_4x3 = 58,
++    HDMI_720x480i240_16x9 = 59,
++// Refet to CEA 861-F
++    HDMI_1280x720p24_16x9 = 60,
++    HDMI_1280x720p25_16x9 = 61,
++    HDMI_1280x720p30_16x9 = 62,
++    HDMI_1920x1080p120_16x9 = 63,
++    HDMI_1920x1080p100_16x9 = 64,
++    HDMI_1280x720p24_64x27 = 65,
++    HDMI_1280x720p25_64x27 = 66,
++    HDMI_1280x720p30_64x27 = 67,
++    HDMI_1280x720p50_64x27 = 68,
++    HDMI_1280x720p60_64x27 = 69,
++    HDMI_1280x720p100_64x27 = 70,
++    HDMI_1280x720p120_64x27 = 71,
++    HDMI_1920x1080p24_64x27 = 72,
++    HDMI_1920x1080p25_64x27 = 73,
++    HDMI_1920x1080p30_64x27 = 74,
++    HDMI_1920x1080p50_64x27 = 75,
++    HDMI_1920x1080p60_64x27 = 76,
++    HDMI_1920x1080p100_64x27 = 77,
++    HDMI_1920x1080p120_64x27 = 78,
++    HDMI_1680x720p24_64x27 = 79,
++    HDMI_1680x720p25_64x27 = 80,
++    HDMI_1680x720p30_64x27 = 81,
++    HDMI_1680x720p50_64x27 = 82,
++    HDMI_1680x720p60_64x27 = 83,
++    HDMI_1680x720p100_64x27 = 84,
++    HDMI_1680x720p120_64x27 = 85,
++    HDMI_2560x1080p24_64x27 = 86,
++    HDMI_2560x1080p25_64x27 = 87,
++    HDMI_2560x1080p30_64x27 = 88,
++    HDMI_2560x1080p50_64x27 = 89,
++    HDMI_2560x1080p60_64x27 = 90,
++    HDMI_2560x1080p100_64x27 = 91,
++    HDMI_2560x1080p120_64x27 = 92,
++    HDMI_3840x2160p24_16x9 = 93,
++    HDMI_3840x2160p25_16x9 = 94,
++    HDMI_3840x2160p30_16x9 = 95,
++    HDMI_3840x2160p50_16x9 = 96,
++    HDMI_3840x2160p60_16x9 = 97,
++    HDMI_4096x2160p24_256x135 = 98,
++    HDMI_4096x2160p25_256x135 = 99,
++    HDMI_4096x2160p30_256x135 = 100,
++    HDMI_4096x2160p50_256x135 = 101,
++    HDMI_4096x2160p60_256x135 = 102,
++    HDMI_3840x2160p24_64x27 = 103,
++    HDMI_3840x2160p25_64x27 = 104,
++    HDMI_3840x2160p30_64x27 = 105,
++    HDMI_3840x2160p50_64x27 = 106,
++    HDMI_3840x2160p60_64x27 = 107,
++    HDMI_RESERVED = 108,
++    HDMI_3840x1080p120hz = 109,
++    HDMI_3840x1080p100hz,
++    HDMI_3840x540p240hz,
++    HDMI_3840x540p200hz,
++} HDMI_Video_Codes_t;
++
++// Compliance with old definitions
++#define HDMI_640x480p60         HDMI_640x480p60_4x3
++#define HDMI_480p60             HDMI_720x480p60_4x3
++#define HDMI_480p60_16x9        HDMI_720x480p60_16x9
++#define HDMI_720p60             HDMI_1280x720p60_16x9
++#define HDMI_1080i60            HDMI_1920x1080i60_16x9
++#define HDMI_480i60             HDMI_720x480i60_4x3
++#define HDMI_480i60_16x9        HDMI_720x480i60_16x9
++#define HDMI_480i60_16x9_rpt    HDMI_2880x480i60_16x9
++#define HDMI_1440x480p60        HDMI_1440x480p60_4x3
++#define HDMI_1440x480p60_16x9   HDMI_1440x480p60_16x9
++#define HDMI_1080p60            HDMI_1920x1080p60_16x9
++#define HDMI_576p50             HDMI_720x576p50_4x3
++#define HDMI_576p50_16x9        HDMI_720x576p50_16x9
++#define HDMI_720p50             HDMI_1280x720p50_16x9
++#define HDMI_1080i50            HDMI_1920x1080i50_16x9
++#define HDMI_576i50             HDMI_720x576i50_4x3
++#define HDMI_576i50_16x9        HDMI_720x576i50_16x9
++#define HDMI_576i50_16x9_rpt    HDMI_2880x576i50_16x9
++#define HDMI_1080p50            HDMI_1920x1080p50_16x9
++#define HDMI_1080p24            HDMI_1920x1080p24_16x9
++#define HDMI_1080p25            HDMI_1920x1080p25_16x9
++#define HDMI_1080p30            HDMI_1920x1080p30_16x9
++#define HDMI_480p60_16x9_rpt    HDMI_2880x480p60_16x9
++#define HDMI_576p50_16x9_rpt    HDMI_2880x576p50_16x9
++#define HDMI_4k2k_24            HDMI_3840x2160p24_16x9
++#define HDMI_4k2k_25            HDMI_3840x2160p25_16x9
++#define HDMI_4k2k_30            HDMI_3840x2160p30_16x9
++#define HDMI_4k2k_50            HDMI_3840x2160p50_16x9
++#define HDMI_4k2k_60            HDMI_3840x2160p60_16x9
++#define HDMI_4k2k_smpte_24      HDMI_4096x2160p24_256x135
++#define HDMI_4k2k_smpte_50      HDMI_4096x2160p50_256x135
++#define HDMI_4k2k_smpte_60      HDMI_4096x2160p60_256x135
++
++// CEA TIMING STRUCT DEFINITION
++struct hdmi_cea_timing {
++    unsigned int pixel_freq;            // Unit: 1000
++    unsigned int h_freq;              // Unit: Hz
++    unsigned int v_freq;              // Unit: 0.001 Hz
++    unsigned int vsync_polarity : 1;    // 1: positive  0: negative
++    unsigned int hsync_polarity : 1;
++    unsigned short h_active;
++    unsigned short h_total;
++    unsigned short h_blank;
++    unsigned short h_front;
++    unsigned short h_sync;
++    unsigned short h_back;
++    unsigned short v_active;
++    unsigned short v_total;
++    unsigned short v_blank;
++    unsigned short v_front;
++    unsigned short v_sync;
++    unsigned short v_back;
++    unsigned short v_sync_ln;
++};
++
++// get hdmi cea timing
++// t: struct hdmi_cea_timing *
++#define GET_TIMING(name)      (t->name)
++
++struct hdmi_format_para {
++    HDMI_Video_Codes_t vic;
++    unsigned char * name;
++    unsigned int pixel_repetition_factor;
++    unsigned int progress_mode : 1;         // 0: Interlace mode  1: Progressive Mode
++    unsigned int scrambler_en : 1;
++    unsigned int tmds_clk_div40 : 1;
++    unsigned int tmds_clk;            // Unit: 1000
++    struct hdmi_cea_timing timing;
++};
++
++// HDMI Packet Type Definitions
++#define PT_NULL_PKT                 0x00
++#define PT_AUD_CLK_REGENERATION     0x01
++#define PT_AUD_SAMPLE               0x02
++#define PT_GENERAL_CONTROL          0x03
++#define PT_ACP                      0x04
++#define PT_ISRC1                    0x05
++#define PT_ISRC2                    0x06
++#define PT_ONE_BIT_AUD_SAMPLE       0x07
++#define PT_DST_AUD                  0x08
++#define PT_HBR_AUD_STREAM           0x09
++#define PT_GAMUT_METADATA           0x0A
++#define PT_3D_AUD_SAMPLE            0x0B
++#define PT_ONE_BIT_3D_AUD_SAMPLE    0x0C
++#define PT_AUD_METADATA             0x0D
++#define PT_MULTI_SREAM_AUD_SAMPLE   0x0E
++#define PT_ONE_BIT_MULTI_SREAM_AUD_SAMPLE   0x0F
++// Infoframe Packet
++#define PT_IF_VENDOR_SEPCIFIC       0x81
++#define PT_IF_AVI                   0x82
++#define PT_IF_SPD                   0x83
++#define PT_IF_AUD                   0x84
++#define PT_IF_MPEG_SOURCE           0x85
++
++// Old definitions
++#define TYPE_AVI_INFOFRAMES       0x82
++#define AVI_INFOFRAMES_VERSION    0x02
++#define AVI_INFOFRAMES_LENGTH     0x0D
++
++enum hdmi_color_depth {
++    HDMI_COLOR_DEPTH_24B = 4,
++    HDMI_COLOR_DEPTH_30B = 5,
++    HDMI_COLOR_DEPTH_36B = 6,
++    HDMI_COLOR_DEPTH_48B = 7,
++};
++
++enum hdmi_color_format {
++    HDMI_COLOR_FORMAT_RGB,
++    HDMI_COLOR_FORMAT_444,
++    HDMI_COLOR_FORMAT_422,
++    HDMI_COLOR_FORMAT_420,
++};
++
++enum hdmi_color_range {
++    HDMI_COLOR_RANGE_LIM,
++    HDMI_COLOR_RANGE_FUL,
++};
++
++enum hdmi_audio_packet {
++    HDMI_AUDIO_PACKET_SMP = 0x02,
++    HDMI_AUDIO_PACKET_1BT = 0x07,
++    HDMI_AUDIO_PACKET_DST = 0x08,
++    HDMI_AUDIO_PACKET_HBR = 0x09,
++};
++
++typedef enum
++{
++    COLOR_SPACE_RGB444 = 0,
++    COLOR_SPACE_YUV422 = 1,
++    COLOR_SPACE_YUV444 = 2,
++    COLOR_SPACE_YUV420 = 3,
++    COLOR_SPACE_RESERVED,
++}color_space_type_t;
++
++typedef enum
++{
++    ASPECT_RATIO_SAME_AS_SOURCE = 0x8,
++    TV_ASPECT_RATIO_4_3 = 0x9,
++    TV_ASPECT_RATIO_16_9 = 0xA,
++    TV_ASPECT_RATIO_14_9 = 0xB,
++    TV_ASPECT_RATIO_MAX
++} hdmi_aspect_ratio_t;
++
++typedef enum
++{
++    COLOR_24BIT = 0,
++    COLOR_30BIT,
++    COLOR_36BIT,
++    COLOR_48BIT
++} hdmi_color_depth_t;
++
++
++struct hdmi_format_para * hdmi_get_fmt_paras(HDMI_Video_Codes_t vic);
++void check_detail_fmt(void);
++
++
++// HDMI Audio Parmeters
++typedef enum
++{
++    CT_REFER_TO_STREAM = 0,
++    CT_PCM,
++    CT_AC_3,
++    CT_MPEG1,
++    CT_MP3,
++    CT_MPEG2,
++    CT_AAC,
++    CT_DTS,
++    CT_ATRAC,
++    CT_ONE_BIT_AUDIO,
++    CT_DOLBY_D,
++    CT_DTS_HD,
++    CT_MAT,
++    CT_DST,
++    CT_WMA,
++    CT_MAX,
++} audio_type_t;
++
++typedef enum
++{
++    CC_REFER_TO_STREAM = 0,
++    CC_2CH,
++    CC_3CH,
++    CC_4CH,
++    CC_5CH,
++    CC_6CH,
++    CC_7CH,
++    CC_8CH,
++    CC_MAX_CH
++} audio_channel_t;
++
++typedef enum
++{
++    AF_SPDIF = 0,
++    AF_I2S,
++    AF_DSD,
++    AF_HBR,
++    AT_MAX
++} audio_format_t;
++
++typedef enum {
++    SS_REFER_TO_STREAM = 0,
++    SS_16BITS,
++    SS_20BITS,
++    SS_24BITS,
++    SS_MAX
++}audio_sample_size_t;
++
++struct size_map_ss {
++    unsigned int sample_bits;
++    audio_sample_size_t ss;
++};
++
++//FL-- Front Left
++//FC --Front Center
++//FR --Front Right
++//FLC-- Front Left Center
++//FRC-- Front RiQhtCenter
++//RL-- Rear Left
++//RC --Rear Center
++//RR-- Rear Right
++//RLC-- Rear Left Center
++//RRC --Rear RiQhtCenter
++//LFE-- Low Frequency Effect
++typedef enum {
++    CA_FR_FL = 0,
++    CA_LFE_FR_FL,
++    CA_FC_FR_FL,
++    CA_FC_LFE_FR_FL,
++
++    CA_RC_FR_FL,
++    CA_RC_LFE_FR_FL,
++    CA_RC_FC_FR_FL,
++    CA_RC_FC_LFE_FR_FL,
++
++    CA_RR_RL_FR_FL,
++    CA_RR_RL_LFE_FR_FL,
++    CA_RR_RL_FC_FR_FL,
++    CA_RR_RL_FC_LFE_FR_FL,
++
++    CA_RC_RR_RL_FR_FL,
++    CA_RC_RR_RL_LFE_FR_FL,
++    CA_RC_RR_RL_FC_FR_FL,
++    CA_RC_RR_RL_FC_LFE_FR_FL,
++
++    CA_RRC_RC_RR_RL_FR_FL,
++    CA_RRC_RC_RR_RL_LFE_FR_FL,
++    CA_RRC_RC_RR_RL_FC_FR_FL,
++    CA_RRC_RC_RR_RL_FC_LFE_FR_FL,
++
++    CA_FRC_RLC_FR_FL,
++    CA_FRC_RLC_LFE_FR_FL,
++    CA_FRC_RLC_FC_FR_FL,
++    CA_FRC_RLC_FC_LFE_FR_FL,
++
++    CA_FRC_RLC_RC_FR_FL,
++    CA_FRC_RLC_RC_LFE_FR_FL,
++    CA_FRC_RLC_RC_FC_FR_FL,
++    CA_FRC_RLC_RC_FC_LFE_FR_FL,
++
++    CA_FRC_RLC_RR_RL_FR_FL,
++    CA_FRC_RLC_RR_RL_LFE_FR_FL,
++    CA_FRC_RLC_RR_RL_FC_FR_FL,
++    CA_FRC_RLC_RR_RL_FC_LFE_FR_FL,
++}speak_location_t;
++
++typedef enum {
++	LSV_0DB = 0,
++        LSV_1DB,
++        LSV_2DB,
++        LSV_3DB,
++        LSV_4DB,
++        LSV_5DB,
++        LSV_6DB,
++        LSV_7DB,
++        LSV_8DB,
++        LSV_9DB,
++        LSV_10DB,
++        LSV_11DB,
++        LSV_12DB,
++        LSV_13DB,
++        LSV_14DB,
++        LSV_15DB,
++}audio_down_mix_t;
++
++typedef enum
++{
++	 STATE_AUDIO__MUTED         =  0,
++	 STATE_AUDIO__REQUEST_AUDIO = 1,
++	 STATE_AUDIO__AUDIO_READY   = 2,
++	 STATE_AUDIO__ON            = 3,
++}hdmi_rx_audio_state_t;
++
++//Sampling Freq Fs:0 - Refer to Stream Header; 1 - 32KHz; 2 - 44.1KHz; 3 - 48KHz; 4 - 88.2KHz...
++typedef enum {
++    FS_REFER_TO_STREAM = 0,
++    FS_32K   = 1,
++    FS_44K1  = 2,
++    FS_48K   = 3,
++    FS_88K2  = 4,
++    FS_96K   = 5,
++    FS_176K4 = 6,
++    FS_192K  = 7,
++    FS_MAX,
++}audio_fs_t;
++
++struct rate_map_fs {
++    unsigned int rate;
++    audio_fs_t fs;
++};
++
++typedef struct
++{
++    audio_type_t type ;     //!< Signal decoding type -- TvAudioType
++    audio_format_t format;
++     audio_channel_t channels ; //!< active audio channels bit mask.
++    audio_fs_t fs;     //!< Signal sample rate in Hz
++    audio_sample_size_t ss;
++    speak_location_t speak_loc;
++    audio_down_mix_t lsv;
++    unsigned N_value;
++    unsigned CTS;
++} Hdmi_rx_audio_info_t;
++
++#define AUDIO_PARA_MAX_NUM       7
++struct hdmi_audio_fs_fmt_n_cts {
++    struct {
++        unsigned int tmds_clk;
++        unsigned int n;
++        unsigned int cts;
++    }array[AUDIO_PARA_MAX_NUM];
++    unsigned int def_n;
++};
++
++#endif
+diff --git a/include/linux/amlogic/hdmi_tx/hdmi_info_global.h b/include/linux/amlogic/hdmi_tx/hdmi_info_global.h
+index 7935159c..bc2fcf11 100644
+--- a/include/linux/amlogic/hdmi_tx/hdmi_info_global.h
++++ b/include/linux/amlogic/hdmi_tx/hdmi_info_global.h
+@@ -1,69 +1,9 @@
+ #ifndef _HDMI_INFO_GLOBAL_H
+ #define _HDMI_INFO_GLOBAL_H
+ 
+-typedef enum HDMI_Video_Type_ {
+-    HDMI_Unkown = 0 ,
+-    HDMI_480x320p60hz = 1,
+-    HDMI_480x272p60hz,
+-    HDMI_640x480p60,
+-    HDMI_480p60,
+-    HDMI_480p60_16x9,
+-    HDMI_720p60,
+-    HDMI_1080i60,
+-    HDMI_480i60,
+-    HDMI_480i60_16x9,
+-    HDMI_480i60_16x9_rpt = 11,
+-    HDMI_1440x480p60 = 14 ,
+-    HDMI_1440x480p60_16x9 = 15 ,
+-    HDMI_1080p60 = 16,
+-    HDMI_576p50,
+-    HDMI_576p50_16x9,
+-    HDMI_720p50,
+-    HDMI_1080i50,
+-    HDMI_576i50,
+-    HDMI_576i50_16x9,
+-    HDMI_576i50_16x9_rpt = 26,
+-    HDMI_1080p50 = 31,
+-    HDMI_1080p24,
+-    HDMI_1080p25,
+-    HDMI_1080p30,
+-    HDMI_480p60_16x9_rpt = 36,
+-    HDMI_576p50_16x9_rpt = 38,
+-    HDMI_1280x1024 = 71,
+-    HDMI_800p = 72,
+-    HDMI_800x480p60hz = 73,
+-    HDMI_480x800p60hz = 74,
+-    HDMI_1366x768p60hz = 75,
+-    HDMI_1600x900p60hz = 76,
+-    HDMI_800x600p60hz = 77,
+-    HDMI_1024x600p60hz,
+-    HDMI_1024x768p60hz,
+-    HDMI_1360x768p60hz,
+-    HDMI_1440x900p60hz,
+-    HDMI_1680x1050p60hz,
+-    HDMI_1920x1200 = 100,
+-    HDMI_4k2k_24 = 93,      // CEA-861-F
+-    HDMI_4k2k_25,
+-    HDMI_4k2k_30,
+-    HDMI_4k2k_50,
+-    HDMI_4k2k_60,
+-    HDMI_4k2k_smpte_24 = 98,   //24 Hz
+-    HDMI_4k2k_smpte_50 = 101,
+-    HDMI_4k2k_smpte_60,
+-} HDMI_Video_Codes_t ;
+-
+-
+-//-------------------HDMI VIDEO--------------------------------
+-#define TYPE_AVI_INFOFRAMES       0x82
+-#define AVI_INFOFRAMES_VERSION    0x02
+-#define AVI_INFOFRAMES_LENGTH     0x0D
++#include "hdmi_common.h"
+ 
+-typedef enum
+-{
+-    COLOR_SPACE_RGB444 = 0,
+-    COLOR_SPACE_YUV422 = 1,
+-    COLOR_SPACE_YUV444 = 2,
+-}color_space_type_t;
++// old definitions move to hdmi_common.h
+ 
+ typedef enum
+ {
+@@ -81,23 +21,6 @@ typedef struct
+ }pixs_type_t;
+ 
+ 
+-typedef enum
+-{
+-    ASPECT_RATIO_SAME_AS_SOURCE= 0,
+-    TV_ASPECT_RATIO_4_3,
+-    TV_ASPECT_RATIO_16_9,
+-    TV_ASPECT_RATIO_14_9,
+-    ASPECT_RATIO_MAX
+-} hdmi_aspect_ratio_t;
+-
+-typedef enum
+-{
+-    COLOR_24BIT = 0,
+-    COLOR_30BIT,
+-    COLOR_36BIT,
+-    COLOR_48BIT
+-} hdmi_color_depth_t;
+-
+ typedef enum
+ {
+     NO_REPEAT = 0,
+@@ -172,178 +95,6 @@ typedef struct {
+ #define AUDIO_INFOFRAMES_LENGTH     0x0A
+ 
+ 
+-typedef enum
+-{
+-    CT_REFER_TO_STREAM = 0,
+-    CT_PCM,
+-    CT_AC_3,
+-    CT_MPEG1,
+-    CT_MP3,
+-    CT_MPEG2,
+-    CT_AAC,
+-    CT_DTS,
+-    CT_ATRAC,
+-    CT_ONE_BIT_AUDIO,
+-    CT_DOLBY_D,
+-    CT_DTS_HD,
+-    CT_MAT,
+-    CT_DST,
+-    CT_WMA,
+-    CT_MAX,
+-} audio_type_t;
+-
+-
+-typedef enum
+-{
+-    CC_REFER_TO_STREAM = 0,
+-    CC_2CH,
+-    CC_3CH,
+-    CC_4CH,
+-    CC_5CH,
+-    CC_6CH,
+-    CC_7CH,
+-    CC_8CH,
+-    CC_MAX_CH
+-} audio_channel_t;
+-
+-typedef enum
+-{
+-    AF_SPDIF = 0,
+-    AF_I2S,
+-    AF_DSD,
+-    AF_HBR,
+-    AT_MAX
+-} audio_format_t;
+-
+-
+-//Sampling Freq Fs:0 - Refer to Stream Header; 1 - 32KHz; 2 - 44.1KHz; 3 - 48KHz; 4 - 88.2KHz...
+-typedef enum {
+-    FS_REFER_TO_STREAM = 0,
+-    FS_32K   = 1,
+-    FS_44K1  = 2,
+-    FS_48K   = 3,
+-    FS_88K2  = 4,
+-    FS_96K   = 5,
+-    FS_176K4 = 6,
+-    FS_192K  = 7,
+-    FS_352K8  = 8,
+-    FS_384K  = 9,
+-    FS_MAX,
+-}audio_fs_t;
+-
+-struct rate_map_fs {
+-    unsigned int rate;
+-    audio_fs_t fs;
+-};
+-
+-typedef enum {
+-    SS_REFER_TO_STREAM = 0,
+-    SS_16BITS,
+-    SS_20BITS,
+-    SS_24BITS,
+-    SS_MAX
+-}audio_sample_size_t;
+-
+-struct size_map_ss {
+-    unsigned int sample_bits;
+-    audio_sample_size_t ss;
+-};
+-
+-//FL-- Front Left
+-//FC --Front Center
+-//FR --Front Right
+-//FLC-- Front Left Center
+-//FRC-- Front RiQhtCenter
+-//RL-- Rear Left
+-//RC --Rear Center
+-//RR-- Rear Right
+-//RLC-- Rear Left Center
+-//RRC --Rear RiQhtCenter
+-//LFE-- Low Frequency Effect
+-typedef enum {
+-    CA_FR_FL = 0,
+-    CA_LFE_FR_FL,
+-    CA_FC_FR_FL,
+-    CA_FC_LFE_FR_FL,
+-
+-    CA_RC_FR_FL,
+-    CA_RC_LFE_FR_FL,
+-    CA_RC_FC_FR_FL,
+-    CA_RC_FC_LFE_FR_FL,
+-
+-    CA_RR_RL_FR_FL,
+-    CA_RR_RL_LFE_FR_FL,
+-    CA_RR_RL_FC_FR_FL,
+-    CA_RR_RL_FC_LFE_FR_FL,
+-
+-    CA_RC_RR_RL_FR_FL,
+-    CA_RC_RR_RL_LFE_FR_FL,
+-    CA_RC_RR_RL_FC_FR_FL,
+-    CA_RC_RR_RL_FC_LFE_FR_FL,
+-
+-    CA_RRC_RC_RR_RL_FR_FL,
+-    CA_RRC_RC_RR_RL_LFE_FR_FL,
+-    CA_RRC_RC_RR_RL_FC_FR_FL,
+-    CA_RRC_RC_RR_RL_FC_LFE_FR_FL,
+-
+-    CA_FRC_RLC_FR_FL,
+-    CA_FRC_RLC_LFE_FR_FL,
+-    CA_FRC_RLC_FC_FR_FL,
+-    CA_FRC_RLC_FC_LFE_FR_FL,
+-
+-    CA_FRC_RLC_RC_FR_FL,
+-    CA_FRC_RLC_RC_LFE_FR_FL,
+-    CA_FRC_RLC_RC_FC_FR_FL,
+-    CA_FRC_RLC_RC_FC_LFE_FR_FL,
+-
+-    CA_FRC_RLC_RR_RL_FR_FL,
+-    CA_FRC_RLC_RR_RL_LFE_FR_FL,
+-    CA_FRC_RLC_RR_RL_FC_FR_FL,
+-    CA_FRC_RLC_RR_RL_FC_LFE_FR_FL,
+-
+-}speak_location_t;
+-
+-typedef enum {
+-	LSV_0DB = 0,
+-        LSV_1DB,
+-        LSV_2DB,
+-        LSV_3DB,
+-        LSV_4DB,
+-        LSV_5DB,
+-        LSV_6DB,
+-        LSV_7DB,
+-        LSV_8DB,
+-        LSV_9DB,
+-        LSV_10DB,
+-        LSV_11DB,
+-        LSV_12DB,
+-        LSV_13DB,
+-        LSV_14DB,
+-        LSV_15DB,
+-
+-}audio_down_mix_t;
+-
+-typedef enum
+-{
+-	 STATE_AUDIO__MUTED         =  0,
+-	 STATE_AUDIO__REQUEST_AUDIO = 1,
+-	 STATE_AUDIO__AUDIO_READY   = 2,
+-	 STATE_AUDIO__ON            = 3,
+-}hdmi_rx_audio_state_t;
+-
+-typedef struct
+-{
+-    audio_type_t		            type ;     //!< Signal decoding type -- TvAudioType
+-    audio_format_t                      format;
+-     audio_channel_t			 channels ; //!< active audio channels bit mask.
+-    audio_fs_t				        fs;     //!< Signal sample rate in Hz
+-    audio_sample_size_t                 ss;
+-    speak_location_t                        speak_loc;
+-    audio_down_mix_t                       lsv;
+-    unsigned                                    N_value;
+-    unsigned                                    CTS;
+-} Hdmi_rx_audio_info_t;
+-
+ #define HDMI_E_NONE         0x0
+ // HPD Event & Status
+ #define E_HPD_PULG_IN       0x1
+@@ -602,11 +353,11 @@ typedef struct {
+ }Hdmi_tx_video_para_t;
+ 
+ typedef struct {
+-    audio_type_t type;  
++    audio_type_t type;
+     audio_channel_t channel_num;
+-    audio_fs_t sample_rate; 
+-    audio_sample_size_t sample_size; 
+-}Hdmi_tx_audio_para_t;    
++    audio_fs_t sample_rate;
++    audio_sample_size_t sample_size;
++}Hdmi_tx_audio_para_t;
+ 
+ // ACR packet CTS parameters have 3 types:
+ // 1. HW auto calculated
+diff --git a/include/linux/amlogic/hdmi_tx/hdmi_tx_cec.h b/include/linux/amlogic/hdmi_tx/hdmi_tx_cec.h
+index 4fa6f294..85b8f2c8 100644
+--- a/include/linux/amlogic/hdmi_tx/hdmi_tx_cec.h
++++ b/include/linux/amlogic/hdmi_tx/hdmi_tx_cec.h
+@@ -1,610 +1,651 @@
+-/*
+- * Amlogic Meson HDMI Transmitter Driver
+- * HDMI CEC Driver-----------HDMI_TX
+- * Copyright (C) 2011 Amlogic, Inc.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the named License,
+- * or any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+- * GNU General Public License for more details.
+- *
+- */
+-
+-#ifndef _TV_CEC_H_
+-#define _TV_CEC_H_
+-#include <linux/amlogic/hdmi_tx/hdmi_tx_module.h> 
+-#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8
+-#include <mach/hdmi_parameter.h>
+-#endif
+-
+-#define CEC0_LOG_ADDR 4 // MBX logical address
+-#define TV_CEC_INTERVAL     (HZ*3)
+-
+-#define CEC_VERSION     "v1.3"
+-#define _RX_DATA_BUF_SIZE_ 16
+-
+-#define _RX_CEC_DBG_ON_
+-#define _TX_CEC_DBG_ON_
+-
+-#ifdef  _RX_CEC_DBG_ON_
+-#define hdmirx_cec_dbg_print(fmt, args...) printk(KERN_WARNING fmt, ## args)//hdmi_print
+-#else
+-#define hdmirx_cec_dbg_print(fmt, args...)
+-#endif
+-
+-#ifdef  _TX_CEC_DBG_ON_
+-#define hdmitx_cec_dbg_print(fmt, args...) printk(KERN_WARNING fmt, ## args)//hdmi_print
+-#else
+-#define hdmitx_cec_dbg_print(fmt, args...)
+-#endif
+-#define HDMI_CEC_DEBUG()  printk("HDMI CEC DEBUG: %s [%d]\n", __FUNCTION__, __LINE__)
+-
+-extern unsigned int cec_tx_irq_flag;
+-extern unsigned int cec_tx_irq_syn_flag;
+-void fiq_gpio_test(unsigned int cmd);
+-
+-
+-#define MSG_P0( init, follow, opcode )    {                \
+-    gbl_msg[0] = (init)<<4 | (follow);                    \
+-    gbl_msg[1] = (opcode);                                \
+-}
+-
+-#define MSG_P1( i, f, o, p1 )    { \
+-    gbl_msg[2]=(p1); MSG_P0((i),(f),(o)); }
+-#define MSG_P2( i, f, o, p1, p2 )    { \
+-    gbl_msg[3]=(p2); MSG_P1((i),(f),(o),(p1)); }
+-#define MSG_P3( i, f, o, p1, p2, p3 )    { \
+-    gbl_msg[4]=(p3); MSG_P2((i),(f),(o),(p1),(p2)); }
+-#define MSG_P4( i, f, o, p1, p2, p3, p4 )    { \
+-    gbl_msg[5]=(p4); MSG_P3((i),(f),(o),(p1),(p2),(p3)); }
+-#define MSG_P5( i, f, o, p1, p2, p3, p4, p5 )    { \
+-    gbl_msg[6]=(p5); MSG_P4((i),(f),(o),(p1),(p2),(p3),(p4)); }
+-#define MSG_P6( i, f, o, p1, p2, p3, p4, p5, p6 )    { \
+-    gbl_msg[7]=(p6); MSG_P5((i),(f),(o),(p1),(p2),(p3),(p4),(p5)); }
+-#define MSG_P7( i, f, o, p1, p2, p3, p4, p5, p6, p7 )    { \
+-    gbl_msg[8]=(p7); MSG_P6((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6)); }
+-#define MSG_P8( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8 )    { \
+-    gbl_msg[9]=(p8); MSG_P7((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7)); }
+-#define MSG_P9( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8, p9 )    { \
+-    gbl_msg[10]=(p9); MSG_P8((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7),(p8)); }
+-#define MSG_P10( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 )    { \
+-    gbl_msg[11]=(p10); MSG_P9((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7),(p8),(p9)); }
+-#define MSG_P11( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 )    { \
+-    gbl_msg[12]=(p11); MSG_P10((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7),(p8),(p9),(p10)); }
+-#define MSG_P12( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 )    { \
+-    gbl_msg[13]=(p12); MSG_P11((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7),(p8),(p9),(p10),(p11)); }
+-#define MSG_P13( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 )    { \
+-    gbl_msg[14]=(p13); MSG_P12((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7),(p8),(p9),(p10),(p11),(p12)); }
+-#define MSG_P14( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14 )    { \
+-    gbl_msg[15]=(p14); MSG_P13((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7),(p8),(p9),(p10),(p11),(p12),(p13)); }
+-
+-
+-#define MAX_MSG        16
+-#define MAX_NUM_OF_DEV    16
+-
+-enum _cec_ping_e {
+-    CEC_PING_REPLY = 0,
+-    CEC_PING_FAIL
+-};
+-
+-enum _cec_log_dev_addr_e {
+-    CEC_TV_ADDR                    = 0x00,
+-    CEC_RECORDING_DEVICE_1_ADDR,
+-    CEC_RECORDING_DEVICE_2_ADDR,
+-    CEC_TUNER_1_ADDR,
+-    CEC_PLAYBACK_DEVICE_1_ADDR,
+-    CEC_AUDIO_SYSTEM_ADDR,
+-    CEC_TUNER_2_ADDR,
+-    CEC_TUNER_3_ADDR,
+-    CEC_PLAYBACK_DEVICE_2_ADDR,
+-    CEC_RECORDING_DEVICE_3_ADDR,
+-    CEC_TUNER_4_ADDR,
+-    CEC_PLAYBACK_DEVICE_3_ADDR,
+-    CEC_RESERVED_1_ADDR,
+-    CEC_RESERVED_2_ADDR,
+-    CEC_FREE_USE_ADDR,
+-    CEC_UNREGISTERED_ADDR
+-};
+-
+-#define CEC_BROADCAST_ADDR CEC_UNREGISTERED_ADDR
+-
+-#define CEC_TV                        ( 1 << CEC_TV_ADDR )
+-#define CEC_RECORDING_DEVICE_1        ( 1 << CEC_RECORDING_DEVICE_1_ADDR )
+-#define CEC_RECORDING_DEVICE_2        ( 1 << CEC_RECORDING_DEVICE_2_ADDR )
+-#define CEC_TUNER_1                    ( 1 << CEC_TUNER_1_ADDR )
+-#define CEC_PLAYBACK_DEVICE_1        ( 1 << CEC_PLAYBACK_DEVICE_1_ADDR )
+-#define CEC_AUDIO_SYSTEM            ( 1 << CEC_AUDIO_SYSTEM_ADDR )
+-#define CEC_TUNER_2                    ( 1 << CEC_TUNER_2_ADDR )
+-#define CEC_TUNER_3                    ( 1 << CEC_TUNER_3_ADDR )
+-#define CEC_PLAYBACK_DEVICE_2        ( 1 << CEC_PLAYBACK_DEVICE_2_ADDR )
+-#define CEC_RECORDING_DEVICE_3        ( 1 << CEC_RECORDING_DEVICE_3_ADDR )
+-#define CEC_TUNER_4                    ( 1 << CEC_TUNER_4_ADDR )
+-#define CEC_PLAYBACK_DEVICE_3        ( 1 << CEC_PLAYBACK_DEVICE_3_ADDR )
+-#define CEC_RESERVED_1                ( 1 << CEC_RESERVED_1_ADDR )
+-#define CEC_RESERVED_2                ( 1 << CEC_RESERVED_2_ADDR )
+-#define CEC_FREE_USE                ( 1 << CEC_FREE_USE_ADDR )
+-#define CEC_UNREGISTERED            ( 1 << CEC_UNREGISTERED_ADDR )
+-
+-#define CEC_DISPLAY_DEVICE            ( CEC_TV | CEC_FREE_USE )
+-#define    CEC_RECORDING_DEVICE        ( CEC_RECORDING_DEVICE_1 | CEC_RECORDING_DEVICE_2 | CEC_RECORDING_DEVICE_3 )
+-#define    CEC_PLAYBACK_DEVICE            ( CEC_PLAYBACK_DEVICE_1 | CEC_PLAYBACK_DEVICE_2 | CEC_PLAYBACK_DEVICE_3 )
+-#define    CEC_TUNER_DEVICE            ( CEC_TUNER_1 | CEC_TUNER_2 | CEC_TUNER_3 | CEC_TUNER_4 )
+-#define    CEC_AUDIO_SYSTEM_DEVICE        ( CEC_AUDIO_SYSTEM )
+-
+-enum cec_dev_type_addr {
+-    CEC_DISPLAY_DEVICE_TYPE = 0x0,
+-    CEC_RECORDING_DEVICE_TYPE,
+-    CEC_RESERVED_DEVICE_TYPE,
+-    CEC_TUNER_DEVICE_TYPE,
+-    CEC_PLAYBACK_DEVICE_TYPE,
+-    CEC_AUDIO_SYSTEM_DEVICE_TYPE,
+-    CEC_UNREGISTERED_DEVICE_TYPE,
+-};
+-
+-typedef struct _context_t {
+-    unsigned char state;
+-} context_t;
+-
+-typedef enum  {
+-    CEC_UNRECONIZED_OPCODE = 0x0,
+-    CEC_NOT_CORRECT_MODE_TO_RESPOND,
+-    CEC_CANNOT_PROVIDE_SOURCE,
+-    CEC_INVALID_OPERAND,
+-    CEC_REFUSED,
+-    CEC_UNABLE_TO_DETERMINE,
+-} cec_feature_abort_e;
+-
+-/*
+- * CEC OPCODES
+- */
+-#define    CEC_OC_ABORT_MESSAGE                     0xFF
+-#define    CEC_OC_ACTIVE_SOURCE                     0x82
+-#define    CEC_OC_CEC_VERSION                         0x9E
+-#define    CEC_OC_CLEAR_ANALOGUE_TIMER             0x33
+-#define    CEC_OC_CLEAR_DIGITAL_TIMER                 0x99
+-#define    CEC_OC_CLEAR_EXTERNAL_TIMER             0xA1
+-#define    CEC_OC_DECK_CONTROL                     0x42
+-#define    CEC_OC_DECK_STATUS                         0x1B
+-#define    CEC_OC_DEVICE_VENDOR_ID                 0x87
+-#define    CEC_OC_FEATURE_ABORT                     0x00
+-#define    CEC_OC_GET_CEC_VERSION                     0x9F
+-#define    CEC_OC_GET_MENU_LANGUAGE                 0x91
+-#define    CEC_OC_GIVE_AUDIO_STATUS                 0x71
+-#define    CEC_OC_GIVE_DECK_STATUS                 0x1A
+-#define    CEC_OC_GIVE_DEVICE_POWER_STATUS         0x8F
+-#define    CEC_OC_GIVE_DEVICE_VENDOR_ID             0x8C
+-#define    CEC_OC_GIVE_OSD_NAME                     0x46
+-#define    CEC_OC_GIVE_PHYSICAL_ADDRESS             0x83
+-#define    CEC_OC_GIVE_SYSTEM_AUDIO_MODE_STATUS     0x7D
+-#define    CEC_OC_GIVE_TUNER_DEVICE_STATUS         0x08
+-#define    CEC_OC_IMAGE_VIEW_ON                     0x04
+-#define    CEC_OC_INACTIVE_SOURCE                     0x9D
+-#define    CEC_OC_MENU_REQUEST                     0x8D
+-#define    CEC_OC_MENU_STATUS                         0x8E
+-#define    CEC_OC_PLAY                             0x41
+-#define    CEC_OC_POLLING_MESSAGE                     0xFC    /* Fake Code - <Poll Message> has no OP Code and requires only the header byte */
+-#define    CEC_OC_RECORD_OFF                         0x0B
+-#define    CEC_OC_RECORD_ON                         0x09
+-#define    CEC_OC_RECORD_STATUS                     0x0A
+-#define    CEC_OC_RECORD_TV_SCREEN                 0x0F
+-#define    CEC_OC_REPORT_AUDIO_STATUS                 0x7A
+-#define    CEC_OC_REPORT_PHYSICAL_ADDRESS             0x84
+-#define    CEC_OC_REPORT_POWER_STATUS                 0x90
+-#define    CEC_OC_REQUEST_ACTIVE_SOURCE             0x85
+-#define    CEC_OC_ROUTING_CHANGE                     0x80
+-#define    CEC_OC_ROUTING_INFORMATION                 0x81
+-#define    CEC_OC_SELECT_ANALOGUE_SERVICE             0x92
+-#define    CEC_OC_SELECT_DIGITAL_SERVICE             0x93
+-#define    CEC_OC_SET_ANALOGUE_TIMER                 0x34
+-#define    CEC_OC_SET_AUDIO_RATE                     0x9A
+-#define    CEC_OC_SET_DIGITAL_TIMER                 0x97
+-#define    CEC_OC_SET_EXTERNAL_TIMER                 0xA2
+-#define    CEC_OC_SET_MENU_LANGUAGE                 0x32
+-#define    CEC_OC_SET_OSD_NAME                     0x47
+-#define    CEC_OC_SET_OSD_STRING                     0x64
+-#define    CEC_OC_SET_STREAM_PATH                     0x86
+-#define    CEC_OC_SET_SYSTEM_AUDIO_MODE             0x72
+-#define    CEC_OC_SET_TIMER_PROGRAM_TITLE             0x67
+-#define    CEC_OC_STANDBY                             0x36
+-#define    CEC_OC_SYSTEM_AUDIO_MODE_REQUEST         0x70
+-#define    CEC_OC_SYSTEM_AUDIO_MODE_STATUS         0x7E
+-#define    CEC_OC_TEXT_VIEW_ON                     0x0D
+-#define    CEC_OC_TIMER_CLEARED_STATUS             0x43
+-#define    CEC_OC_TIMER_STATUS                     0x35
+-#define    CEC_OC_TUNER_DEVICE_STATUS                 0x07
+-#define    CEC_OC_TUNER_STEP_DECREMENT             0x06
+-#define    CEC_OC_TUNER_STEP_INCREMENT             0x05
+-#define    CEC_OC_USER_CONTROL_PRESSED             0x44
+-#define    CEC_OC_USER_CONTROL_RELEASED             0x45
+-#define    CEC_OC_VENDOR_COMMAND                     0x89
+-#define    CEC_OC_VENDOR_COMMAND_WITH_ID             0xA0
+-#define    CEC_OC_VENDOR_REMOTE_BUTTON_DOWN         0x8A
+-#define    CEC_OC_VENDOR_REMOTE_BUTTON_UP             0x8B
+-
+-/* cec message structure */
+-typedef struct {
+-    union {
+-        unsigned char buffer[16];          // message memory
+-        struct {
+-            unsigned char header;          // 4bit Initiator logical address + 4bit Destination logical address
+-            unsigned char opcode;          // message opcode
+-            unsigned char operands[14];    // the maximun operand is 14
+-            //unsigned int  flag;            // flag = 1 ,cec key pressed;flag = 0, cec key released
+-        }msg;                              // message struct
+-    }content;                              // message content
+-    unsigned char operand_num;             // number of operand
+-    unsigned char msg_length;
+-} cec_rx_message_t;
+-
+-typedef struct {
+-    cec_rx_message_t cec_message;
+-    struct list_head list;
+-} cec_rx_message_list_t;
+-
+-typedef struct {
+-    unsigned char msg[MAX_MSG];
+-    unsigned char length;
+-    struct list_head list;
+-} cec_tx_message_list_t;
+-
+-/* cec global struct */
+-
+-typedef enum {
+-    STATE_UNKNOWN = 0x00,
+-    STATE_START,
+-    STATE_STOP
+-} cec_node_status_e;
+-
+-typedef enum {
+-    POWER_ON = 0x00,
+-    POWER_STANDBY,
+-    TRANS_STANDBY_TO_ON,
+-    TRANS_ON_TO_STANDBY,
+-} cec_power_status_e;
+-
+-typedef enum {
+-    STATUS_REQ_ON = 1,
+-    STATUS_REQ_OFF,
+-    STATUS_REQ_ONCE,
+-}status_req_mode_e;
+-
+-typedef enum {
+-    DECK_UNKNOWN_STATUS = 0,
+-    DECK_PLAY = 0X11,
+-    DECK_RECORD,
+-    DECK_PLAY_REVERSE,
+-    DECK_STILL,
+-    DECK_SLOW,
+-    DECK_SLOW_REVERSE,
+-    DECK_FAST_FORWARD,
+-    DECK_FAST_REVERSE,
+-    DECK_NO_MEDIA,
+-    DECK_STOP,
+-    DECK_SKIP_FORWARD_WIND,
+-    DECK_SKIP_REVERSE_REWIND,
+-    DECK_INDEX_SEARCH_FORWARD,
+-    DECK_INDEX_SEARCH_REVERSE,
+-    DECK_OTHER_STATUS,
+-} deck_info_e;
+-
+-typedef enum {
+-    DECK_CNT_SKIP_FORWARD_WIND = 1,
+-    DECK_CNT_SKIP_REVERSE_REWIND,
+-    DECK_CNT_STOP,
+-    DECK_CNT_EJECT,
+-} deck_cnt_mode_e;
+-
+-typedef enum {
+-    PLAY_FORWARD = 0X24,
+-    PLAY_REVERSE = 0X20,
+-    PLAY_STILL = 0X25,
+-    FAST_FORWARD_MIN_SPEED = 0X05,
+-    FAST_FORWARD_MEDIUM_SPEED = 0X06,
+-    FAST_FORWARD_MAX_SPEED = 0X07,
+-    FAST_REVERSE_MIN_SPEED = 0X09,
+-    FAST_REVERSE_MEDIUM_SPEED = 0X0A,
+-    FAST_REVERSE_MAX_SPEED = 0X0B,
+-    SLOW_FORWARD_MIN_SPEED = 0X15,
+-    SLOW_FORWARD_MEDIUM_SPEED = 0X16,
+-    SLOW_FORWARD_MAX_SPEED = 0X17,
+-    SLOW_REVERSE_MIN_SPEED = 0X19,
+-    SLOW_REVERSE_MEDIUM_SPEED = 0X1A,
+-    SLOW_REVERSE_MAX_SPEED = 0X1B,
+-} play_mode_e;
+-
+-typedef enum {
+-    MENU_REQ_ACTIVATE = 0,
+-    MENU_REQ_DEACTIVATE,
+-    MENU_REQ_QUERY,
+-} menu_req_type_e;
+-
+-typedef enum {
+-    MENU_STATE_ACTIVATED = 0,
+-    MENU_STATE_DEACTIVATED,
+-} menu_state_e;
+-
+-typedef enum {
+-    CEC_VERSION_11 = 0,
+-    CEC_VERSION_12,
+-    CEC_VERSION_12A,
+-    CEC_VERSION_13,
+-    CEC_VERSION_13A,
+-    CEC_VERSION_14A,
+-} cec_version_e;
+-
+-typedef enum {
+-    CEC_HDMI_PORT_UKNOWN = 0,
+-    CEC_HDMI_PORT_1,
+-    CEC_HDMI_PORT_2,
+-    CEC_HDMI_PORT_3,
+-} cec_hdmi_port_e;
+-
+-typedef enum {
+-    OFF = 0,
+-    ON,
+-} system_audio_status_e;
+-typedef unsigned long cec_info_mask;
+-
+-#define INFO_MASK_CEC_VERSION                (1<<0)
+-#define INFO_MASK_VENDOR_ID                  (1<<1)
+-#define INFO_MASK_DEVICE_TYPE                (1<<2)
+-#define INFO_MASK_POWER_STATUS               (1<<3)
+-#define INFO_MASK_PHYSICAL_ADDRESS           (1<<4)
+-#define INFO_MASK_LOGIC_ADDRESS              (1<<5)
+-#define INFO_MASK_OSD_NAME                   (1<<6)
+-#define INFO_MASK_MENU_STATE                 (1<<7)
+-#define INFO_MASK_MENU_LANGUAGE              (1<<8)
+-#define INFO_MASK_DECK_INfO                  (1<<9)
+-#define INFO_MASK_PLAY_MODE                  (1<<10)
+-
+-/*CEC UI MASK*/
+-#define CEC_FUNC_MSAK                        0
+-#define ONE_TOUCH_PLAY_MASK                  1
+-#define ONE_TOUCH_STANDBY_MASK               2
+-#define AUTO_POWER_ON_MASK                   3
+-
+-
+-typedef struct {
+-    cec_hdmi_port_e hdmi_port;
+-    cec_info_mask real_info_mask;
+-    unsigned char cec_version;
+-    unsigned int vendor_id:24;
+-    unsigned char dev_type;
+-    unsigned char menu_status;
+-    cec_power_status_e power_status;
+-    union {
+-        unsigned short phy_addr_4;
+-        struct {
+-            unsigned char cd;
+-            unsigned char ab;
+-        } phy_addr_2;
+-        struct {
+-            unsigned char d:4;
+-            unsigned char c:4;
+-            unsigned char b:4;
+-            unsigned char a:4;
+-        }phy_addr_1;
+-    }phy_addr;
+-    unsigned char log_addr;
+-    unsigned char osd_name[16];
+-    unsigned char osd_name_def[16];
+-    menu_state_e menu_state;
+-    int menu_lang;
+-    union {
+-        struct {
+-        } display;
+-        struct {
+-        } recording;
+-        struct {
+-            deck_cnt_mode_e deck_cnt_mode;
+-            deck_info_e deck_info;
+-            play_mode_e play_mode;
+-        } playback;
+-        struct {
+-        } tuner;
+-        struct {
+-            system_audio_status_e sys_audio_mode;
+-            struct {
+-                unsigned char audio_mute_status : 1;
+-                unsigned char audio_volume_status : 7;
+-            } audio_status;
+-        } audio;
+-    }specific_info;
+-    
+-} cec_node_info_t;
+-
+-typedef struct {
+-    cec_rx_message_t cec_rx_message[_RX_DATA_BUF_SIZE_];
+-    unsigned char rx_write_pos;
+-    unsigned char rx_read_pos;
+-    unsigned char rx_buf_size;
+-} cec_rx_msg_buf_t;
+-
+-typedef struct {
+-    unsigned int cec_key_flag;
+-    unsigned int cec_init_flag;
+-    int cec_fiq_flag;
+-    int cec_repeat_flag;
+-} cec_flag_t;
+-
+-typedef struct {
+-    unsigned short dev_mask;
+-    unsigned char active_log_dev;
+-    unsigned char my_node_index;
+-    cec_flag_t cec_flag;
+-    struct input_dev *remote_cec_dev; //cec input device
+-    cec_node_info_t cec_node_info[MAX_NUM_OF_DEV];
+-    cec_rx_msg_buf_t cec_rx_msg_buf;
+-    hdmitx_dev_t* hdmitx_device;
+-    cec_power_status_e tv_power_status;
+-} cec_global_info_t;
+-
+-typedef struct {
+-    unsigned char dev_number;
+-    unsigned char active_log_dev;
+-    cec_node_info_t cec_node_info_online[];
+-} cec_global_info_to_usr_t;
+-
+-typedef enum {
+-    GET_CEC_VERSION = 0,
+-    GET_POWER_STATUS,
+-    GET_DEV_POWER_STATUS,
+-    GET_DEV_VENDOR_ID,
+-    GET_OSD_NAME,
+-    GET_OSD_STRING,
+-    GET_PHYSICAL_ADDR,
+-    GET_SYSTEM_AUDIO_MODE,
+-    GET_TUNER_DEV_STATUS,       //0x8
+-    GIVE_DECK_STATUS,
+-    SET_DECK_CONTROL_MODE,
+-    SET_PLAY_MODE,
+-    GET_AUDIO_STATUS,
+-    SET_STANDBY,
+-    SET_IMAGEVIEW_ON,
+-    GET_MENU_STATE,
+-    SET_MENU_STATE,             //0x10
+-    SET_MENU_LANGAGE,
+-    GET_MENU_LANGUAGE,
+-    GET_ACTIVE_SOURCE,
+-    SET_ACTIVE_SOURCE,
+-    SET_DEACTIVE_SOURCE,
+-    CLR_NODE_DEV_REAL_INFO_MASK,
+-    REPORT_PHYSICAL_ADDRESS,    //0x17
+-    SET_TEXT_VIEW_ON,
+-    POLLING_ONLINE_DEV, //0x19
+-    PING_TV,
+-    USR_CMD_MAX,
+-} usr_cmd_type_e;
+-
+-typedef enum {
+-    TV_CEC_PENDING_OFF = 0,
+-    TV_CEC_PENDING_ON,
+-} tv_cec_pending_e;
+-
+-typedef enum {
+-    TV_CEC_POLLING_OFF = 0,
+-    TV_CEC_POLLING_ON,
+-} tv_cec_polling_state_e;
+-
+-typedef enum {
+-    DEVICE_MENU_ACTIVE = 0,
+-    DEVICE_MENU_INACTIVE,    
+-} cec_device_menu_state_e;
+-
+-void cec_enable_irq(void);
+-void cec_disable_irq(void);
+-
+-int cec_ll_tx_polling(const unsigned char *msg, unsigned char len);
+-
+-int cec_ll_tx(const unsigned char *msg, unsigned char len);
+-int cec_ll_rx( unsigned char *msg, unsigned char *len);
+-
+-void cec_test_function(unsigned char* arg, unsigned char arg_cnt);
+-void cec_node_init(hdmitx_dev_t* hdmitx_device);
+-void cec_node_uninit(hdmitx_dev_t* hdmitx_device);
+-
+-void cec_hw_reset(void);
+-
+-void register_cec_rx_msg(unsigned char *msg, unsigned char len );
+-void cec_handle_message(cec_rx_message_t* pcec_message);
+-void unregister_cec_tx_msg(cec_tx_message_list_t* cec_usr_message_list);
+-void register_cec_tx_msg(unsigned char *msg, unsigned char len);
+-void cec_usr_cmd_post_process(void);
+-void cec_set_pending(tv_cec_pending_e on_off);
+-void cec_polling_online_dev(int log_addr, int *bool);
+-unsigned short cec_log_addr_to_dev_type(unsigned char log_addr);
+-
+-void cec_routing_information(cec_rx_message_t* pcec_message);
+-void cec_routing_change(cec_rx_message_t* pcec_message);
+-void cec_usrcmd_set_osd_name(cec_rx_message_t* pcec_message);
+-void cec_usrcmd_set_device_vendor_id(void);
+-void cec_usrcmd_get_cec_version(unsigned char log_addr);
+-void cec_usrcmd_get_audio_status(unsigned char log_addr);
+-void cec_usrcmd_get_deck_status(unsigned char log_addr);
+-void cec_usrcmd_get_device_power_status(unsigned char log_addr);
+-void cec_usrcmd_get_device_vendor_id(unsigned char log_addr);
+-void cec_usrcmd_get_osd_name(unsigned char log_addr);
+-void cec_usrcmd_get_physical_address(unsigned char log_addr);
+-void cec_usrcmd_get_system_audio_mode_status(unsigned char log_addr);
+-void cec_usrcmd_get_tuner_device_status(unsigned char log_addr);
+-void cec_usrcmd_parse_all_dev_online(void);
+-void cec_usrcmd_set_deck_cnt_mode(unsigned char log_addr, deck_cnt_mode_e deck_cnt_mode);
+-void cec_usrcmd_set_standby(unsigned char log_addr);
+-void cec_usrcmd_set_imageview_on(unsigned char log_addr);
+-void cec_usrcmd_set_play_mode(unsigned char log_addr, play_mode_e play_mode);
+-void cec_usrcmd_get_menu_state(unsigned char log_addr);
+-void cec_usrcmd_set_menu_state(unsigned char log_addr, menu_req_type_e menu_req_type);
+-void cec_usrcmd_get_menu_language(unsigned char log_addr);
+-void cec_usrcmd_get_active_source(void);
+-void cec_usrcmd_set_active_source(void);
+-void cec_usrcmd_set_deactive_source(unsigned char log_addr);
+-void cec_usrcmd_clear_node_dev_real_info_mask(unsigned char log_addr, cec_info_mask mask);
+-void cec_usrcmd_set_report_physical_address(void);
+-void cec_usrcmd_text_view_on(unsigned char log_addr);
+-void cec_polling_online_dev(int log_addr, int *bool);
+-void cec_device_vendor_id(cec_rx_message_t* pcec_message);
+-void cec_report_power_status(cec_rx_message_t* pcec_message);
+-void cec_active_source(cec_rx_message_t* pcec_message);
+-void cec_set_stream_path(cec_rx_message_t* pcec_message);
+-void cec_set_osd_name(cec_rx_message_t* pcec_message);
+-void cec_set_osd_name_init(void);
+-void cec_inactive_source_rx(cec_rx_message_t* pcec_message);
+-void cec_set_system_audio_mode(void);
+-void cec_system_audio_mode_request(void);
+-void cec_report_audio_status(void);
+-void cec_get_menu_language_smp(void);
+-void cec_device_vendor_id_smp(void);
+-void cec_menu_status_smp(cec_device_menu_state_e status);
+-void cec_set_imageview_on_irq(void);
+-void cec_active_source_irq(void);
+-
+-void cec_report_physical_address_smp(void);
+-void cec_imageview_on_smp(void);
+-void cec_active_source_smp(void);
+-void cec_active_source_rx(cec_rx_message_t* pcec_message);
+-
+-size_t cec_usrcmd_get_global_info(char * buf);
+-void cec_usrcmd_set_dispatch(const char * buf, size_t count);
+-void cec_usrcmd_set_config(const char * buf, size_t count);
+-void cec_usrcmd_set_lang_config(const char * buf, size_t count); 
+-void cec_input_handle_message(void);
+-void cec_send_event_irq(void);
+-void cec_standby_irq(void);
+-void cec_user_control_released_irq(void);
+-void cec_user_control_pressed_irq(void);
+-void cec_inactive_source(void);
+-void cec_set_standby(void);
+-void cec_isr_post_process(void);
+-void cec_clear_buf(unsigned int flag);
+-
+-#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8
+-void cec_arbit_bit_time_set(unsigned bit_set, unsigned time_set, unsigned flag);
+-void tx_irq_handle(void);
+-void cec_arbit_bit_time_read(void);
+-void tx_irq_handle(void);
+-void ao_cec_init(void);
+-#endif
+-
+-#ifdef CONFIG_ARCH_MESON6
+-void cec_gpi_init(void);
+-#endif
+-
+-unsigned char check_cec_msg_valid(const cec_rx_message_t* pcec_message);
+-void cec_send_event(cec_rx_message_t* pcec_message);
+-void cec_user_control_pressed(cec_rx_message_t* pcec_message);
+-void cec_user_control_released(cec_rx_message_t* pcec_message);  
+-void cec_standby(cec_rx_message_t* pcec_message);
+-void cec_send_simplink_alive(cec_rx_message_t *pcec_message);
+-void cec_send_simplink_ack(cec_rx_message_t *pcec_message);
+-extern void cec_key_init(void);
+-
+-extern __u16 cec_key_map[];
+-extern cec_global_info_t cec_global_info;
+-
+-#endif
+-
++/*
++ * Amlogic Meson HDMI Transmitter Driver
++ * HDMI CEC Driver-----------HDMI_TX
++ * Copyright (C) 2011 Amlogic, Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the named License,
++ * or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ */
++
++#ifndef _TV_CEC_H_
++#define _TV_CEC_H_
++#include <linux/amlogic/hdmi_tx/hdmi_tx_module.h>
++#if (MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8) && (MESON_CPU_TYPE < MESON_CPU_TYPE_MESONG9TV)
++#include <mach/hdmi_parameter.h>
++#endif
++
++#define CEC0_LOG_ADDR 4 // MBX logical address
++#define TV_CEC_INTERVAL     (HZ*3)
++
++#define CEC_VERSION     "v1.3"
++#define _RX_DATA_BUF_SIZE_ 16
++
++#define _RX_CEC_DBG_ON_
++#define _TX_CEC_DBG_ON_
++
++#ifdef  _RX_CEC_DBG_ON_
++#define hdmirx_cec_dbg_print(fmt, args...) printk(KERN_WARNING fmt, ## args)//hdmi_print
++#else
++#define hdmirx_cec_dbg_print(fmt, args...)
++#endif
++
++#ifdef  _TX_CEC_DBG_ON_
++#define hdmitx_cec_dbg_print(fmt, args...) printk(KERN_WARNING fmt, ## args)//hdmi_print
++#else
++#define hdmitx_cec_dbg_print(fmt, args...)
++#endif
++#define HDMI_CEC_DEBUG()  printk("HDMI CEC DEBUG: %s [%d]\n", __FUNCTION__, __LINE__)
++
++//#define G9_CEC  //for G9 CEC debug.
++#define AO_CEC  //for switch between aocec and hdmi cec2.0
++
++extern unsigned int cec_tx_irq_flag;
++extern unsigned int cec_tx_irq_syn_flag;
++void fiq_gpio_test(unsigned int cmd);
++
++
++#define MSG_P0( init, follow, opcode )    {                \
++    gbl_msg[0] = (init)<<4 | (follow);                    \
++    gbl_msg[1] = (opcode);                                \
++}
++
++#define MSG_P1( i, f, o, p1 )    { \
++    gbl_msg[2]=(p1); MSG_P0((i),(f),(o)); }
++#define MSG_P2( i, f, o, p1, p2 )    { \
++    gbl_msg[3]=(p2); MSG_P1((i),(f),(o),(p1)); }
++#define MSG_P3( i, f, o, p1, p2, p3 )    { \
++    gbl_msg[4]=(p3); MSG_P2((i),(f),(o),(p1),(p2)); }
++#define MSG_P4( i, f, o, p1, p2, p3, p4 )    { \
++    gbl_msg[5]=(p4); MSG_P3((i),(f),(o),(p1),(p2),(p3)); }
++#define MSG_P5( i, f, o, p1, p2, p3, p4, p5 )    { \
++    gbl_msg[6]=(p5); MSG_P4((i),(f),(o),(p1),(p2),(p3),(p4)); }
++#define MSG_P6( i, f, o, p1, p2, p3, p4, p5, p6 )    { \
++    gbl_msg[7]=(p6); MSG_P5((i),(f),(o),(p1),(p2),(p3),(p4),(p5)); }
++#define MSG_P7( i, f, o, p1, p2, p3, p4, p5, p6, p7 )    { \
++    gbl_msg[8]=(p7); MSG_P6((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6)); }
++#define MSG_P8( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8 )    { \
++    gbl_msg[9]=(p8); MSG_P7((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7)); }
++#define MSG_P9( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8, p9 )    { \
++    gbl_msg[10]=(p9); MSG_P8((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7),(p8)); }
++#define MSG_P10( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 )    { \
++    gbl_msg[11]=(p10); MSG_P9((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7),(p8),(p9)); }
++#define MSG_P11( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11 )    { \
++    gbl_msg[12]=(p11); MSG_P10((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7),(p8),(p9),(p10)); }
++#define MSG_P12( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12 )    { \
++    gbl_msg[13]=(p12); MSG_P11((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7),(p8),(p9),(p10),(p11)); }
++#define MSG_P13( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 )    { \
++    gbl_msg[14]=(p13); MSG_P12((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7),(p8),(p9),(p10),(p11),(p12)); }
++#define MSG_P14( i, f, o, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14 )    { \
++    gbl_msg[15]=(p14); MSG_P13((i),(f),(o),(p1),(p2),(p3),(p4),(p5),(p6),(p7),(p8),(p9),(p10),(p11),(p12),(p13)); }
++
++
++#define MAX_MSG        16
++#define MAX_NUM_OF_DEV    16
++
++enum _cec_ping_e {
++    CEC_PING_REPLY = 0,
++    CEC_PING_FAIL
++};
++
++enum _cec_log_dev_addr_e {
++    CEC_TV_ADDR                    = 0x00,
++    CEC_RECORDING_DEVICE_1_ADDR,
++    CEC_RECORDING_DEVICE_2_ADDR,
++    CEC_TUNER_1_ADDR,
++    CEC_PLAYBACK_DEVICE_1_ADDR,
++    CEC_AUDIO_SYSTEM_ADDR,
++    CEC_TUNER_2_ADDR,
++    CEC_TUNER_3_ADDR,
++    CEC_PLAYBACK_DEVICE_2_ADDR,
++    CEC_RECORDING_DEVICE_3_ADDR,
++    CEC_TUNER_4_ADDR,
++    CEC_PLAYBACK_DEVICE_3_ADDR,
++    CEC_RESERVED_1_ADDR,
++    CEC_RESERVED_2_ADDR,
++    CEC_FREE_USE_ADDR,
++    CEC_UNREGISTERED_ADDR
++};
++
++#define CEC_BROADCAST_ADDR CEC_UNREGISTERED_ADDR
++
++#define CEC_TV                        ( 1 << CEC_TV_ADDR )
++#define CEC_RECORDING_DEVICE_1        ( 1 << CEC_RECORDING_DEVICE_1_ADDR )
++#define CEC_RECORDING_DEVICE_2        ( 1 << CEC_RECORDING_DEVICE_2_ADDR )
++#define CEC_TUNER_1                    ( 1 << CEC_TUNER_1_ADDR )
++#define CEC_PLAYBACK_DEVICE_1        ( 1 << CEC_PLAYBACK_DEVICE_1_ADDR )
++#define CEC_AUDIO_SYSTEM            ( 1 << CEC_AUDIO_SYSTEM_ADDR )
++#define CEC_TUNER_2                    ( 1 << CEC_TUNER_2_ADDR )
++#define CEC_TUNER_3                    ( 1 << CEC_TUNER_3_ADDR )
++#define CEC_PLAYBACK_DEVICE_2        ( 1 << CEC_PLAYBACK_DEVICE_2_ADDR )
++#define CEC_RECORDING_DEVICE_3        ( 1 << CEC_RECORDING_DEVICE_3_ADDR )
++#define CEC_TUNER_4                    ( 1 << CEC_TUNER_4_ADDR )
++#define CEC_PLAYBACK_DEVICE_3        ( 1 << CEC_PLAYBACK_DEVICE_3_ADDR )
++#define CEC_RESERVED_1                ( 1 << CEC_RESERVED_1_ADDR )
++#define CEC_RESERVED_2                ( 1 << CEC_RESERVED_2_ADDR )
++#define CEC_FREE_USE                ( 1 << CEC_FREE_USE_ADDR )
++#define CEC_UNREGISTERED            ( 1 << CEC_UNREGISTERED_ADDR )
++
++#define CEC_DISPLAY_DEVICE            ( CEC_TV | CEC_FREE_USE )
++#define    CEC_RECORDING_DEVICE        ( CEC_RECORDING_DEVICE_1 | CEC_RECORDING_DEVICE_2 | CEC_RECORDING_DEVICE_3 )
++#define    CEC_PLAYBACK_DEVICE            ( CEC_PLAYBACK_DEVICE_1 | CEC_PLAYBACK_DEVICE_2 | CEC_PLAYBACK_DEVICE_3 )
++#define    CEC_TUNER_DEVICE            ( CEC_TUNER_1 | CEC_TUNER_2 | CEC_TUNER_3 | CEC_TUNER_4 )
++#define    CEC_AUDIO_SYSTEM_DEVICE        ( CEC_AUDIO_SYSTEM )
++
++enum cec_dev_type_addr {
++    CEC_DISPLAY_DEVICE_TYPE = 0x0,
++    CEC_RECORDING_DEVICE_TYPE,
++    CEC_RESERVED_DEVICE_TYPE,
++    CEC_TUNER_DEVICE_TYPE,
++    CEC_PLAYBACK_DEVICE_TYPE,
++    CEC_AUDIO_SYSTEM_DEVICE_TYPE,
++    CEC_UNREGISTERED_DEVICE_TYPE,
++};
++
++typedef struct _context_t {
++    unsigned char state;
++} context_t;
++
++typedef enum  {
++    CEC_UNRECONIZED_OPCODE = 0x0,
++    CEC_NOT_CORRECT_MODE_TO_RESPOND,
++    CEC_CANNOT_PROVIDE_SOURCE,
++    CEC_INVALID_OPERAND,
++    CEC_REFUSED,
++    CEC_UNABLE_TO_DETERMINE,
++} cec_feature_abort_e;
++
++//#ifdef AO_CEC
++#if 1
++
++typedef enum {
++    JTAG_TMS = 1,
++    HDMI_CEC_AO,
++    HDMITX_CEC,
++    HDMIRX_CEC,
++    HDMI_GPIOAO_9,
++} cec_pinmux_set_e;
++
++typedef enum {
++    CEC_READ = 1,
++    CEC_WRITE,
++} cec_rw_e;
++
++void cec_hw_init(void);
++void cec_logic_addr_set(enum _cec_log_dev_addr_e phyaddr);
++
++#endif
++/*
++ * CEC OPCODES
++ */
++#define    CEC_OC_ABORT_MESSAGE                     0xFF
++#define    CEC_OC_ACTIVE_SOURCE                     0x82
++#define    CEC_OC_CEC_VERSION                       0x9E
++#define    CEC_OC_CLEAR_ANALOGUE_TIMER              0x33
++#define    CEC_OC_CLEAR_DIGITAL_TIMER               0x99
++#define    CEC_OC_CLEAR_EXTERNAL_TIMER              0xA1
++#define    CEC_OC_DECK_CONTROL                      0x42
++#define    CEC_OC_DECK_STATUS                       0x1B
++#define    CEC_OC_DEVICE_VENDOR_ID                  0x87
++#define    CEC_OC_FEATURE_ABORT                     0x00
++#define    CEC_OC_GET_CEC_VERSION                   0x9F
++#define    CEC_OC_GET_MENU_LANGUAGE                 0x91
++#define    CEC_OC_GIVE_AUDIO_STATUS                 0x71
++#define    CEC_OC_GIVE_DECK_STATUS                  0x1A
++#define    CEC_OC_GIVE_DEVICE_POWER_STATUS          0x8F
++#define    CEC_OC_GIVE_DEVICE_VENDOR_ID             0x8C
++#define    CEC_OC_GIVE_OSD_NAME                     0x46
++#define    CEC_OC_GIVE_PHYSICAL_ADDRESS             0x83
++#define    CEC_OC_GIVE_SYSTEM_AUDIO_MODE_STATUS     0x7D
++#define    CEC_OC_GIVE_TUNER_DEVICE_STATUS          0x08
++#define    CEC_OC_IMAGE_VIEW_ON                     0x04
++#define    CEC_OC_INACTIVE_SOURCE                   0x9D
++#define    CEC_OC_MENU_REQUEST                      0x8D
++#define    CEC_OC_MENU_STATUS                       0x8E
++#define    CEC_OC_PLAY                              0x41
++#define    CEC_OC_POLLING_MESSAGE                   0xFC    /* Fake Code - <Poll Message> has no OP Code and requires only the header byte */
++#define    CEC_OC_RECORD_OFF                        0x0B
++#define    CEC_OC_RECORD_ON                         0x09
++#define    CEC_OC_RECORD_STATUS                     0x0A
++#define    CEC_OC_RECORD_TV_SCREEN                  0x0F
++#define    CEC_OC_REPORT_AUDIO_STATUS               0x7A
++#define    CEC_OC_REPORT_PHYSICAL_ADDRESS           0x84
++#define    CEC_OC_REPORT_POWER_STATUS               0x90
++#define    CEC_OC_REQUEST_ACTIVE_SOURCE             0x85
++#define    CEC_OC_ROUTING_CHANGE                    0x80
++#define    CEC_OC_ROUTING_INFORMATION               0x81
++#define    CEC_OC_SELECT_ANALOGUE_SERVICE           0x92
++#define    CEC_OC_SELECT_DIGITAL_SERVICE            0x93
++#define    CEC_OC_SET_ANALOGUE_TIMER                0x34
++#define    CEC_OC_SET_AUDIO_RATE                    0x9A
++#define    CEC_OC_SET_DIGITAL_TIMER                 0x97
++#define    CEC_OC_SET_EXTERNAL_TIMER                0xA2
++#define    CEC_OC_SET_MENU_LANGUAGE                 0x32
++#define    CEC_OC_SET_OSD_NAME                      0x47
++#define    CEC_OC_SET_OSD_STRING                    0x64
++#define    CEC_OC_SET_STREAM_PATH                   0x86
++#define    CEC_OC_SET_SYSTEM_AUDIO_MODE             0x72
++#define    CEC_OC_SET_TIMER_PROGRAM_TITLE           0x67
++#define    CEC_OC_STANDBY                           0x36
++#define    CEC_OC_SYSTEM_AUDIO_MODE_REQUEST         0x70
++#define    CEC_OC_SYSTEM_AUDIO_MODE_STATUS          0x7E
++#define    CEC_OC_TEXT_VIEW_ON                      0x0D
++#define    CEC_OC_TIMER_CLEARED_STATUS              0x43
++#define    CEC_OC_TIMER_STATUS                      0x35
++#define    CEC_OC_TUNER_DEVICE_STATUS               0x07
++#define    CEC_OC_TUNER_STEP_DECREMENT              0x06
++#define    CEC_OC_TUNER_STEP_INCREMENT              0x05
++#define    CEC_OC_USER_CONTROL_PRESSED              0x44
++#define    CEC_OC_USER_CONTROL_RELEASED             0x45
++#define    CEC_OC_VENDOR_COMMAND                    0x89
++#define    CEC_OC_VENDOR_COMMAND_WITH_ID            0xA0
++#define    CEC_OC_VENDOR_REMOTE_BUTTON_DOWN         0x8A
++#define    CEC_OC_VENDOR_REMOTE_BUTTON_UP           0x8B
++
++/* cec message structure */
++typedef struct {
++    union {
++        unsigned char buffer[16];          // message memory
++        struct {
++            unsigned char header;          // 4bit Initiator logical address + 4bit Destination logical address
++            unsigned char opcode;          // message opcode
++            unsigned char operands[14];    // the maximun operand is 14
++            //unsigned int  flag;            // flag = 1 ,cec key pressed;flag = 0, cec key released
++        }msg;                              // message struct
++    }content;                              // message content
++    unsigned char operand_num;             // number of operand
++    unsigned char msg_length;
++} cec_rx_message_t;
++
++typedef struct {
++    cec_rx_message_t cec_message;
++    struct list_head list;
++} cec_rx_message_list_t;
++
++typedef struct {
++    unsigned char msg[MAX_MSG];
++    unsigned char length;
++    struct list_head list;
++} cec_usr_message_list_t;
++
++/* cec global struct */
++
++typedef enum {
++    STATE_UNKNOWN = 0x00,
++    STATE_START,
++    STATE_STOP
++} cec_node_status_e;
++
++typedef enum {
++    POWER_ON = 0x00,
++    POWER_STANDBY,
++    TRANS_STANDBY_TO_ON,
++    TRANS_ON_TO_STANDBY,
++} cec_power_status_e;
++
++typedef enum {
++    STATUS_REQ_ON = 1,
++    STATUS_REQ_OFF,
++    STATUS_REQ_ONCE,
++}status_req_mode_e;
++
++typedef enum {
++    DECK_UNKNOWN_STATUS = 0,
++    DECK_PLAY = 0X11,
++    DECK_RECORD,
++    DECK_PLAY_REVERSE,
++    DECK_STILL,
++    DECK_SLOW,
++    DECK_SLOW_REVERSE,
++    DECK_FAST_FORWARD,
++    DECK_FAST_REVERSE,
++    DECK_NO_MEDIA,
++    DECK_STOP,
++    DECK_SKIP_FORWARD_WIND,
++    DECK_SKIP_REVERSE_REWIND,
++    DECK_INDEX_SEARCH_FORWARD,
++    DECK_INDEX_SEARCH_REVERSE,
++    DECK_OTHER_STATUS,
++} deck_info_e;
++
++typedef enum {
++    DECK_CNT_SKIP_FORWARD_WIND = 1,
++    DECK_CNT_SKIP_REVERSE_REWIND,
++    DECK_CNT_STOP,
++    DECK_CNT_EJECT,
++} deck_cnt_mode_e;
++
++typedef enum {
++    PLAY_FORWARD = 0X24,
++    PLAY_REVERSE = 0X20,
++    PLAY_STILL = 0X25,
++    FAST_FORWARD_MIN_SPEED = 0X05,
++    FAST_FORWARD_MEDIUM_SPEED = 0X06,
++    FAST_FORWARD_MAX_SPEED = 0X07,
++    FAST_REVERSE_MIN_SPEED = 0X09,
++    FAST_REVERSE_MEDIUM_SPEED = 0X0A,
++    FAST_REVERSE_MAX_SPEED = 0X0B,
++    SLOW_FORWARD_MIN_SPEED = 0X15,
++    SLOW_FORWARD_MEDIUM_SPEED = 0X16,
++    SLOW_FORWARD_MAX_SPEED = 0X17,
++    SLOW_REVERSE_MIN_SPEED = 0X19,
++    SLOW_REVERSE_MEDIUM_SPEED = 0X1A,
++    SLOW_REVERSE_MAX_SPEED = 0X1B,
++} play_mode_e;
++
++typedef enum {
++    MENU_REQ_ACTIVATE = 0,
++    MENU_REQ_DEACTIVATE,
++    MENU_REQ_QUERY,
++} menu_req_type_e;
++
++typedef enum {
++    MENU_STATE_ACTIVATED = 0,
++    MENU_STATE_DEACTIVATED,
++} menu_state_e;
++
++typedef enum {
++    CEC_VERSION_11 = 0,
++    CEC_VERSION_12,
++    CEC_VERSION_12A,
++    CEC_VERSION_13,
++    CEC_VERSION_13A,
++    CEC_VERSION_14A,
++} cec_version_e;
++
++typedef enum {
++    CEC_HDMI_PORT_UKNOWN = 0,
++    CEC_HDMI_PORT_1,
++    CEC_HDMI_PORT_2,
++    CEC_HDMI_PORT_3,
++} cec_hdmi_port_e;
++
++typedef enum {
++    OFF = 0,
++    ON,
++} system_audio_status_e;
++typedef unsigned long cec_info_mask;
++
++#define INFO_MASK_CEC_VERSION                (1<<0)
++#define INFO_MASK_VENDOR_ID                  (1<<1)
++#define INFO_MASK_DEVICE_TYPE                (1<<2)
++#define INFO_MASK_POWER_STATUS               (1<<3)
++#define INFO_MASK_PHYSICAL_ADDRESS           (1<<4)
++#define INFO_MASK_LOGIC_ADDRESS              (1<<5)
++#define INFO_MASK_OSD_NAME                   (1<<6)
++#define INFO_MASK_MENU_STATE                 (1<<7)
++#define INFO_MASK_MENU_LANGUAGE              (1<<8)
++#define INFO_MASK_DECK_INfO                  (1<<9)
++#define INFO_MASK_PLAY_MODE                  (1<<10)
++
++/*CEC UI MASK*/
++#define CEC_FUNC_MSAK                        0
++#define ONE_TOUCH_PLAY_MASK                  1
++#define ONE_TOUCH_STANDBY_MASK               2
++#define AUTO_POWER_ON_MASK                   3
++#define SYSTEM_AUDIO_MASK                    6
++
++
++typedef struct {
++    cec_hdmi_port_e hdmi_port;
++    cec_info_mask real_info_mask;
++    unsigned char cec_version;
++    unsigned int vendor_id:24;
++    unsigned char dev_type;
++    unsigned char menu_status;
++    cec_power_status_e power_status;
++    union {
++        unsigned short phy_addr_4;
++        struct {
++            unsigned char cd;
++            unsigned char ab;
++        } phy_addr_2;
++        struct {
++            unsigned char d:4;
++            unsigned char c:4;
++            unsigned char b:4;
++            unsigned char a:4;
++        }phy_addr_1;
++    }phy_addr;
++    unsigned char log_addr;
++    unsigned char osd_name[16];
++    unsigned char osd_name_def[16];
++    menu_state_e menu_state;
++    int menu_lang;
++    union {
++        struct {
++        } display;
++        struct {
++        } recording;
++        struct {
++            deck_cnt_mode_e deck_cnt_mode;
++            deck_info_e deck_info;
++            play_mode_e play_mode;
++        } playback;
++        struct {
++        } tuner;
++        struct {
++            system_audio_status_e sys_audio_mode;
++            struct {
++                unsigned char audio_mute_status : 1;
++                unsigned char audio_volume_status : 7;
++            } audio_status;
++        } audio;
++    }specific_info;
++
++} cec_node_info_t;
++
++typedef struct {
++    cec_rx_message_t cec_rx_message[_RX_DATA_BUF_SIZE_];
++    unsigned char rx_write_pos;
++    unsigned char rx_read_pos;
++    unsigned char rx_buf_size;
++} cec_rx_msg_buf_t;
++
++typedef struct {
++    unsigned int cec_key_flag;
++    unsigned int cec_init_flag;
++    int cec_fiq_flag;
++    int cec_repeat_flag;
++} cec_flag_t;
++
++typedef struct {
++    unsigned short dev_mask;
++    unsigned char active_log_dev;
++    unsigned char my_node_index;
++    cec_flag_t cec_flag;
++    struct input_dev *remote_cec_dev; //cec input device
++    cec_node_info_t cec_node_info[MAX_NUM_OF_DEV];
++    cec_rx_msg_buf_t cec_rx_msg_buf;
++    hdmitx_dev_t* hdmitx_device;
++    cec_power_status_e tv_power_status;
++} cec_global_info_t;
++
++typedef struct {
++    unsigned char dev_number;
++    unsigned char active_log_dev;
++    cec_node_info_t cec_node_info_online[];
++} cec_global_info_to_usr_t;
++
++typedef enum {
++    GET_CEC_VERSION = 0,
++    GET_POWER_STATUS,
++    GET_DEV_POWER_STATUS,
++    GET_DEV_VENDOR_ID,
++    GET_OSD_NAME,
++    GET_OSD_STRING,
++    GET_PHYSICAL_ADDR,
++    GET_SYSTEM_AUDIO_MODE,
++    GET_TUNER_DEV_STATUS,       //0x8
++    GIVE_DECK_STATUS,
++    SET_DECK_CONTROL_MODE,
++    SET_PLAY_MODE,
++    GET_AUDIO_STATUS,
++    SET_STANDBY,
++    SET_IMAGEVIEW_ON,
++    GET_MENU_STATE,
++    SET_MENU_STATE,             //0x10
++    SET_MENU_LANGAGE,
++    GET_MENU_LANGUAGE,
++    GET_ACTIVE_SOURCE,
++    SET_ACTIVE_SOURCE,
++    SET_DEACTIVE_SOURCE,
++    CLR_NODE_DEV_REAL_INFO_MASK,
++    REPORT_PHYSICAL_ADDRESS,    //0x17
++    SET_TEXT_VIEW_ON,
++    POLLING_ONLINE_DEV, //0x19
++    PING_TV,
++    DEVICE_MENU_CONTROL, //0x1b
++    USR_CMD_MAX,
++} usr_cmd_type_e;
++
++typedef enum {
++    TV_CEC_PENDING_OFF = 0,
++    TV_CEC_PENDING_ON,
++} tv_cec_pending_e;
++
++typedef enum {
++    TV_CEC_POLLING_OFF = 0,
++    TV_CEC_POLLING_ON,
++} tv_cec_polling_state_e;
++
++typedef enum {
++    DEVICE_MENU_ACTIVE = 0,
++    DEVICE_MENU_INACTIVE,
++} cec_device_menu_state_e;
++
++void cec_enable_irq(void);
++void cec_disable_irq(void);
++
++int cec_ll_tx_polling(const unsigned char *msg, unsigned char len);
++
++int cec_ll_tx(const unsigned char *msg, unsigned char len);
++int cec_ll_rx( unsigned char *msg, unsigned char *len);
++int cec_rx_irq_handle(unsigned char *msg, unsigned char *len);
++unsigned int cec_intr_stat(void);
++
++void cec_test_function(unsigned char* arg, unsigned char arg_cnt);
++void cec_node_init(hdmitx_dev_t* hdmitx_device);
++void cec_node_uninit(hdmitx_dev_t* hdmitx_device);
++void dumpaocecreg(void);
++void raocec(unsigned int addr);
++void waocec(unsigned int addr, unsigned int value);
++int cec_rx_buf_check(void);
++void cec_rx_buf_clear(void);
++void cec_hw_reset(void);
++
++unsigned int dispatch_buffer_parse(const char *buf, const char *string,  char *param, size_t count);
++void register_cec_rx_msg(unsigned char *msg, unsigned char len );
++void cec_handle_message(cec_rx_message_t* pcec_message);
++void unregister_cec_tx_msg(cec_usr_message_list_t* cec_tx_message_list);
++void unregister_cec_rx_msg(cec_usr_message_list_t* cec_rx_message_list);
++void register_cec_tx_msg(unsigned char *msg, unsigned char len);
++void cec_tx_cmd_post_process(void);
++void cec_set_pending(tv_cec_pending_e on_off);
++void cec_polling_online_dev(int log_addr, int *bool);
++unsigned short cec_log_addr_to_dev_type(unsigned char log_addr);
++
++void cec_routing_information(cec_rx_message_t* pcec_message);
++void cec_routing_change(cec_rx_message_t* pcec_message);
++void cec_usrcmd_set_osd_name(cec_rx_message_t* pcec_message);
++void cec_usrcmd_set_device_vendor_id(void);
++void cec_usrcmd_get_cec_version(unsigned char log_addr);
++void cec_usrcmd_get_audio_status(unsigned char log_addr);
++void cec_usrcmd_get_deck_status(unsigned char log_addr);
++void cec_usrcmd_get_device_power_status(unsigned char log_addr);
++void cec_usrcmd_get_device_vendor_id(unsigned char log_addr);
++void cec_usrcmd_get_osd_name(unsigned char log_addr);
++void cec_usrcmd_get_physical_address(unsigned char log_addr);
++void cec_usrcmd_get_system_audio_mode_status(unsigned char log_addr);
++void cec_usrcmd_get_tuner_device_status(unsigned char log_addr);
++void cec_usrcmd_parse_all_dev_online(void);
++void cec_usrcmd_set_deck_cnt_mode(unsigned char log_addr, deck_cnt_mode_e deck_cnt_mode);
++void cec_usrcmd_set_standby(unsigned char log_addr);
++void cec_usrcmd_set_imageview_on(unsigned char log_addr);
++void cec_usrcmd_set_play_mode(unsigned char log_addr, play_mode_e play_mode);
++void cec_usrcmd_get_menu_state(unsigned char log_addr);
++void cec_usrcmd_set_menu_state(unsigned char log_addr, menu_req_type_e menu_req_type);
++void cec_usrcmd_get_menu_language(unsigned char log_addr);
++void cec_usrcmd_get_active_source(void);
++void cec_usrcmd_set_active_source(void);
++void cec_usrcmd_set_deactive_source(unsigned char log_addr);
++void cec_usrcmd_clear_node_dev_real_info_mask(unsigned char log_addr, cec_info_mask mask);
++void cec_usrcmd_set_report_physical_address(void);
++void cec_usrcmd_text_view_on(unsigned char log_addr);
++void cec_usrcmd_device_menu_control(unsigned char log_addr, unsigned char button);
++void cec_polling_online_dev(int log_addr, int *bool);
++void cec_device_vendor_id(cec_rx_message_t* pcec_message);
++void cec_report_power_status(cec_rx_message_t* pcec_message);
++void cec_active_source(cec_rx_message_t* pcec_message);
++void cec_set_stream_path(cec_rx_message_t* pcec_message);
++void cec_set_osd_name(cec_rx_message_t* pcec_message);
++void cec_set_osd_name_init(void);
++void cec_inactive_source_rx(cec_rx_message_t* pcec_message);
++void cec_set_system_audio_mode(void);
++void cec_system_audio_mode_request(void);
++void cec_report_audio_status(void);
++void cec_get_menu_language_smp(void);
++void cec_device_vendor_id_smp(void);
++void cec_menu_status_smp(cec_device_menu_state_e status);
++void cec_set_imageview_on_irq(void);
++void cec_active_source_irq(void);
++
++void cec_report_physical_address_smp(void);
++void cec_imageview_on_smp(void);
++void cec_active_source_smp(void);
++void cec_active_source_rx(cec_rx_message_t* pcec_message);
++
++void cec_system_audio_mode_request_smp(void);
++void cec_system_audio_mode_release_smp(void);
++void cec_inactive_source_smp(void);
++
++size_t cec_usrcmd_get_global_info(char * buf);
++void cec_usrcmd_set_dispatch(const char * buf, size_t count);
++void cec_usrcmd_set_config(const char * buf, size_t count);
++void cec_usrcmd_set_lang_config(const char * buf, size_t count);
++void cec_input_handle_message(void);
++void cec_send_event_irq(void);
++void cec_standby_irq(void);
++void cec_user_control_released_irq(void);
++void cec_user_control_pressed_irq(void);
++void cec_inactive_source(void);
++void cec_set_standby(void);
++void cec_isr_post_process(void);
++void cec_clear_buf(unsigned int flag);
++void cec_keep_reset(void);
++
++void cec_tx_irq_handle(void);
++
++#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8
++void cec_arbit_bit_time_set(unsigned bit_set, unsigned time_set, unsigned flag);
++void tx_irq_handle(void);
++void cec_arbit_bit_time_read(void);
++void tx_irq_handle(void);
++void ao_cec_init(void);
++#endif
++
++#ifdef CONFIG_ARCH_MESON6
++void cec_gpi_init(void);
++#endif
++
++
++unsigned char check_cec_msg_valid(const cec_rx_message_t* pcec_message);
++void cec_send_event(cec_rx_message_t* pcec_message);
++void cec_user_control_pressed(cec_rx_message_t* pcec_message);
++void cec_user_control_released(cec_rx_message_t* pcec_message);
++void cec_standby(cec_rx_message_t* pcec_message);
++void cec_send_simplink_alive(cec_rx_message_t *pcec_message);
++void cec_send_simplink_ack(cec_rx_message_t *pcec_message);
++extern void cec_key_init(void);
++
++extern __u16 cec_key_map[];
++extern cec_global_info_t cec_global_info;
++
++#endif
+diff --git a/include/linux/amlogic/hdmi_tx/hdmi_tx_compliance.h b/include/linux/amlogic/hdmi_tx/hdmi_tx_compliance.h
+new file mode 100644
+index 00000000..4bdbe36d
+--- /dev/null
++++ b/include/linux/amlogic/hdmi_tx/hdmi_tx_compliance.h
+@@ -0,0 +1,25 @@
++/*
++ * Amlogic Meson HDMI Transmitter Driver
++ * hdmitx driver-----------HDMI_TX
++ * Copyright (C) 2013 Amlogic, Inc.
++ * Author: zongdong.jiao@amlogic.com
++ *
++ * In order to get better HDMI TX compliance,
++ * you can add special code here, such as clock configure.
++ * 
++ * Function hdmitx_special_operation() is called by
++ * hdmitx_m3_set_dispmode() at the end
++ *
++ */
++
++#ifndef __HDMI_TX_COMPLIANCE_H
++#define __HDMI_TX_COMPLIANCE_H
++
++#include "hdmi_info_global.h"
++#include "hdmi_tx_module.h"
++
++void hdmitx_special_handler_video(hdmitx_dev_t* hdmitx_device);
++void hdmitx_special_handler_audio(hdmitx_dev_t* hdmitx_device);
++int hdmitx_is_special_tv(void);
++#endif
++
+diff --git a/include/linux/amlogic/hdmi_tx/hdmi_tx_module.h b/include/linux/amlogic/hdmi_tx/hdmi_tx_module.h
+old mode 100644
+new mode 100755
+index 2f1b5d58..87036b85
+--- a/include/linux/amlogic/hdmi_tx/hdmi_tx_module.h
++++ b/include/linux/amlogic/hdmi_tx/hdmi_tx_module.h
+@@ -1,376 +1,379 @@
+-#ifndef _HDMI_TX_MODULE_H
+-#define _HDMI_TX_MODULE_H
+-#include "hdmi_info_global.h"
+-#include <plat/hdmi_config.h>
+-#include <linux/wait.h>
+-#include <linux/cdev.h>
+-//#include <linux/amlogic/aml_gpio_consumer.h>
+-
+-/*****************************
+-*    hdmitx attr management 
+-******************************/
+-
+-/************************************
+-*    hdmitx device structure
+-*************************************/
+-#define VIC_MAX_NUM 128  // consider 4k2k
+-#define AUD_MAX_NUM 60
+-typedef struct
+-{
+-    unsigned char audio_format_code;
+-    unsigned char channel_num_max;
+-    unsigned char freq_cc;        
+-    unsigned char cc3;
+-} rx_audio_cap_t;
+-
+-enum hd_ctrl {
+-    VID_EN,
+-    VID_DIS,
+-    AUD_EN,
+-    AUD_DIS,
+-    EDID_EN,
+-    EDID_DIS,
+-    HDCP_EN,
+-    HDCP_DIS,
+-};
+-
+-typedef struct rx_cap_
+-{
+-    unsigned char native_Mode;
+-    /*video*/
+-    unsigned char VIC[VIC_MAX_NUM];
+-    unsigned char VIC_count;
+-    unsigned char native_VIC;
+-    /*audio*/
+-    rx_audio_cap_t RxAudioCap[AUD_MAX_NUM];
+-    unsigned char AUD_count;
+-    unsigned char RxSpeakerAllocation;
+-    /*vendor*/    
+-    unsigned int IEEEOUI;
+-    unsigned char ReceiverBrandName[4];
+-    unsigned char ReceiverProductName[16];
+-    unsigned int ColorDeepSupport;
+-    unsigned int Max_TMDS_Clock; 
+-    unsigned int Video_Latency;
+-    unsigned int Audio_Latency;
+-    unsigned int Interlaced_Video_Latency;
+-    unsigned int Interlaced_Audio_Latency;
+-    unsigned int threeD_present;
+-    unsigned int threeD_Multi_present;
+-    unsigned int HDMI_VIC_LEN;
+-    unsigned int HDMI_3D_LEN;
+-    unsigned int threeD_Structure_ALL_15_0;
+-    unsigned int threeD_MASK_15_0;
+-    struct {
+-        unsigned char frame_packing;
+-        unsigned char top_and_bottom;
+-        unsigned char side_by_side;
+-    } support_3d_format[VIC_MAX_NUM];
+-}rx_cap_t;
+-
+-typedef struct Cts_conf_tab_ {
+-    unsigned int fixed_n;
+-    unsigned int tmds_clk;
+-    unsigned int fixed_cts;
+-}Cts_conf_tab;
+-
+-typedef struct Vic_attr_map_ {
+-    HDMI_Video_Codes_t VIC;
+-    unsigned int tmds_clk;
+-}Vic_attr_map;
+-
+-#define EDID_MAX_BLOCK              4
+-#define HDMI_TMP_BUF_SIZE           1024
+-typedef struct hdmi_tx_dev_s {
+-    struct cdev cdev;             /* The cdev structure */
+-    struct proc_dir_entry *proc_file;
+-    struct task_struct *task;
+-    struct task_struct *task_monitor;
+-    struct task_struct *task_hdcp;
+-    struct task_struct *task_cec;
+-    wait_queue_head_t cec_wait_rx;
+-    struct {
+-        void (*SetPacket)(int type, unsigned char* DB, unsigned char* HB);
+-        void (*SetAudioInfoFrame)(unsigned char* AUD_DB, unsigned char* CHAN_STAT_BUF);
+-        int (*SetDispMode)(struct hdmi_tx_dev_s* hdmitx_device, Hdmi_tx_video_para_t *param);
+-        int (*SetAudMode)(struct hdmi_tx_dev_s* hdmitx_device, Hdmi_tx_audio_para_t* audio_param);
+-        void (*SetupIRQ)(struct hdmi_tx_dev_s* hdmitx_device);
+-        void (*DebugFun)(struct hdmi_tx_dev_s* hdmitx_device, const char * buf);
+-        void (*UnInit)(struct hdmi_tx_dev_s* hdmitx_device);
+-        int (*CntlPower)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);       // Power control
+-        int (*CntlDDC)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);         // edid/hdcp control
+-        int (*GetState)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);      // Audio/Video/System Status
+-        int (*CntlPacket)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);      // Packet control
+-        int (*CntlConfig)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);      // Configure control
+-        int (*CntlMisc)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);            // Other control
+-        int (*Cntl)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);            // Other control
+-    }HWOp;
+-
+-    struct hdmi_config_platform_data config_data;
+-    
+-    //wait_queue_head_t   wait_queue;            /* wait queues */
+-    /*EDID*/
+-    unsigned cur_edid_block;
+-    unsigned cur_phy_block_ptr;
+-    unsigned char EDID_buf[EDID_MAX_BLOCK*128];
+-    unsigned char EDID_buf1[EDID_MAX_BLOCK*128];    // for second read
+-    unsigned char EDID_hash[20];
+-    rx_cap_t RXCap;
+-    Hdmi_tx_video_para_t *cur_video_param;
+-    int vic_count;
+-    /*audio*/
+-    Hdmi_tx_audio_para_t cur_audio_param;
+-    int audio_param_update_flag;
+-    /*status*/
+-#define DISP_SWITCH_FORCE       0
+-#define DISP_SWITCH_EDID        1    
+-    unsigned char disp_switch_config; /* 0, force; 1,edid */
+-    unsigned char cur_VIC;
+-    unsigned char unplug_powerdown;
+-    /**/
+-    unsigned char hpd_event; /* 1, plugin; 2, plugout */
+-    unsigned char hpd_state; /* 1, connect; 0, disconnect */
+-    unsigned char force_audio_flag;
+-    unsigned char mux_hpd_if_pin_high_flag; 
+-	unsigned char cec_func_flag;
+-    int  auth_process_timer;
+-    HDMI_TX_INFO_t hdmi_info;
+-    unsigned char tmp_buf[HDMI_TMP_BUF_SIZE];
+-    unsigned int  log;
+-    unsigned int  internal_mode_change;
+-    unsigned int  cec_func_config;
+-    unsigned int  cec_init_ready;
+-    unsigned int  tv_cec_support;
+-    unsigned int  tx_aud_cfg; /* 0, off; 1, on */
+-    unsigned int  tv_no_edid;           // For some un-well-known TVs, no edid at all
+-    unsigned int  hpd_lock;
+-    unsigned int  output_blank_flag;    // if equals to 1, means current video & audio output are blank
+-    unsigned int  audio_notify_flag;
+-    unsigned int  audio_step;
+-    hdmi_mo_s hpd;
+-    hdmi_mo_s hdcp;
+-}hdmitx_dev_t;
+-
+-#define CMD_DDC_OFFSET          (0x10 << 24)
+-#define CMD_STATUS_OFFSET       (0x11 << 24)
+-#define CMD_PACKET_OFFSET       (0x12 << 24)
+-#define CMD_MISC_OFFSET         (0x13 << 24)
+-#define CMD_CONF_OFFSET         (0x14 << 24)
+-#define CMD_STAT_OFFSET         (0x15 << 24)
+-
+-/***********************************************************************
+- *             DDC CONTROL //CntlDDC
+- **********************************************************************/
+-#define DDC_RESET_EDID          (CMD_DDC_OFFSET + 0x00)
+-#define DDC_RESET_HDCP          (CMD_DDC_OFFSET + 0x01)
+-#define DDC_HDCP_OP             (CMD_DDC_OFFSET + 0x02)
+-    #define HDCP_ON             0x1
+-    #define HDCP_OFF            0x2
+-#define DDC_IS_HDCP_ON          (CMD_DDC_OFFSET + 0x04)
+-#define DDC_HDCP_GET_AKSV       (CMD_DDC_OFFSET + 0x05)
+-#define DDC_HDCP_GET_BKSV       (CMD_DDC_OFFSET + 0x06)
+-#define DDC_HDCP_GET_AUTH       (CMD_DDC_OFFSET + 0x07)
+-#define DDC_PIN_MUX_OP          (CMD_DDC_OFFSET + 0x08)
+-    #define PIN_MUX             0x1
+-    #define PIN_UNMUX           0x2
+-#define DDC_EDID_READ_DATA      (CMD_DDC_OFFSET + 0x0a)
+-#define DDC_IS_EDID_DATA_READY  (CMD_DDC_OFFSET + 0x0b)
+-#define DDC_EDID_GET_DATA       (CMD_DDC_OFFSET + 0x0c)
+-#define DDC_EDID_CLEAR_RAM      (CMD_DDC_OFFSET + 0x0d)
+-
+-/***********************************************************************
+- *             CONFIG CONTROL //CntlConfig
+- **********************************************************************/
+-// Video part
+-#define CONF_VIDEO_BLANK_OP     (CMD_CONF_OFFSET + 0x00)
+-    #define VIDEO_BLANK         0x1
+-    #define VIDEO_UNBLANK       0x2
+-#define CONF_HDMI_DVI_MODE      (CMD_CONF_OFFSET + 0x02)
+-    #define HDMI_MODE           0x1
+-    #define DVI_MODE            0x2
+-#define CONF_SYSTEM_ST          (CMD_CONF_OFFSET + 0x03)
+-// Audio part
+-#define CONF_CLR_AVI_PACKET     (CMD_CONF_OFFSET + 0x04)
+-#define CONF_CLR_VSDB_PACKET    (CMD_CONF_OFFSET + 0x05)
+-#define CONF_AUDIO_MUTE_OP      (CMD_CONF_OFFSET + 0x1000 + 0x00)
+-    #define AUDIO_MUTE          0x1
+-    #define AUDIO_UNMUTE        0x2
+-#define CONF_CLR_AUDINFO_PACKET (CMD_CONF_OFFSET + 0x1000 + 0x01)
+-
+-/***********************************************************************
+- *             MISC control, hpd, hpll //CntlMisc
+- **********************************************************************/
+-#define MISC_HPD_MUX_OP         (CMD_MISC_OFFSET + 0x00)
+-#define MISC_HPD_GPI_ST         (CMD_MISC_OFFSET + 0x02)
+-#define MISC_HPLL_OP            (CMD_MISC_OFFSET + 0x03)
+-    #define HPLL_ENABLE         0x1
+-    #define HPLL_DISABLE        0x2
+-#define MISC_TMDS_PHY_OP        (CMD_MISC_OFFSET + 0x04)
+-    #define TMDS_PHY_ENABLE     0x1
+-    #define TMDS_PHY_DISABLE    0x2
+-#define MISC_VIID_IS_USING      (CMD_MISC_OFFSET + 0x05)
+-
+-/***********************************************************************
+- *                          Get State //GetState
+- **********************************************************************/
+-#define STAT_VIDEO_VIC          (CMD_STAT_OFFSET + 0x00)
+-#define STAT_VIDEO_CLK          (CMD_STAT_OFFSET + 0x01)
+-#define STAT_AUDIO_FORMAT       (CMD_STAT_OFFSET + 0x10)
+-#define STAT_AUDIO_CHANNEL      (CMD_STAT_OFFSET + 0x11)
+-#define STAT_AUDIO_CLK_STABLE   (CMD_STAT_OFFSET + 0x12)
+-#define STAT_AUDIO_PACK         (CMD_STAT_OFFSET + 0x13)
+-
+-// HDMI LOG
+-#define HDMI_LOG_HDCP           (1 << 0)
+-
+-#define HDMI_SOURCE_DESCRIPTION 0
+-#define HDMI_PACKET_VEND        1
+-#define HDMI_MPEG_SOURCE_INFO   2
+-#define HDMI_PACKET_AVI         3
+-#define HDMI_AUDIO_INFO         4
+-#define HDMI_AUDIO_CONTENT_PROTECTION   5
+-#define HDMI_PACKET_HBR         6
+-
+-#define HDMI_PROCESS_DELAY  msleep(10)
+-#define AUTH_PROCESS_TIME   (1000/100)       // reduce a little time, previous setting is 4000/10
+-
+-#define HDMITX_VER "2014May6"
+-
+-/***********************************************************************
+-*    hdmitx protocol level interface
+- **********************************************************************/
+-extern void hdmitx_init_parameters(HDMI_TX_INFO_t *info);
+-
+-extern int hdmitx_edid_parse(hdmitx_dev_t* hdmitx_device);
+-
+-HDMI_Video_Codes_t hdmitx_edid_get_VIC(hdmitx_dev_t* hdmitx_device, const char* disp_mode, char force_flag);
+-
+-extern int hdmitx_edid_VIC_support(HDMI_Video_Codes_t vic);
+-
+-extern int hdmitx_edid_dump(hdmitx_dev_t* hdmitx_device, char* buffer, int buffer_len);
+-
+-extern void hdmitx_edid_clear(hdmitx_dev_t* hdmitx_device);
+-
+-extern void hdmitx_edid_buf_compare_print(hdmitx_dev_t* hdmitx_device);
+-
+-extern const char* hdmitx_edid_get_native_VIC(hdmitx_dev_t* hdmitx_device);
+-
+-extern int hdmitx_set_display(hdmitx_dev_t* hdmitx_device, HDMI_Video_Codes_t VideoCode);
+-
+-extern int hdmi_set_3d(hdmitx_dev_t* hdmitx_device, int type, unsigned int param);
+-
+-extern int hdmitx_set_audio(hdmitx_dev_t* hdmitx_device, Hdmi_tx_audio_para_t* audio_param, int hdmi_ch);
+-
+-extern hdmitx_dev_t * get_hdmitx_device(void);
+-
+-extern  int hdmi_print_buf(char* buf, int len);
+-
+-extern void hdmi_set_audio_para(int para);
+-
+-extern void hdmitx_output_rgb(void);
+-
+-extern int get_cur_vout_index(void);
+-
+-/***********************************************************************
+-*    hdmitx hardware level interface
+-***********************************************************************/
+-//#define DOUBLE_CLK_720P_1080I
+-extern unsigned char hdmi_pll_mode; /* 1, use external clk as hdmi pll source */
+-
+-extern void HDMITX_Meson_Init(hdmitx_dev_t* hdmitx_device);
+-
+-extern unsigned char hdmi_audio_off_flag;
+-
+-#define HDMITX_HWCMD_MUX_HPD_IF_PIN_HIGH       0x3
+-#define HDMITX_HWCMD_TURNOFF_HDMIHW           0x4
+-#define HDMITX_HWCMD_MUX_HPD                0x5
+-#define HDMITX_HWCMD_PLL_MODE                0x6
+-#define HDMITX_HWCMD_TURN_ON_PRBS           0x7
+-#define HDMITX_FORCE_480P_CLK                0x8
+-#define HDMITX_GET_AUTHENTICATE_STATE        0xa
+-#define HDMITX_SW_INTERNAL_HPD_TRIG          0xb
+-#define HDMITX_HWCMD_OSD_ENABLE              0xf
+-
+-#define HDMITX_HDCP_MONITOR                  0x11
+-#define HDMITX_IP_INTR_MASN_RST              0x12
+-#define HDMITX_EARLY_SUSPEND_RESUME_CNTL     0x14
+-    #define HDMITX_EARLY_SUSPEND             0x1
+-    #define HDMITX_LATE_RESUME               0x2
+-#define HDMITX_IP_SW_RST                     0x15   // Refer to HDMI_OTHER_CTRL0 in hdmi_tx_reg.h
+-    #define TX_CREG_SW_RST      (1<<5)
+-    #define TX_SYS_SW_RST       (1<<4)
+-    #define CEC_CREG_SW_RST     (1<<3)
+-    #define CEC_SYS_SW_RST      (1<<2)
+-#define HDMITX_AVMUTE_CNTL                   0x19
+-    #define AVMUTE_SET          0   // set AVMUTE to 1
+-    #define AVMUTE_CLEAR        1   // set AVunMUTE to 1
+-    #define AVMUTE_OFF          2   // set both AVMUTE and AVunMUTE to 0
+-#define HDMITX_CBUS_RST                      0x1A
+-#define HDMITX_INTR_MASKN_CNTL               0x1B
+-    #define INTR_MASKN_ENABLE   0
+-    #define INTR_MASKN_DISABLE  1
+-    #define INTR_CLEAR          2
+-
+-#define HDMI_HDCP_DELAYTIME_AFTER_DISPLAY    20      // unit: ms
+-
+-#define HDMITX_HDCP_MONITOR_BUF_SIZE         1024
+-typedef struct {
+-    char *hdcp_sub_name;
+-    unsigned hdcp_sub_addr_start;
+-    unsigned hdcp_sub_len;
+-}hdcp_sub_t;
+-
+-/***********************************************************************
+- *                   hdmi debug printk
+- * level: 0 ~ 4     Default is 2
+- *      0: ERRor  1: IMPortant  2: INFormative  3: DETtal  4: LOW
+- * hdmi_print(ERR, EDID "edid bad\");
+- * hdmi_print(IMP, AUD "set audio format: AC-3\n");
+- * hdmi_print(DET)
+- **********************************************************************/
+-#define HD          "hdmitx: "
+-#define VID         HD "video: "
+-#define AUD         HD "audio: "
+-#define CEC         HD "cec: "
+-#define EDID        HD "edid: "
+-#define HDCP        HD "hdcp: "
+-#define SYS         HD "system: "
+-#define HPD         HD "hpd: "
+-
+-#define ERR         1
+-#define IMP         2
+-#define INF         3
+-#define LOW         4
+-#define DET         5, "%s[%d]", __FUNCTION__, __LINE__
+-
+-extern void hdmi_print(int level, const char *fmt, ...);
+-
+-#define VOUTMODE_HDMI		0x00
+-#define VOUTMODE_DVI		0x01
+-#define VOUTMODE_VGA		0x02
+-#define VOUTMODE_NONHDMI	(VOUTMODE_DVI | VOUTMODE_VGA)
+-
+-extern int odroidc_voutmode(void);
+-
+-static inline int voutmode_hdmi(void)
+-{
+-	return odroidc_voutmode() == VOUTMODE_HDMI;
+-}
+-
+-static inline int voutmode_dvi(void)
+-{
+-	return !!(odroidc_voutmode() & VOUTMODE_DVI);
+-}
+-
+-static inline int voutmode_vga(void)
+-{
+-	return !!(odroidc_voutmode() & VOUTMODE_VGA);
+-}
+-
+-static inline int voutmode_dvi_vga(void)
+-{
+-	return voutmode_dvi() || voutmode_vga();
+-}
+-
+-#endif
+-
++#ifndef _HDMI_TX_MODULE_H
++#define _HDMI_TX_MODULE_H
++#include "hdmi_info_global.h"
++#include <plat/hdmi_config.h>
++#include <linux/wait.h>
++//#include <linux/amlogic/aml_gpio_consumer.h>
++
++/*****************************
++*    hdmitx attr management
++******************************/
++
++/************************************
++*    hdmitx device structure
++*************************************/
++#define VIC_MAX_NUM 128  // consider 4k2k
++#define AUD_MAX_NUM 60
++typedef struct
++{
++    unsigned char audio_format_code;
++    unsigned char channel_num_max;
++    unsigned char freq_cc;
++    unsigned char cc3;
++} rx_audio_cap_t;
++
++enum hd_ctrl {
++    VID_EN,
++    VID_DIS,
++    AUD_EN,
++    AUD_DIS,
++    EDID_EN,
++    EDID_DIS,
++    HDCP_EN,
++    HDCP_DIS,
++};
++
++typedef struct rx_cap_
++{
++    unsigned char native_Mode;
++    /*video*/
++    unsigned char VIC[VIC_MAX_NUM];
++    unsigned char VIC_count;
++    unsigned char native_VIC;
++    /*audio*/
++    rx_audio_cap_t RxAudioCap[AUD_MAX_NUM];
++    unsigned char AUD_count;
++    unsigned char RxSpeakerAllocation;
++    /*vendor*/
++    unsigned int IEEEOUI;
++    unsigned char ReceiverBrandName[4];
++    unsigned char ReceiverProductName[16];
++    unsigned int ColorDeepSupport;
++    unsigned int Max_TMDS_Clock;
++    unsigned int Video_Latency;
++    unsigned int Audio_Latency;
++    unsigned int Interlaced_Video_Latency;
++    unsigned int Interlaced_Audio_Latency;
++    unsigned int threeD_present;
++    unsigned int threeD_Multi_present;
++    unsigned int HDMI_VIC_LEN;
++    unsigned int HDMI_3D_LEN;
++    unsigned int threeD_Structure_ALL_15_0;
++    unsigned int threeD_MASK_15_0;
++    struct {
++        unsigned char frame_packing;
++        unsigned char top_and_bottom;
++        unsigned char side_by_side;
++    } support_3d_format[VIC_MAX_NUM];
++    /*blk0 check sum*/
++    unsigned char blk0_chksum;
++}rx_cap_t;
++
++typedef struct Cts_conf_tab_ {
++    unsigned int fixed_n;
++    unsigned int tmds_clk;
++    unsigned int fixed_cts;
++}Cts_conf_tab;
++
++typedef struct Vic_attr_map_ {
++    HDMI_Video_Codes_t VIC;
++    unsigned int tmds_clk;
++}Vic_attr_map;
++
++enum hdmi_event_t {
++    HDMI_TX_NONE = 0,
++    HDMI_TX_HPD_PLUGIN = 1,
++    HDMI_TX_HPD_PLUGOUT = 2,
++    HDMI_TX_INTERNAL_INTR = 4,
++};
++
++#define EDID_MAX_BLOCK              4
++#define HDMI_TMP_BUF_SIZE           1024
++typedef struct hdmi_tx_dev_s {
++    struct cdev cdev;             /* The cdev structure */
++    struct proc_dir_entry *proc_file;
++    struct task_struct *task;
++    struct task_struct *task_monitor;
++    struct task_struct *task_hdcp;
++    struct task_struct *task_cec;
++    struct workqueue_struct *hdmi_wq;
++    struct delayed_work work_hpd_plugin;
++    struct delayed_work work_hpd_plugout;
++    struct work_struct work_internal_intr;
++	struct work_struct cec_work;
++    wait_queue_head_t cec_wait_rx;
++    struct {
++        void (*SetPacket)(int type, unsigned char* DB, unsigned char* HB);
++        void (*SetAudioInfoFrame)(unsigned char* AUD_DB, unsigned char* CHAN_STAT_BUF);
++        int (*SetDispMode)(struct hdmi_tx_dev_s* hdmitx_device, Hdmi_tx_video_para_t *param);
++        int (*SetAudMode)(struct hdmi_tx_dev_s* hdmitx_device, Hdmi_tx_audio_para_t* audio_param);
++        void (*SetAudN)(void);
++        void (*SetupIRQ)(struct hdmi_tx_dev_s* hdmitx_device);
++        void (*DebugFun)(struct hdmi_tx_dev_s* hdmitx_device, const char * buf);
++        void (*UnInit)(struct hdmi_tx_dev_s* hdmitx_device);
++        int (*CntlPower)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);       // Power control
++        int (*CntlDDC)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);         // edid/hdcp control
++        int (*GetState)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);      // Audio/Video/System Status
++        int (*CntlPacket)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);      // Packet control
++        int (*CntlConfig)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);      // Configure control
++        int (*CntlMisc)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);            // Other control
++        int (*Cntl)(struct hdmi_tx_dev_s* hdmitx_device, unsigned cmd, unsigned arg);            // Other control
++    }HWOp;
++
++    struct hdmi_config_platform_data config_data;
++    enum hdmi_event_t hdmitx_event;
++    //wait_queue_head_t   wait_queue;            /* wait queues */
++    /*EDID*/
++    unsigned cur_edid_block;
++    unsigned cur_phy_block_ptr;
++    unsigned char EDID_buf[EDID_MAX_BLOCK*128];
++    unsigned char EDID_buf1[EDID_MAX_BLOCK*128];    // for second read
++    unsigned char EDID_hash[20];
++    rx_cap_t RXCap;
++    Hdmi_tx_video_para_t *cur_video_param;
++    int vic_count;
++    /*audio*/
++    Hdmi_tx_audio_para_t cur_audio_param;
++    int audio_param_update_flag;
++    /*status*/
++#define DISP_SWITCH_FORCE       0
++#define DISP_SWITCH_EDID        1
++    unsigned char disp_switch_config; /* 0, force; 1,edid */
++    unsigned char cur_VIC;
++    unsigned char unplug_powerdown;
++    /**/
++    unsigned char hpd_event; /* 1, plugin; 2, plugout */
++    unsigned char hpd_state; /* 1, connect; 0, disconnect */
++    unsigned char force_audio_flag;
++    unsigned char mux_hpd_if_pin_high_flag;
++	unsigned char cec_func_flag;
++    int  auth_process_timer;
++    HDMI_TX_INFO_t hdmi_info;
++    unsigned char tmp_buf[HDMI_TMP_BUF_SIZE];
++    unsigned int  log;
++    unsigned int  internal_mode_change;
++    unsigned int  cec_func_config;
++    unsigned int  cec_init_ready;
++    unsigned int  tv_cec_support;
++    unsigned int  tx_aud_cfg; /* 0, off; 1, on */
++    unsigned int  tv_no_edid;           // For some un-well-known TVs, no edid at all
++    unsigned int  hpd_lock;
++    unsigned int  mode420;
++    unsigned int  output_blank_flag;    // if equals to 1, means current video & audio output are blank
++    unsigned int  audio_notify_flag;
++    unsigned int  audio_step;
++    hdmi_mo_s hpd;
++    hdmi_mo_s hdcp;
++}hdmitx_dev_t;
++
++#define CMD_DDC_OFFSET          (0x10 << 24)
++#define CMD_STATUS_OFFSET       (0x11 << 24)
++#define CMD_PACKET_OFFSET       (0x12 << 24)
++#define CMD_MISC_OFFSET         (0x13 << 24)
++#define CMD_CONF_OFFSET         (0x14 << 24)
++#define CMD_STAT_OFFSET         (0x15 << 24)
++
++/***********************************************************************
++ *             DDC CONTROL //CntlDDC
++ **********************************************************************/
++#define DDC_RESET_EDID          (CMD_DDC_OFFSET + 0x00)
++#define DDC_RESET_HDCP          (CMD_DDC_OFFSET + 0x01)
++#define DDC_HDCP_OP             (CMD_DDC_OFFSET + 0x02)
++    #define HDCP_ON             0x1
++    #define HDCP_OFF            0x2
++#define DDC_IS_HDCP_ON          (CMD_DDC_OFFSET + 0x04)
++#define DDC_HDCP_GET_AKSV       (CMD_DDC_OFFSET + 0x05)
++#define DDC_HDCP_GET_BKSV       (CMD_DDC_OFFSET + 0x06)
++#define DDC_HDCP_GET_AUTH       (CMD_DDC_OFFSET + 0x07)
++#define DDC_PIN_MUX_OP          (CMD_DDC_OFFSET + 0x08)
++    #define PIN_MUX             0x1
++    #define PIN_UNMUX           0x2
++#define DDC_EDID_READ_DATA      (CMD_DDC_OFFSET + 0x0a)
++#define DDC_IS_EDID_DATA_READY  (CMD_DDC_OFFSET + 0x0b)
++#define DDC_EDID_GET_DATA       (CMD_DDC_OFFSET + 0x0c)
++#define DDC_EDID_CLEAR_RAM      (CMD_DDC_OFFSET + 0x0d)
++
++/***********************************************************************
++ *             CONFIG CONTROL //CntlConfig
++ **********************************************************************/
++// Video part
++#define CONF_VIDEO_BLANK_OP     (CMD_CONF_OFFSET + 0x00)
++    #define VIDEO_BLANK         0x1
++    #define VIDEO_UNBLANK       0x2
++#define CONF_HDMI_DVI_MODE      (CMD_CONF_OFFSET + 0x02)
++    #define HDMI_MODE           0x1
++    #define DVI_MODE            0x2
++#define CONF_SYSTEM_ST          (CMD_CONF_OFFSET + 0x03)
++// Audio part
++#define CONF_CLR_AVI_PACKET     (CMD_CONF_OFFSET + 0x04)
++#define CONF_CLR_VSDB_PACKET    (CMD_CONF_OFFSET + 0x05)
++#define CONF_AUDIO_MUTE_OP      (CMD_CONF_OFFSET + 0x1000 + 0x00)
++    #define AUDIO_MUTE          0x1
++    #define AUDIO_UNMUTE        0x2
++#define CONF_CLR_AUDINFO_PACKET (CMD_CONF_OFFSET + 0x1000 + 0x01)
++
++/***********************************************************************
++ *             MISC control, hpd, hpll //CntlMisc
++ **********************************************************************/
++#define MISC_HPD_MUX_OP         (CMD_MISC_OFFSET + 0x00)
++#define MISC_HPD_GPI_ST         (CMD_MISC_OFFSET + 0x02)
++#define MISC_HPLL_OP            (CMD_MISC_OFFSET + 0x03)
++    #define HPLL_ENABLE         0x1
++    #define HPLL_DISABLE        0x2
++#define MISC_TMDS_PHY_OP        (CMD_MISC_OFFSET + 0x04)
++    #define TMDS_PHY_ENABLE     0x1
++    #define TMDS_PHY_DISABLE    0x2
++#define MISC_VIID_IS_USING      (CMD_MISC_OFFSET + 0x05)
++#define MISC_CONF_MODE420       (CMD_MISC_OFFSET + 0x06)
++#define MISC_TMDS_CLK_DIV40     (CMD_MISC_OFFSET + 0x07)
++#define MISC_COMP_HPLL         (CMD_MISC_OFFSET + 0x08)
++    #define COMP_HPLL_SET_OPTIMISE_HPLL1    0x1
++    #define COMP_HPLL_SET_OPTIMISE_HPLL2    0x2
++#define MISC_COMP_AUDIO         (CMD_MISC_OFFSET + 0x09)
++    #define COMP_AUDIO_SET_N_6144x2          0x1
++    #define COMP_AUDIO_SET_N_6144x3          0x2
++
++/***********************************************************************
++ *                          Get State //GetState
++ **********************************************************************/
++#define STAT_VIDEO_VIC          (CMD_STAT_OFFSET + 0x00)
++#define STAT_VIDEO_CLK          (CMD_STAT_OFFSET + 0x01)
++#define STAT_AUDIO_FORMAT       (CMD_STAT_OFFSET + 0x10)
++#define STAT_AUDIO_CHANNEL      (CMD_STAT_OFFSET + 0x11)
++#define STAT_AUDIO_CLK_STABLE   (CMD_STAT_OFFSET + 0x12)
++#define STAT_AUDIO_PACK         (CMD_STAT_OFFSET + 0x13)
++
++// HDMI LOG
++#define HDMI_LOG_HDCP           (1 << 0)
++
++#define HDMI_SOURCE_DESCRIPTION 0
++#define HDMI_PACKET_VEND        1
++#define HDMI_MPEG_SOURCE_INFO   2
++#define HDMI_PACKET_AVI         3
++#define HDMI_AUDIO_INFO         4
++#define HDMI_AUDIO_CONTENT_PROTECTION   5
++#define HDMI_PACKET_HBR         6
++
++#define HDMI_PROCESS_DELAY  msleep(10)
++#define AUTH_PROCESS_TIME   (1000/100)       // reduce a little time, previous setting is 4000/10
++
++#define HDMITX_VER "2014May6"
++
++/***********************************************************************
++*    hdmitx protocol level interface
++ **********************************************************************/
++extern void hdmitx_init_parameters(HDMI_TX_INFO_t *info);
++
++extern int hdmitx_edid_parse(hdmitx_dev_t* hdmitx_device);
++
++HDMI_Video_Codes_t hdmitx_edid_get_VIC(hdmitx_dev_t* hdmitx_device, const char* disp_mode, char force_flag);
++
++extern int hdmitx_edid_VIC_support(HDMI_Video_Codes_t vic);
++
++extern int hdmitx_edid_dump(hdmitx_dev_t* hdmitx_device, char* buffer, int buffer_len);
++
++extern void hdmitx_edid_clear(hdmitx_dev_t* hdmitx_device);
++
++extern void hdmitx_edid_buf_compare_print(hdmitx_dev_t* hdmitx_device);
++
++extern const char* hdmitx_edid_get_native_VIC(hdmitx_dev_t* hdmitx_device);
++
++extern int hdmitx_set_display(hdmitx_dev_t* hdmitx_device, HDMI_Video_Codes_t VideoCode);
++
++extern int hdmi_set_3d(hdmitx_dev_t* hdmitx_device, int type, unsigned int param);
++
++extern int hdmitx_set_audio(hdmitx_dev_t* hdmitx_device, Hdmi_tx_audio_para_t* audio_param, int hdmi_ch);
++
++extern hdmitx_dev_t * get_hdmitx_device(void);
++
++extern  int hdmi_print_buf(char* buf, int len);
++
++extern void hdmi_set_audio_para(int para);
++
++extern void hdmitx_output_rgb(void);
++
++extern int get_cur_vout_index(void);
++
++/***********************************************************************
++*    hdmitx hardware level interface
++***********************************************************************/
++//#define DOUBLE_CLK_720P_1080I
++extern unsigned char hdmi_pll_mode; /* 1, use external clk as hdmi pll source */
++
++extern void HDMITX_Meson_Init(hdmitx_dev_t* hdmitx_device);
++
++extern void hdmitx_hpd_plugin_handler(struct work_struct *work);
++extern void hdmitx_hpd_plugout_handler(struct work_struct *work);
++extern void hdmitx_internal_intr_handler(struct work_struct *work);
++extern unsigned char hdmi_audio_off_flag;
++
++#define HDMITX_HWCMD_MUX_HPD_IF_PIN_HIGH       0x3
++#define HDMITX_HWCMD_TURNOFF_HDMIHW           0x4
++#define HDMITX_HWCMD_MUX_HPD                0x5
++#define HDMITX_HWCMD_PLL_MODE                0x6
++#define HDMITX_HWCMD_TURN_ON_PRBS           0x7
++#define HDMITX_FORCE_480P_CLK                0x8
++#define HDMITX_GET_AUTHENTICATE_STATE        0xa
++#define HDMITX_SW_INTERNAL_HPD_TRIG          0xb
++#define HDMITX_HWCMD_OSD_ENABLE              0xf
++
++#define HDMITX_HDCP_MONITOR                  0x11
++#define HDMITX_IP_INTR_MASN_RST              0x12
++#define HDMITX_EARLY_SUSPEND_RESUME_CNTL     0x14
++    #define HDMITX_EARLY_SUSPEND             0x1
++    #define HDMITX_LATE_RESUME               0x2
++#define HDMITX_IP_SW_RST                     0x15   // Refer to HDMI_OTHER_CTRL0 in hdmi_tx_reg.h
++    #define TX_CREG_SW_RST      (1<<5)
++    #define TX_SYS_SW_RST       (1<<4)
++    #define CEC_CREG_SW_RST     (1<<3)
++    #define CEC_SYS_SW_RST      (1<<2)
++#define HDMITX_AVMUTE_CNTL                   0x19
++    #define AVMUTE_SET          0   // set AVMUTE to 1
++    #define AVMUTE_CLEAR        1   // set AVunMUTE to 1
++    #define AVMUTE_OFF          2   // set both AVMUTE and AVunMUTE to 0
++#define HDMITX_CBUS_RST                      0x1A
++#define HDMITX_INTR_MASKN_CNTL               0x1B
++    #define INTR_MASKN_ENABLE   0
++    #define INTR_MASKN_DISABLE  1
++    #define INTR_CLEAR          2
++
++#define HDMI_HDCP_DELAYTIME_AFTER_DISPLAY    20      // unit: ms
++
++#define HDMITX_HDCP_MONITOR_BUF_SIZE         1024
++typedef struct {
++    char *hdcp_sub_name;
++    unsigned hdcp_sub_addr_start;
++    unsigned hdcp_sub_len;
++}hdcp_sub_t;
++
++/***********************************************************************
++ *                   hdmi debug printk
++ * level: 0 ~ 4     Default is 2
++ *      0: ERRor  1: IMPortant  2: INFormative  3: DETtal  4: LOW
++ * hdmi_print(ERR, EDID "edid bad\");
++ * hdmi_print(IMP, AUD "set audio format: AC-3\n");
++ * hdmi_print(DET)
++ **********************************************************************/
++#define HD          "hdmitx: "
++#define VID         HD "video: "
++#define AUD         HD "audio: "
++#define CEC         HD "cec: "
++#define EDID        HD "edid: "
++#define HDCP        HD "hdcp: "
++#define SYS         HD "system: "
++#define HPD         HD "hpd: "
++
++#define ERR         1
++#define IMP         2
++#define INF         3
++#define LOW         4
++#define DET         5, "%s[%d]", __FUNCTION__, __LINE__
++
++extern void hdmi_print(int level, const char *fmt, ...);
++
++#define dd()
++#ifndef dd
++#error delete debug information
++#endif
++
++#endif
+diff --git a/include/linux/amlogic/hdmi_tx/hdmi_tx_scdc.h b/include/linux/amlogic/hdmi_tx/hdmi_tx_scdc.h
+new file mode 100644
+index 00000000..943447c8
+--- /dev/null
++++ b/include/linux/amlogic/hdmi_tx/hdmi_tx_scdc.h
+@@ -0,0 +1,30 @@
++#ifndef __HDMI_TX_SCDC_H__
++#define __HDMI_TX_SCDC_H__
++
++// Little-Endian format
++enum {
++    SINK_VER = 0x01,
++    SOURCE_VER,                 // RW
++    UPDATE_0 = 0x10,            // RW
++    UPDATE_1,                   // RW
++    TMDS_CFG = 0x20,            // RW
++    SCRAMBLER_ST,
++    CONFIG_0 = 0x30,            // RW
++    STATUS_FLAGS_0 = 0x40,
++    STATUS_FLAGS_1,
++    ERR_DET_0_L = 0x50,
++    ERR_DET_0_H,
++    ERR_DET_1_L,
++    ERR_DET_1_H,
++    ERR_DET_2_L,
++    ERR_DET_2_H,
++    ERR_DET_CHKSUM,
++    TEST_CONFIG_0 = 0xC0,       // RW
++    MANUFACT_IEEE_OUI_2 = 0xD0,
++    MANUFACT_IEEE_OUI_1,
++    MANUFACT_IEEE_OUI_0,
++    DEVICE_ID = 0xD3,           // 0xD3 ~ 0xDD
++    MANUFACT_SPECIFIC = 0xDE,   // RW   0xDE ~ 0xFF
++}scdc_addr;
++
++#endif  // __HDMI_TX_SCDC_H__

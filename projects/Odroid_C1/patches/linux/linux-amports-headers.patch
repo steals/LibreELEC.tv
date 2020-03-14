@@ -1,0 +1,1778 @@
+diff --git a/include/linux/amlogic/amports/aformat.h b/include/linux/amlogic/amports/aformat.h
+old mode 100644
+new mode 100755
+index e615fd9d..ff269604
+--- a/include/linux/amlogic/amports/aformat.h
++++ b/include/linux/amlogic/amports/aformat.h
+@@ -47,9 +47,11 @@ typedef enum {
+     AFORMAT_EAC3   = 21,
+     AFORMAT_PCM_WIFIDISPLAY = 22,
+     AFORMAT_TRUEHD = 25,
+-    AFORMAT_UNSUPPORT = 26,
+-    AFORMAT_MAX    = 27
++    AFORMAT_MPEG1  =26,//AFORMAT_MPEG-->mp3,AFORMAT_MPEG1-->mp1,AFROMAT_MPEG2-->mp2
++    AFORMAT_MPEG2  =27,
++    AFORMAT_WMAVOI =28,
++    AFORMAT_UNSUPPORT = 29,
++    AFORMAT_MAX    = 30
+ } aformat_t;
+ 
+ #endif /* AFORMAT_H */
+-
+diff --git a/include/linux/amlogic/amports/amstream.h b/include/linux/amlogic/amports/amstream.h
+old mode 100644
+new mode 100755
+index ef3aa2d0..6934eceb
+--- a/include/linux/amlogic/amports/amstream.h
++++ b/include/linux/amlogic/amports/amstream.h
+@@ -1,350 +1,344 @@
+-/*
+- * AMLOGIC Audio/Video streaming port driver.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the named License,
+- * or any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+- *
+- * Author:  Tim Yao <timyao@amlogic.com>
+- *
+- */
+-
+-#ifndef AMSTREAM_H
+-#define AMSTREAM_H
+-
+-//#include <linux/interrupt.h>
+-#include "ve.h"
+-
+-#ifdef __KERNEL__
+-#define PORT_FLAG_IN_USE    0x0001
+-#define PORT_FLAG_VFORMAT   0x0002
+-#define PORT_FLAG_AFORMAT   0x0004
+-#define PORT_FLAG_FORMAT    (PORT_FLAG_VFORMAT | PORT_FLAG_AFORMAT)
+-#define PORT_FLAG_VID       0x0008
+-#define PORT_FLAG_AID       0x0010
+-#define PORT_FLAG_SID       0x0020
+-#define PORT_FLAG_UD       0x0040
+-#define PORT_FLAG_DRM       0x0080
+-#define PORT_FLAG_ID        (PORT_FLAG_VID | PORT_FLAG_AID | PORT_FLAG_SID | PORT_FLAG_UD)
+-#define PORT_FLAG_INITED    0x100
+-
+-#define PORT_TYPE_VIDEO     0x01
+-#define PORT_TYPE_AUDIO     0x02
+-#define PORT_TYPE_MPTS      0x04
+-#define PORT_TYPE_MPPS      0x08
+-#define PORT_TYPE_ES        0x10
+-#define PORT_TYPE_RM        0x20
+-#define PORT_TYPE_SUB       0x40
+-#define PORT_TYPE_SUB_RD    0x80
+-#define PORT_TYPE_HEVC      0x100
+-#define PORT_TYPE_USERDATA	0x200
+-#endif
+-
+-#define AMSTREAM_IOC_MAGIC  'S'
+-
+-#define AMSTREAM_IOC_VB_START   _IOW(AMSTREAM_IOC_MAGIC, 0x00, int)
+-#define AMSTREAM_IOC_VB_SIZE    _IOW(AMSTREAM_IOC_MAGIC, 0x01, int)
+-#define AMSTREAM_IOC_AB_START   _IOW(AMSTREAM_IOC_MAGIC, 0x02, int)
+-#define AMSTREAM_IOC_AB_SIZE    _IOW(AMSTREAM_IOC_MAGIC, 0x03, int)
+-#define AMSTREAM_IOC_VFORMAT    _IOW(AMSTREAM_IOC_MAGIC, 0x04, int)
+-#define AMSTREAM_IOC_AFORMAT    _IOW(AMSTREAM_IOC_MAGIC, 0x05, int)
+-#define AMSTREAM_IOC_VID        _IOW(AMSTREAM_IOC_MAGIC, 0x06, int)
+-#define AMSTREAM_IOC_AID        _IOW(AMSTREAM_IOC_MAGIC, 0x07, int)
+-#define AMSTREAM_IOC_VB_STATUS  _IOR(AMSTREAM_IOC_MAGIC, 0x08, unsigned long)
+-#define AMSTREAM_IOC_AB_STATUS  _IOR(AMSTREAM_IOC_MAGIC, 0x09, unsigned long)
+-#define AMSTREAM_IOC_SYSINFO    _IOW(AMSTREAM_IOC_MAGIC, 0x0a, int)
+-#define AMSTREAM_IOC_ACHANNEL   _IOW(AMSTREAM_IOC_MAGIC, 0x0b, int)
+-#define AMSTREAM_IOC_SAMPLERATE _IOW(AMSTREAM_IOC_MAGIC, 0x0c, int)
+-#define AMSTREAM_IOC_DATAWIDTH  _IOW(AMSTREAM_IOC_MAGIC, 0x0d, int)
+-#define AMSTREAM_IOC_TSTAMP     _IOW(AMSTREAM_IOC_MAGIC, 0x0e, unsigned long)
+-#define AMSTREAM_IOC_VDECSTAT   _IOR(AMSTREAM_IOC_MAGIC, 0x0f, unsigned long)
+-#define AMSTREAM_IOC_ADECSTAT   _IOR(AMSTREAM_IOC_MAGIC, 0x10, unsigned long)
+-
+-#define AMSTREAM_IOC_PORT_INIT   _IO(AMSTREAM_IOC_MAGIC, 0x11)
+-#define AMSTREAM_IOC_TRICKMODE  _IOW(AMSTREAM_IOC_MAGIC, 0x12, unsigned long)
+-
+-#define AMSTREAM_IOC_AUDIO_INFO	_IOW(AMSTREAM_IOC_MAGIC, 0x13, unsigned long)
+-#define AMSTREAM_IOC_TRICK_STAT  _IOR(AMSTREAM_IOC_MAGIC, 0x14, unsigned long)
+-#define AMSTREAM_IOC_AUDIO_RESET _IO(AMSTREAM_IOC_MAGIC, 0x15)
+-#define AMSTREAM_IOC_SID         _IOW(AMSTREAM_IOC_MAGIC, 0x16, int)
+-#define AMSTREAM_IOC_VPAUSE      _IOW(AMSTREAM_IOC_MAGIC, 0x17, int)
+-#define AMSTREAM_IOC_AVTHRESH   _IOW(AMSTREAM_IOC_MAGIC, 0x18, int)
+-#define AMSTREAM_IOC_SYNCTHRESH _IOW(AMSTREAM_IOC_MAGIC, 0x19, int)
+-#define AMSTREAM_IOC_SUB_RESET   _IOW(AMSTREAM_IOC_MAGIC, 0x1a, int)
+-#define AMSTREAM_IOC_SUB_LENGTH  _IOR(AMSTREAM_IOC_MAGIC, 0x1b, unsigned long)
+-#define AMSTREAM_IOC_SET_DEC_RESET _IOW(AMSTREAM_IOC_MAGIC, 0x1c, int)
+-#define AMSTREAM_IOC_TS_SKIPBYTE _IOW(AMSTREAM_IOC_MAGIC, 0x1d, int)
+-#define AMSTREAM_IOC_SUB_TYPE    _IOW(AMSTREAM_IOC_MAGIC, 0x1e, int)
+-#define AMSTREAM_IOC_CLEAR_VIDEO _IOW(AMSTREAM_IOC_MAGIC, 0x1f, int)
+-
+-#define AMSTREAM_IOC_APTS             _IOR(AMSTREAM_IOC_MAGIC, 0x40, unsigned long)
+-#define AMSTREAM_IOC_VPTS             _IOR(AMSTREAM_IOC_MAGIC, 0x41, unsigned long)
+-#define AMSTREAM_IOC_PCRSCR           _IOR(AMSTREAM_IOC_MAGIC, 0x42, unsigned long)
+-#define AMSTREAM_IOC_SYNCENABLE      _IOW(AMSTREAM_IOC_MAGIC, 0x43, unsigned long)
+-#define AMSTREAM_IOC_GET_SYNC_ADISCON  _IOR(AMSTREAM_IOC_MAGIC, 0x44, unsigned long)
+-#define AMSTREAM_IOC_SET_SYNC_ADISCON  _IOW(AMSTREAM_IOC_MAGIC, 0x45, unsigned long)
+-#define AMSTREAM_IOC_GET_SYNC_VDISCON  _IOR(AMSTREAM_IOC_MAGIC, 0x46, unsigned long)
+-#define AMSTREAM_IOC_SET_SYNC_VDISCON  _IOW(AMSTREAM_IOC_MAGIC, 0x47, unsigned long)
+-#define AMSTREAM_IOC_GET_VIDEO_DISABLE  _IOR(AMSTREAM_IOC_MAGIC, 0x48, unsigned long)
+-#define AMSTREAM_IOC_SET_VIDEO_DISABLE  _IOW(AMSTREAM_IOC_MAGIC, 0x49, unsigned long)
+-#define AMSTREAM_IOC_SET_PCRSCR       _IOW(AMSTREAM_IOC_MAGIC, 0x4a, unsigned long)
+-#define AMSTREAM_IOC_GET_VIDEO_AXIS   _IOR(AMSTREAM_IOC_MAGIC, 0x4b, unsigned long)
+-#define AMSTREAM_IOC_SET_VIDEO_AXIS   _IOW(AMSTREAM_IOC_MAGIC, 0x4c, unsigned long)
+-#define AMSTREAM_IOC_GET_VIDEO_CROP   _IOR(AMSTREAM_IOC_MAGIC, 0x4d, unsigned long)
+-#define AMSTREAM_IOC_SET_VIDEO_CROP   _IOW(AMSTREAM_IOC_MAGIC, 0x4e, unsigned long)
+-#define AMSTREAM_IOC_PCRID        _IOW(AMSTREAM_IOC_MAGIC, 0x4f, int)
+-
+-// VPP.VE IOCTL command list
+-#define AMSTREAM_IOC_VE_BEXT   _IOW(AMSTREAM_IOC_MAGIC, 0x20, struct ve_bext_s  )
+-#define AMSTREAM_IOC_VE_DNLP   _IOW(AMSTREAM_IOC_MAGIC, 0x21, struct ve_dnlp_s  )
+-#define AMSTREAM_IOC_VE_HSVS   _IOW(AMSTREAM_IOC_MAGIC, 0x22, struct ve_hsvs_s  )
+-#define AMSTREAM_IOC_VE_CCOR   _IOW(AMSTREAM_IOC_MAGIC, 0x23, struct ve_ccor_s  )
+-#define AMSTREAM_IOC_VE_BENH   _IOW(AMSTREAM_IOC_MAGIC, 0x24, struct ve_benh_s  )
+-#define AMSTREAM_IOC_VE_DEMO   _IOW(AMSTREAM_IOC_MAGIC, 0x25, struct ve_demo_s  )
+-#define AMSTREAM_IOC_VE_VDO_MEAS _IOW(AMSTREAM_IOC_MAGIC, 0x27, struct vdo_meas_s )
+-#define AMSTREAM_IOC_VE_DEBUG    _IOWR(AMSTREAM_IOC_MAGIC, 0x28, unsigned long long)
+-#define AMSTREAM_IOC_VE_REGMAP   _IOW(AMSTREAM_IOC_MAGIC, 0x29, struct ve_regmap_s)
+-
+-// VPP.CM IOCTL command list
+-#define AMSTREAM_IOC_CM_REGION _IOW(AMSTREAM_IOC_MAGIC, 0x30, struct cm_region_s)
+-#define AMSTREAM_IOC_CM_TOP    _IOW(AMSTREAM_IOC_MAGIC, 0x31, struct cm_top_s   )
+-#define AMSTREAM_IOC_CM_DEMO   _IOW(AMSTREAM_IOC_MAGIC, 0x32, struct cm_demo_s  )
+-#define AMSTREAM_IOC_CM_DEBUG  _IOWR(AMSTREAM_IOC_MAGIC, 0x33, unsigned long long)
+-#define AMSTREAM_IOC_CM_REGMAP  _IOW(AMSTREAM_IOC_MAGIC, 0x34, struct cm_regmap_s)
+-
+-//VPP.3D IOCTL command list^M
+-#define  AMSTREAM_IOC_SET_3D_TYPE  _IOW(AMSTREAM_IOC_MAGIC, 0x3c, unsigned int)
+-#define  AMSTREAM_IOC_GET_3D_TYPE  _IOW(AMSTREAM_IOC_MAGIC, 0x3d, unsigned int)
+-
+-#define AMSTREAM_IOC_SUB_NUM	_IOR(AMSTREAM_IOC_MAGIC, 0x50, unsigned long)
+-#define AMSTREAM_IOC_SUB_INFO	_IOR(AMSTREAM_IOC_MAGIC, 0x51, unsigned long)
+-#define AMSTREAM_IOC_GET_BLACKOUT_POLICY   _IOR(AMSTREAM_IOC_MAGIC, 0x52, unsigned long)
+-#define AMSTREAM_IOC_SET_BLACKOUT_POLICY   _IOW(AMSTREAM_IOC_MAGIC, 0x53, unsigned long)
+-#define AMSTREAM_IOC_GET_SCREEN_MODE _IOR(AMSTREAM_IOC_MAGIC, 0x58, int)
+-#define AMSTREAM_IOC_SET_SCREEN_MODE _IOW(AMSTREAM_IOC_MAGIC, 0x59, int)
+-#define AMSTREAM_IOC_GET_VIDEO_DISCONTINUE_REPORT _IOR(AMSTREAM_IOC_MAGIC, 0x5a, int)
+-#define AMSTREAM_IOC_SET_VIDEO_DISCONTINUE_REPORT _IOW(AMSTREAM_IOC_MAGIC, 0x5b, int)
+-#define AMSTREAM_IOC_VF_STATUS  _IOR(AMSTREAM_IOC_MAGIC, 0x60, unsigned long)
+-#define AMSTREAM_IOC_CLEAR_VBUF _IO(AMSTREAM_IOC_MAGIC, 0x80)
+-
+-#define AMSTREAM_IOC_APTS_LOOKUP    _IOR(AMSTREAM_IOC_MAGIC, 0x81, unsigned long)
+-#define GET_FIRST_APTS_FLAG    _IOR(AMSTREAM_IOC_MAGIC, 0x82, long)
+-
+-#define AMSTREAM_IOC_GET_SYNC_ADISCON_DIFF  _IOR(AMSTREAM_IOC_MAGIC, 0x83, unsigned long)
+-#define AMSTREAM_IOC_GET_SYNC_VDISCON_DIFF  _IOR(AMSTREAM_IOC_MAGIC, 0x84, unsigned long)
+-#define AMSTREAM_IOC_SET_SYNC_ADISCON_DIFF  _IOW(AMSTREAM_IOC_MAGIC, 0x85, unsigned long)
+-#define AMSTREAM_IOC_SET_SYNC_VDISCON_DIFF  _IOW(AMSTREAM_IOC_MAGIC, 0x86, unsigned long)
+-#define AMSTREAM_IOC_GET_FREERUN_MODE  _IOR(AMSTREAM_IOC_MAGIC, 0x87, unsigned long)
+-#define AMSTREAM_IOC_SET_FREERUN_MODE  _IOW(AMSTREAM_IOC_MAGIC, 0x88, unsigned long)
+-#define AMSTREAM_IOC_SET_VSYNC_UPINT   _IOW(AMSTREAM_IOC_MAGIC, 0x89, unsigned long)
+-#define AMSTREAM_IOC_GET_VSYNC_SLOW_FACTOR   _IOW(AMSTREAM_IOC_MAGIC, 0x8a, unsigned long)
+-#define AMSTREAM_IOC_SET_VSYNC_SLOW_FACTOR   _IOW(AMSTREAM_IOC_MAGIC, 0x8b, unsigned long)
+-#define AMSTREAM_IOC_SET_DEMUX  _IOW(AMSTREAM_IOC_MAGIC, 0x90, unsigned long)
+-#define AMSTREAM_IOC_SET_DRMMODE _IOW(AMSTREAM_IOC_MAGIC, 0x91, unsigned long)
+-#define AMSTREAM_IOC_TSTAMP_uS64 _IOW(AMSTREAM_IOC_MAGIC, 0x95, unsigned long)
+-
+-#define AMSTREAM_IOC_SET_VIDEO_DELAY_LIMIT_MS _IOW(AMSTREAM_IOC_MAGIC, 0xa0, unsigned long)
+-#define AMSTREAM_IOC_GET_VIDEO_DELAY_LIMIT_MS _IOR(AMSTREAM_IOC_MAGIC, 0xa1, unsigned long)
+-#define AMSTREAM_IOC_SET_AUDIO_DELAY_LIMIT_MS _IOW(AMSTREAM_IOC_MAGIC, 0xa2, unsigned long)
+-#define AMSTREAM_IOC_GET_AUDIO_DELAY_LIMIT_MS _IOR(AMSTREAM_IOC_MAGIC, 0xa3, unsigned long)
+-#define AMSTREAM_IOC_GET_AUDIO_CUR_DELAY_MS _IOR(AMSTREAM_IOC_MAGIC, 0xa4, unsigned long)
+-#define AMSTREAM_IOC_GET_VIDEO_CUR_DELAY_MS _IOR(AMSTREAM_IOC_MAGIC, 0xa5, unsigned long)
+-#define AMSTREAM_IOC_GET_AUDIO_AVG_BITRATE_BPS _IOR(AMSTREAM_IOC_MAGIC, 0xa6, unsigned long)
+-#define AMSTREAM_IOC_GET_VIDEO_AVG_BITRATE_BPS _IOR(AMSTREAM_IOC_MAGIC, 0xa7, unsigned long)
+-#define AMSTREAM_IOC_SET_APTS                  _IOW(AMSTREAM_IOC_MAGIC, 0xa8, unsigned long)
+-#define AMSTREAM_IOC_GET_LAST_CHECKIN_APTS   _IOR(AMSTREAM_IOC_MAGIC, 0xa9, unsigned long)
+-#define AMSTREAM_IOC_GET_LAST_CHECKIN_VPTS   _IOR(AMSTREAM_IOC_MAGIC, 0xaa, unsigned long)
+-#define AMSTREAM_IOC_GET_LAST_CHECKOUT_APTS  _IOR(AMSTREAM_IOC_MAGIC, 0xab, unsigned long)
+-#define AMSTREAM_IOC_GET_LAST_CHECKOUT_VPTS  _IOR(AMSTREAM_IOC_MAGIC, 0xac, unsigned long)
+-//subtitle.c get/set subtitle info
+-#define AMSTREAM_IOC_GET_SUBTITLE_INFO       _IOR(AMSTREAM_IOC_MAGIC, 0xad, unsigned long)
+-#define AMSTREAM_IOC_SET_SUBTITLE_INFO       _IOW(AMSTREAM_IOC_MAGIC, 0xae, unsigned long)
+-#define AMSTREAM_IOC_SET_OMX_VPTS            _IOW(AMSTREAM_IOC_MAGIC, 0xaf, unsigned long)
+-#define AMSTREAM_IOC_GET_OMX_VPTS            _IOW(AMSTREAM_IOC_MAGIC, 0xb0, unsigned long)
+-#define TRICKMODE_NONE       0x00
+-#define TRICKMODE_I          0x01
+-#define TRICKMODE_FFFB       0x02
+-
+-#define TRICK_STAT_DONE     0x01
+-#define TRICK_STAT_WAIT     0x00
+-
+-#define AUDIO_EXTRA_DATA_SIZE   (4096)
+-#define MAX_SUB_NUM		32
+-
+-#define MAX_STREAMBUFFER_SIZE (1024*1024*15)
+-
+-
+-enum VIDEO_DEC_TYPE
+-{
+-        VIDEO_DEC_FORMAT_UNKNOW,
+-        VIDEO_DEC_FORMAT_MPEG4_3,
+-        VIDEO_DEC_FORMAT_MPEG4_4,
+-        VIDEO_DEC_FORMAT_MPEG4_5,
+-        VIDEO_DEC_FORMAT_H264,
+-        VIDEO_DEC_FORMAT_MJPEG,
+-        VIDEO_DEC_FORMAT_MP4,
+-        VIDEO_DEC_FORMAT_H263,
+-        VIDEO_DEC_FORMAT_REAL_8,
+-        VIDEO_DEC_FORMAT_REAL_9,
+-        VIDEO_DEC_FORMAT_WMV3,
+-        VIDEO_DEC_FORMAT_WVC1,
+-        VIDEO_DEC_FORMAT_SW,
+-    	VIDEO_DEC_FORMAT_MAX
+-};
+-
+-struct buf_status {
+-        int size;
+-        int data_len;
+-        int free_len;
+-        unsigned int read_pointer;
+-        unsigned int write_pointer;
+-};
+-
+-/*struct vdec_status.status*/
+-#define STAT_TIMER_INIT     0x01
+-#define STAT_MC_LOAD        0x02
+-#define STAT_ISR_REG        0x04
+-#define STAT_VF_HOOK        0x08
+-#define STAT_TIMER_ARM      0x10
+-#define STAT_VDEC_RUN       0x20
+-//-/*struct vdec_status.status on error*/
+-
+-#define PARSER_FATAL_ERROR              (0x10<<16)
+-#define DECODER_ERROR_VLC_DECODE_TBL    (0x20<<16)
+-#define PARSER_ERROR_WRONG_HEAD_VER     (0x40<<16)
+-#define PARSER_ERROR_WRONG_PACKAGE_SIZE (0x80<<16)
+-#define DECODER_FATAL_ERROR_SIZE_OVERFLOW     (0x100<<16)
+-#define DECODER_FATAL_ERROR_UNKNOW             (0x200<<16)
+-#define DECODER_ERROR_MASK	(0xffff<<16)
+-
+-
+-struct vdec_status {
+-        unsigned int width;
+-        unsigned int height;
+-        unsigned int fps;
+-        unsigned int error_count;
+-        unsigned int status;
+-};
+-
+-struct adec_status {
+-        unsigned int channels;
+-        unsigned int sample_rate;
+-        unsigned int resolution;
+-        unsigned int error_count;
+-        unsigned int status;
+-};
+-
+-struct am_io_param {
+-    union {
+-          int data;
+-          int id;//get bufstatus? //or others
+-    };
+-
+-    int len; //buffer size;
+-
+-    union {
+-        char buf[1];
+-        struct buf_status status;
+-        struct vdec_status vstatus;
+-        struct adec_status astatus;
+-    };
+-};
+-struct audio_info {
+-    int valid;
+-    int sample_rate;
+-    int channels;
+-    int bitrate;
+-    int codec_id;
+-    int block_align;
+-    int extradata_size;
+-    char extradata[AUDIO_EXTRA_DATA_SIZE];
+-};
+-
+-struct dec_sysinfo {
+-    unsigned int    format;
+-    unsigned int    width;
+-    unsigned int    height;
+-    unsigned int    rate;
+-    unsigned int    extra;
+-    unsigned int    status;
+-    unsigned int    ratio;
+-    void *          param;
+-	unsigned long long    ratio64;
+-};
+-
+-struct subtitle_info
+-{
+-    unsigned char id;
+-    unsigned char width;
+-    unsigned char height;
+-    unsigned char type;
+-};
+-
+-struct codec_profile_t
+-{
+-	char *name;		// video codec short name
+-	char *profile;	// Attributes,seperated by commas
+-};
+-
+-#define SUPPORT_VDEC_NUM	(8)
+-
+-int vcodec_profile_register(const struct codec_profile_t *vdec_profile);
+-ssize_t vcodec_profile_read(char *buf);
+-
+-#ifdef __KERNEL__
+-#ifdef ENABLE_DEMUX_DRIVER
+-/*TS demux operation interface*/
+-struct tsdemux_ops {
+-    int (*reset)(void);
+-    int (*set_reset_flag)(void);
+-    int (*request_irq)(irq_handler_t handler, void *data);
+-    int (*free_irq)(void);
+-    int (*set_vid)(int vpid);
+-    int (*set_aid)(int apid);
+-    int (*set_sid)(int spid);
+-	int (*set_pcrid)(int pcrpid);
+-    int (*set_skipbyte)(int skipbyte);
+-    int (*set_demux)(int dev);
+-};
+-
+-void tsdemux_set_ops(struct tsdemux_ops *ops);
+-int tsdemux_set_reset_flag(void);
+-
+-#endif /*ENABLE_DEMUX_DRIVER*/
+-void set_vdec_func(int (*vdec_func)(struct vdec_status *));
+-void set_adec_func(int (*adec_func)(struct adec_status *));
+-void set_trickmode_func(int (*trickmode_func)(unsigned long trickmode));
+-void wakeup_sub_poll(void);
+-int wakeup_userdata_poll(int wp, int start_phyaddr, int buf_size);
+-int get_sub_type(void);
+-#endif
+-
+-typedef struct tcon_gamma_table_s {
+-    u16 data[256];
+-} tcon_gamma_table_t;
+-
+-typedef struct tcon_rgb_ogo_s {
+-    unsigned int en;
+-             int r_pre_offset;  // s11.0, range -1024~+1023, default is 0
+-             int g_pre_offset;  // s11.0, range -1024~+1023, default is 0
+-             int b_pre_offset;  // s11.0, range -1024~+1023, default is 0
+-    unsigned int r_gain;        // u1.10, range 0~2047, default is 1024 (1.0x)
+-    unsigned int g_gain;        // u1.10, range 0~2047, default is 1024 (1.0x)
+-    unsigned int b_gain;        // u1.10, range 0~2047, default is 1024 (1.0x)
+-             int r_post_offset; // s11.0, range -1024~+1023, default is 0
+-             int g_post_offset; // s11.0, range -1024~+1023, default is 0
+-             int b_post_offset; // s11.0, range -1024~+1023, default is 0
+-} tcon_rgb_ogo_t;
+-
+-#endif /* AMSTREAM_H */
+-
++/*
++ * AMLOGIC Audio/Video streaming port driver.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the named License,
++ * or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
++ *
++ * Author:  Tim Yao <timyao@amlogic.com>
++ *
++ */
++
++#ifndef AMSTREAM_H
++#define AMSTREAM_H
++
++//#include <linux/interrupt.h>
++
++#ifdef __KERNEL__
++#define PORT_FLAG_IN_USE    0x0001
++#define PORT_FLAG_VFORMAT   0x0002
++#define PORT_FLAG_AFORMAT   0x0004
++#define PORT_FLAG_FORMAT    (PORT_FLAG_VFORMAT | PORT_FLAG_AFORMAT)
++#define PORT_FLAG_VID       0x0008
++#define PORT_FLAG_AID       0x0010
++#define PORT_FLAG_SID       0x0020
++#define PORT_FLAG_UD       0x0040
++#define PORT_FLAG_DRM       0x0080
++#define PORT_FLAG_ID        (PORT_FLAG_VID | PORT_FLAG_AID | PORT_FLAG_SID | PORT_FLAG_UD)
++#define PORT_FLAG_INITED    0x100
++
++#define PORT_TYPE_VIDEO     0x01
++#define PORT_TYPE_AUDIO     0x02
++#define PORT_TYPE_MPTS      0x04
++#define PORT_TYPE_MPPS      0x08
++#define PORT_TYPE_ES        0x10
++#define PORT_TYPE_RM        0x20
++#define PORT_TYPE_SUB       0x40
++#define PORT_TYPE_SUB_RD    0x80
++#define PORT_TYPE_HEVC      0x100
++#define PORT_TYPE_USERDATA	0x200
++#endif
++
++#define AMSTREAM_IOC_MAGIC  'S'
++
++#define AMSTREAM_IOC_VB_START   _IOW(AMSTREAM_IOC_MAGIC, 0x00, int)
++#define AMSTREAM_IOC_VB_SIZE    _IOW(AMSTREAM_IOC_MAGIC, 0x01, int)
++#define AMSTREAM_IOC_AB_START   _IOW(AMSTREAM_IOC_MAGIC, 0x02, int)
++#define AMSTREAM_IOC_AB_SIZE    _IOW(AMSTREAM_IOC_MAGIC, 0x03, int)
++#define AMSTREAM_IOC_VFORMAT    _IOW(AMSTREAM_IOC_MAGIC, 0x04, int)
++#define AMSTREAM_IOC_AFORMAT    _IOW(AMSTREAM_IOC_MAGIC, 0x05, int)
++#define AMSTREAM_IOC_VID        _IOW(AMSTREAM_IOC_MAGIC, 0x06, int)
++#define AMSTREAM_IOC_AID        _IOW(AMSTREAM_IOC_MAGIC, 0x07, int)
++#define AMSTREAM_IOC_VB_STATUS  _IOR(AMSTREAM_IOC_MAGIC, 0x08, unsigned long)
++#define AMSTREAM_IOC_AB_STATUS  _IOR(AMSTREAM_IOC_MAGIC, 0x09, unsigned long)
++#define AMSTREAM_IOC_SYSINFO    _IOW(AMSTREAM_IOC_MAGIC, 0x0a, int)
++#define AMSTREAM_IOC_ACHANNEL   _IOW(AMSTREAM_IOC_MAGIC, 0x0b, int)
++#define AMSTREAM_IOC_SAMPLERATE _IOW(AMSTREAM_IOC_MAGIC, 0x0c, int)
++#define AMSTREAM_IOC_DATAWIDTH  _IOW(AMSTREAM_IOC_MAGIC, 0x0d, int)
++#define AMSTREAM_IOC_TSTAMP     _IOW(AMSTREAM_IOC_MAGIC, 0x0e, unsigned long)
++#define AMSTREAM_IOC_VDECSTAT   _IOR(AMSTREAM_IOC_MAGIC, 0x0f, unsigned long)
++#define AMSTREAM_IOC_ADECSTAT   _IOR(AMSTREAM_IOC_MAGIC, 0x10, unsigned long)
++
++#define AMSTREAM_IOC_PORT_INIT   _IO(AMSTREAM_IOC_MAGIC, 0x11)
++#define AMSTREAM_IOC_TRICKMODE  _IOW(AMSTREAM_IOC_MAGIC, 0x12, unsigned long)
++
++#define AMSTREAM_IOC_AUDIO_INFO	_IOW(AMSTREAM_IOC_MAGIC, 0x13, unsigned long)
++#define AMSTREAM_IOC_TRICK_STAT  _IOR(AMSTREAM_IOC_MAGIC, 0x14, unsigned long)
++#define AMSTREAM_IOC_AUDIO_RESET _IO(AMSTREAM_IOC_MAGIC, 0x15)
++#define AMSTREAM_IOC_SID         _IOW(AMSTREAM_IOC_MAGIC, 0x16, int)
++#define AMSTREAM_IOC_VPAUSE      _IOW(AMSTREAM_IOC_MAGIC, 0x17, int)
++#define AMSTREAM_IOC_AVTHRESH   _IOW(AMSTREAM_IOC_MAGIC, 0x18, int)
++#define AMSTREAM_IOC_SYNCTHRESH _IOW(AMSTREAM_IOC_MAGIC, 0x19, int)
++#define AMSTREAM_IOC_SUB_RESET   _IOW(AMSTREAM_IOC_MAGIC, 0x1a, int)
++#define AMSTREAM_IOC_SUB_LENGTH  _IOR(AMSTREAM_IOC_MAGIC, 0x1b, unsigned long)
++#define AMSTREAM_IOC_SET_DEC_RESET _IOW(AMSTREAM_IOC_MAGIC, 0x1c, int)
++#define AMSTREAM_IOC_TS_SKIPBYTE _IOW(AMSTREAM_IOC_MAGIC, 0x1d, int)
++#define AMSTREAM_IOC_SUB_TYPE    _IOW(AMSTREAM_IOC_MAGIC, 0x1e, int)
++#define AMSTREAM_IOC_CLEAR_VIDEO _IOW(AMSTREAM_IOC_MAGIC, 0x1f, int)
++
++#define AMSTREAM_IOC_APTS             _IOR(AMSTREAM_IOC_MAGIC, 0x40, unsigned long)
++#define AMSTREAM_IOC_VPTS             _IOR(AMSTREAM_IOC_MAGIC, 0x41, unsigned long)
++#define AMSTREAM_IOC_PCRSCR           _IOR(AMSTREAM_IOC_MAGIC, 0x42, unsigned long)
++#define AMSTREAM_IOC_SYNCENABLE      _IOW(AMSTREAM_IOC_MAGIC, 0x43, unsigned long)
++#define AMSTREAM_IOC_GET_SYNC_ADISCON  _IOR(AMSTREAM_IOC_MAGIC, 0x44, unsigned long)
++#define AMSTREAM_IOC_SET_SYNC_ADISCON  _IOW(AMSTREAM_IOC_MAGIC, 0x45, unsigned long)
++#define AMSTREAM_IOC_GET_SYNC_VDISCON  _IOR(AMSTREAM_IOC_MAGIC, 0x46, unsigned long)
++#define AMSTREAM_IOC_SET_SYNC_VDISCON  _IOW(AMSTREAM_IOC_MAGIC, 0x47, unsigned long)
++#define AMSTREAM_IOC_GET_VIDEO_DISABLE  _IOR(AMSTREAM_IOC_MAGIC, 0x48, unsigned long)
++#define AMSTREAM_IOC_SET_VIDEO_DISABLE  _IOW(AMSTREAM_IOC_MAGIC, 0x49, unsigned long)
++#define AMSTREAM_IOC_SET_PCRSCR       _IOW(AMSTREAM_IOC_MAGIC, 0x4a, unsigned long)
++#define AMSTREAM_IOC_GET_VIDEO_AXIS   _IOR(AMSTREAM_IOC_MAGIC, 0x4b, unsigned long)
++#define AMSTREAM_IOC_SET_VIDEO_AXIS   _IOW(AMSTREAM_IOC_MAGIC, 0x4c, unsigned long)
++#define AMSTREAM_IOC_GET_VIDEO_CROP   _IOR(AMSTREAM_IOC_MAGIC, 0x4d, unsigned long)
++#define AMSTREAM_IOC_SET_VIDEO_CROP   _IOW(AMSTREAM_IOC_MAGIC, 0x4e, unsigned long)
++#define AMSTREAM_IOC_PCRID        _IOW(AMSTREAM_IOC_MAGIC, 0x4f, int)
++
++//VPP.3D IOCTL command list^M
++#define  AMSTREAM_IOC_SET_3D_TYPE  _IOW(AMSTREAM_IOC_MAGIC, 0x3c, unsigned int)
++#define  AMSTREAM_IOC_GET_3D_TYPE  _IOW(AMSTREAM_IOC_MAGIC, 0x3d, unsigned int)
++
++#define AMSTREAM_IOC_SUB_NUM	_IOR(AMSTREAM_IOC_MAGIC, 0x50, unsigned long)
++#define AMSTREAM_IOC_SUB_INFO	_IOR(AMSTREAM_IOC_MAGIC, 0x51, unsigned long)
++#define AMSTREAM_IOC_GET_BLACKOUT_POLICY   _IOR(AMSTREAM_IOC_MAGIC, 0x52, unsigned long)
++#define AMSTREAM_IOC_SET_BLACKOUT_POLICY   _IOW(AMSTREAM_IOC_MAGIC, 0x53, unsigned long)
++#define AMSTREAM_IOC_UD_LENGTH _IOR(AMSTREAM_IOC_MAGIC, 0x54, unsigned long)
++#define AMSTREAM_IOC_UD_POC _IOR(AMSTREAM_IOC_MAGIC, 0x55, unsigned long)
++#define AMSTREAM_IOC_GET_SCREEN_MODE _IOR(AMSTREAM_IOC_MAGIC, 0x58, int)
++#define AMSTREAM_IOC_SET_SCREEN_MODE _IOW(AMSTREAM_IOC_MAGIC, 0x59, int)
++#define AMSTREAM_IOC_GET_VIDEO_DISCONTINUE_REPORT _IOR(AMSTREAM_IOC_MAGIC, 0x5a, int)
++#define AMSTREAM_IOC_SET_VIDEO_DISCONTINUE_REPORT _IOW(AMSTREAM_IOC_MAGIC, 0x5b, int)
++#define AMSTREAM_IOC_VF_STATUS  _IOR(AMSTREAM_IOC_MAGIC, 0x60, unsigned long)
++#define AMSTREAM_IOC_CLEAR_VBUF _IO(AMSTREAM_IOC_MAGIC, 0x80)
++
++#define AMSTREAM_IOC_APTS_LOOKUP    _IOR(AMSTREAM_IOC_MAGIC, 0x81, unsigned long)
++#define GET_FIRST_APTS_FLAG    _IOR(AMSTREAM_IOC_MAGIC, 0x82, long)
++
++#define AMSTREAM_IOC_GET_SYNC_ADISCON_DIFF  _IOR(AMSTREAM_IOC_MAGIC, 0x83, unsigned long)
++#define AMSTREAM_IOC_GET_SYNC_VDISCON_DIFF  _IOR(AMSTREAM_IOC_MAGIC, 0x84, unsigned long)
++#define AMSTREAM_IOC_SET_SYNC_ADISCON_DIFF  _IOW(AMSTREAM_IOC_MAGIC, 0x85, unsigned long)
++#define AMSTREAM_IOC_SET_SYNC_VDISCON_DIFF  _IOW(AMSTREAM_IOC_MAGIC, 0x86, unsigned long)
++#define AMSTREAM_IOC_GET_FREERUN_MODE  _IOR(AMSTREAM_IOC_MAGIC, 0x87, unsigned long)
++#define AMSTREAM_IOC_SET_FREERUN_MODE  _IOW(AMSTREAM_IOC_MAGIC, 0x88, unsigned long)
++#define AMSTREAM_IOC_SET_VSYNC_UPINT   _IOW(AMSTREAM_IOC_MAGIC, 0x89, unsigned long)
++#define AMSTREAM_IOC_GET_VSYNC_SLOW_FACTOR   _IOW(AMSTREAM_IOC_MAGIC, 0x8a, unsigned long)
++#define AMSTREAM_IOC_SET_VSYNC_SLOW_FACTOR   _IOW(AMSTREAM_IOC_MAGIC, 0x8b, unsigned long)
++#define AMSTREAM_IOC_SET_DEMUX  _IOW(AMSTREAM_IOC_MAGIC, 0x90, unsigned long)
++#define AMSTREAM_IOC_SET_DRMMODE _IOW(AMSTREAM_IOC_MAGIC, 0x91, unsigned long)
++#define AMSTREAM_IOC_TSTAMP_uS64 _IOW(AMSTREAM_IOC_MAGIC, 0x95, unsigned long)
++
++#define AMSTREAM_IOC_SET_VIDEO_DELAY_LIMIT_MS _IOW(AMSTREAM_IOC_MAGIC, 0xa0, unsigned long)
++#define AMSTREAM_IOC_GET_VIDEO_DELAY_LIMIT_MS _IOR(AMSTREAM_IOC_MAGIC, 0xa1, unsigned long)
++#define AMSTREAM_IOC_SET_AUDIO_DELAY_LIMIT_MS _IOW(AMSTREAM_IOC_MAGIC, 0xa2, unsigned long)
++#define AMSTREAM_IOC_GET_AUDIO_DELAY_LIMIT_MS _IOR(AMSTREAM_IOC_MAGIC, 0xa3, unsigned long)
++#define AMSTREAM_IOC_GET_AUDIO_CUR_DELAY_MS _IOR(AMSTREAM_IOC_MAGIC, 0xa4, unsigned long)
++#define AMSTREAM_IOC_GET_VIDEO_CUR_DELAY_MS _IOR(AMSTREAM_IOC_MAGIC, 0xa5, unsigned long)
++#define AMSTREAM_IOC_GET_AUDIO_AVG_BITRATE_BPS _IOR(AMSTREAM_IOC_MAGIC, 0xa6, unsigned long)
++#define AMSTREAM_IOC_GET_VIDEO_AVG_BITRATE_BPS _IOR(AMSTREAM_IOC_MAGIC, 0xa7, unsigned long)
++#define AMSTREAM_IOC_SET_APTS                  _IOW(AMSTREAM_IOC_MAGIC, 0xa8, unsigned long)
++#define AMSTREAM_IOC_GET_LAST_CHECKIN_APTS   _IOR(AMSTREAM_IOC_MAGIC, 0xa9, unsigned long)
++#define AMSTREAM_IOC_GET_LAST_CHECKIN_VPTS   _IOR(AMSTREAM_IOC_MAGIC, 0xaa, unsigned long)
++#define AMSTREAM_IOC_GET_LAST_CHECKOUT_APTS  _IOR(AMSTREAM_IOC_MAGIC, 0xab, unsigned long)
++#define AMSTREAM_IOC_GET_LAST_CHECKOUT_VPTS  _IOR(AMSTREAM_IOC_MAGIC, 0xac, unsigned long)
++//subtitle.c get/set subtitle info
++#define AMSTREAM_IOC_GET_SUBTITLE_INFO       _IOR(AMSTREAM_IOC_MAGIC, 0xad, unsigned long)
++#define AMSTREAM_IOC_SET_SUBTITLE_INFO       _IOW(AMSTREAM_IOC_MAGIC, 0xae, unsigned long)
++#define AMSTREAM_IOC_SET_OMX_VPTS            _IOW(AMSTREAM_IOC_MAGIC, 0xaf, unsigned long)
++#define AMSTREAM_IOC_GET_OMX_VPTS            _IOW(AMSTREAM_IOC_MAGIC, 0xb0, unsigned long)
++
++#define AMSTREAM_IOC_GET_TRICK_VPTS          _IOR(AMSTREAM_IOC_MAGIC, 0xf0, unsigned long)
++#define AMSTREAM_IOC_DISABLE_SLOW_SYNC       _IOR(AMSTREAM_IOC_MAGIC, 0xf1, unsigned long)
++
++#define TRICKMODE_NONE       0x00
++#define TRICKMODE_I          0x01
++#define TRICKMODE_FFFB       0x02
++
++#define TRICK_STAT_DONE     0x01
++#define TRICK_STAT_WAIT     0x00
++
++#define AUDIO_EXTRA_DATA_SIZE   (4096)
++#define MAX_SUB_NUM		32
++
++#define MAX_STREAMBUFFER_SIZE (1024*1024*15)
++
++
++enum VIDEO_DEC_TYPE
++{
++        VIDEO_DEC_FORMAT_UNKNOW,
++        VIDEO_DEC_FORMAT_MPEG4_3,
++        VIDEO_DEC_FORMAT_MPEG4_4,
++        VIDEO_DEC_FORMAT_MPEG4_5,
++        VIDEO_DEC_FORMAT_H264,
++        VIDEO_DEC_FORMAT_MJPEG,
++        VIDEO_DEC_FORMAT_MP4,
++        VIDEO_DEC_FORMAT_H263,
++        VIDEO_DEC_FORMAT_REAL_8,
++        VIDEO_DEC_FORMAT_REAL_9,
++        VIDEO_DEC_FORMAT_WMV3,
++        VIDEO_DEC_FORMAT_WVC1,
++        VIDEO_DEC_FORMAT_SW,
++	VIDEO_DEC_FORMAT_MAX
++};
++
++struct buf_status {
++        int size;
++        int data_len;
++        int free_len;
++        unsigned int read_pointer;
++        unsigned int write_pointer;
++};
++
++/*struct vdec_status.status*/
++#define STAT_TIMER_INIT     0x01
++#define STAT_MC_LOAD        0x02
++#define STAT_ISR_REG        0x04
++#define STAT_VF_HOOK        0x08
++#define STAT_TIMER_ARM      0x10
++#define STAT_VDEC_RUN       0x20
++//-/*struct vdec_status.status on error*/
++
++#define PARSER_FATAL_ERROR              (0x10<<16)
++#define DECODER_ERROR_VLC_DECODE_TBL    (0x20<<16)
++#define PARSER_ERROR_WRONG_HEAD_VER     (0x40<<16)
++#define PARSER_ERROR_WRONG_PACKAGE_SIZE (0x80<<16)
++#define DECODER_FATAL_ERROR_SIZE_OVERFLOW     (0x100<<16)
++#define DECODER_FATAL_ERROR_UNKNOW             (0x200<<16)
++#define DECODER_ERROR_MASK	(0xffff<<16)
++
++
++struct vdec_status {
++        unsigned int width;
++        unsigned int height;
++        unsigned int fps;
++        unsigned int error_count;
++        unsigned int status;
++};
++
++struct adec_status {
++        unsigned int channels;
++        unsigned int sample_rate;
++        unsigned int resolution;
++        unsigned int error_count;
++        unsigned int status;
++};
++
++struct am_io_param {
++    union {
++          int data;
++          int id;//get bufstatus? //or others
++    };
++
++    int len; //buffer size;
++
++    union {
++        char buf[1];
++        struct buf_status status;
++        struct vdec_status vstatus;
++        struct adec_status astatus;
++    };
++};
++struct audio_info {
++    int valid;
++    int sample_rate;
++    int channels;
++    int bitrate;
++    int codec_id;
++    int block_align;
++    int extradata_size;
++    char extradata[AUDIO_EXTRA_DATA_SIZE];
++};
++
++struct dec_sysinfo {
++    unsigned int    format;
++    unsigned int    width;
++    unsigned int    height;
++    unsigned int    rate;
++    unsigned int    extra;
++    unsigned int    status;
++    unsigned int    ratio;
++    void *          param;
++	unsigned long long    ratio64;
++};
++
++struct subtitle_info
++{
++    unsigned char id;
++    unsigned char width;
++    unsigned char height;
++    unsigned char type;
++};
++
++struct codec_profile_t
++{
++	char *name;		// video codec short name
++	char *profile;	// Attributes,seperated by commas
++};
++
++struct userdata_poc_info_t
++{
++    unsigned int poc_info;
++    unsigned int poc_number;
++};
++
++#define SUPPORT_VDEC_NUM	(8)
++
++int vcodec_profile_register(const struct codec_profile_t *vdec_profile);
++ssize_t vcodec_profile_read(char *buf);
++
++#ifdef __KERNEL__
++#ifdef ENABLE_DEMUX_DRIVER
++/*TS demux operation interface*/
++struct tsdemux_ops {
++    int (*reset)(void);
++    int (*set_reset_flag)(void);
++    int (*request_irq)(irq_handler_t handler, void *data);
++    int (*free_irq)(void);
++    int (*set_vid)(int vpid);
++    int (*set_aid)(int apid);
++    int (*set_sid)(int spid);
++	int (*set_pcrid)(int pcrpid);
++    int (*set_skipbyte)(int skipbyte);
++    int (*set_demux)(int dev);
++};
++
++void tsdemux_set_ops(struct tsdemux_ops *ops);
++int tsdemux_set_reset_flag(void);
++
++#endif /*ENABLE_DEMUX_DRIVER*/
++void set_vdec_func(int (*vdec_func)(struct vdec_status *));
++void set_adec_func(int (*adec_func)(struct adec_status *));
++void set_trickmode_func(int (*trickmode_func)(unsigned long trickmode));
++void wakeup_sub_poll(void);
++void set_userdata_poc(struct userdata_poc_info_t poc);
++void init_userdata_fifo(void);
++int wakeup_userdata_poll(int wp, int start_phyaddr, int buf_size, int data_length);
++int get_sub_type(void);
++#endif
++
++typedef struct tcon_gamma_table_s {
++    u16 data[256];
++} tcon_gamma_table_t;
++
++typedef struct tcon_rgb_ogo_s {
++    unsigned int en;
++             int r_pre_offset;  // s11.0, range -1024~+1023, default is 0
++             int g_pre_offset;  // s11.0, range -1024~+1023, default is 0
++             int b_pre_offset;  // s11.0, range -1024~+1023, default is 0
++    unsigned int r_gain;        // u1.10, range 0~2047, default is 1024 (1.0x)
++    unsigned int g_gain;        // u1.10, range 0~2047, default is 1024 (1.0x)
++    unsigned int b_gain;        // u1.10, range 0~2047, default is 1024 (1.0x)
++             int r_post_offset; // s11.0, range -1024~+1023, default is 0
++             int g_post_offset; // s11.0, range -1024~+1023, default is 0
++             int b_post_offset; // s11.0, range -1024~+1023, default is 0
++} tcon_rgb_ogo_t;
++
++#endif /* AMSTREAM_H */
+diff --git a/include/linux/amlogic/amports/amvideocap.h b/include/linux/amlogic/amports/amvideocap.h
+old mode 100644
+new mode 100755
+index eabe3404..d3c5cac1
+--- a/include/linux/amlogic/amports/amvideocap.h
++++ b/include/linux/amlogic/amports/amvideocap.h
+@@ -50,4 +50,3 @@ enum amvideocap_state{
+ 	AMVIDEOCAP_STATE_ERROR=0xffff,
+ };
+ #endif//__AMVIDEOCAP_HEADHER_
+-
+diff --git a/include/linux/amlogic/amports/canvas.h b/include/linux/amlogic/amports/canvas.h
+old mode 100644
+new mode 100755
+index 08082df6..db78ffac
+--- a/include/linux/amlogic/amports/canvas.h
++++ b/include/linux/amlogic/amports/canvas.h
+@@ -40,6 +40,9 @@ typedef struct {
+ #define AMVDEC_ALL_CANVAS_RANGE_0 0xb  // vc1/real/mpeg12/mpeg4/ jpeg logo / h264
+ #define AMVDEC_ALL_CANVAS_RANGE_1 0x25 //mjpeg
+ 
++#define PPMGR2_MAX_CANVAS 8
++#define PPMGR2_CANVAS_INDEX 0x70    // 0x70-0x7f for PPMGR2 (IONVIDEO)
++
+ #define AMVDEC_H264MVC_CANVAS_INDEX 0x78
+ #define AMVDEC_H264MVC_CANVAS_MAX 0xbf
+ 
+@@ -96,11 +99,17 @@ typedef struct {
+ #define DI_CONTPRD_CANVAS_IDX           0x74
+ #define DI_CONTP2RD_CANVAS_IDX           0x75
+ #define DI_CONTWR_CANVAS_IDX            0x76
++#define DI_MCINFORD_CANVAS_IDX          0x26
++#define DI_MCINFOWR_CANVAS_IDX          0x27
++#define DI_MCVECWR_CANVAS_IDX           0x28
+ //DI POST, share with DISPLAY
+ #define DI_POST_BUF0_CANVAS_IDX         0x66
+ #define DI_POST_BUF1_CANVAS_IDX         0x67
+ #define DI_POST_MTNCRD_CANVAS_IDX       0x68
+ #define DI_POST_MTNPRD_CANVAS_IDX       0x69
++//MCDI POST
++#define DI_POST_MCVECRD_CANVAS_IDX      0xE4
++#define DI_POST_MCVECRD_CANVAS_IDX2     0xE5
+ 
+ #ifdef CONFIG_VSYNC_RDMA
+ #define DI_POST_BUF0_CANVAS_IDX2         0x6a
+@@ -117,6 +126,7 @@ typedef struct {
+ #ifdef CONFIG_GE2D_KEEP_FRAME
+ #define DISPLAY_CANVAS_YDUP_INDEX 0x6e
+ #define DISPLAY_CANVAS_UDUP_INDEX 0x6f
++#define DISPLAY_CANVAS_VDUP_INDEX 0x6d
+ #endif
+ 
+ #define AMVIDEOCAP_CANVAS_INDEX 0x6e
+@@ -125,7 +135,7 @@ typedef struct {
+ #define MIPI_CANVAS_MAX_INDEX 0x7f
+ 
+ //tvin vdin: 0x18-0x3B
+-#define VDIN_CANVAS_INDEX              0x26
++#define VDIN_CANVAS_INDEX              0x29
+ #define VDIN_CANVAS_MAX_INDEX          0x3B
+ 
+ #define CAMERA_USER_CANVAS_INDEX             0x4e
+diff --git a/include/linux/amlogic/amports/dsp_register.h b/include/linux/amlogic/amports/dsp_register.h
+old mode 100644
+new mode 100755
+index c952766f..04f4529f
+--- a/include/linux/amlogic/amports/dsp_register.h
++++ b/include/linux/amlogic/amports/dsp_register.h
+@@ -1,242 +1,240 @@
+-/*
+-dsp_register.h
+-*/
+-#ifndef DSP_REGISTER_H
+-#define DSP_REGISTER_H
++/*
++dsp_register.h
++*/
++#ifndef DSP_REGISTER_H
++#define DSP_REGISTER_H
+ #include <linux/dma-mapping.h>
+ #include <mach/cpu.h>
+-
+-#ifdef CONFIG_ARCH_MESON8
+-#define SYS_MEM_START	0x00000000
+-#else
+-#define SYS_MEM_START	0x80000000
+-#endif
+-#define SYS_MEM_SIZE	0x8000000
+-
+-#define S_1K					(1024)
+-#define S_1M					(S_1K*S_1K)
+-
+-#define AUDIO_DSP_MEM_SIZE		 S_1M
++
++#ifdef CONFIG_ARCH_MESON8
++#define SYS_MEM_START	0x00000000
++#else
++#define SYS_MEM_START	0x80000000
++#endif
++#define SYS_MEM_SIZE	0x8000000
++
++#define S_1K					(1024)
++#define S_1M					(S_1K*S_1K)
++
++#define AUDIO_DSP_MEM_SIZE		 S_1M
+ #if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8
+-#define AUDIO_DSP_START_PHY_ADDR 0x06000000
+-#else
+-#define AUDIO_DSP_START_PHY_ADDR 0x85000000
+-#endif
+-#define AUDIO_DSP_START_ADDR	((unsigned)phys_to_virt(AUDIO_DSP_START_PHY_ADDR))//((SYS_MEM_START+SYS_MEM_SIZE)-AUDIO_DSP_MEM_SIZE)
+-#define AUDIO_DSP_END_ADDR		((AUDIO_DSP_START_ADDR+AUDIO_DSP_MEM_SIZE))
+-#define REG_MEM_SIZE					(S_1K*4)
+-
+-
+-
+-
+-#define DSP_REG_OFFSET	(AUDIO_DSP_START_ADDR+ AUDIO_DSP_MEM_SIZE-REG_MEM_SIZE)
+-#define DSP_REG_END			(AUDIO_DSP_START_ADDR+ AUDIO_DSP_MEM_SIZE-4)
+-#define DSP_REG(x)			(DSP_REG_OFFSET | ((x)<<5))
+-
+-#define DSP_STATUS_HALT		('H'<<24 | 'a'<<16|'l'<<8 |'t')
+-#define DSP_STATUS_RUNING		('R'<<16|'u'<<8 |'n')
+-#define DSP_STATUS_SLEEP    ('S'<<24 | 'L'<<16|'E'<<8 |'P')
+-#define DSP_STATUS_WAKEUP   ('W'<<24 | 'A'<<16|'K'<<8 |'E')
+-#define DSP_AUDIOINFO_READY ('A'<<24 | 'I'<<16|'R'<<8 |'D')
+-
+-#define DSP_STATUS				DSP_REG(0)
+-#define DSP_JIFFIES				DSP_REG(1)
+-#define DSP_STACK_START   DSP_REG(3)
+-#define DSP_STACK_END   	DSP_REG(4)
+-#define DSP_GP_STACK_START   DSP_REG(5)
+-#define DSP_GP_STACK_END   	DSP_REG(6)
+-
+-#define DSP_MEM_START  		DSP_REG(7)
+-#define DSP_MEM_END 	 		DSP_REG(8)
+-
+-
+-#define DSP_DECODE_OUT_START_ADDR  	DSP_REG(9)
+-#define DSP_DECODE_OUT_END_ADDR   	DSP_REG(10)
+-#define DSP_DECODE_OUT_RD_ADDR  	  DSP_REG(11)
+-#define DSP_DECODE_OUT_WD_ADDR  		DSP_REG(12)
+-#define DSP_AUDIOINFO_STATUS              DSP_REG(13)
+-#define DSP_SLEEP_STATUS                DSP_REG(14)
+-//#define DEBUG_TIME_TEST
+-#ifdef DEBUG_TIME_TEST
+-#define DSP_TEST_TIME_VALUE                DSP_REG(15)
+-#endif
+-#define DSP_ARM_REF_CLK_VAL                DSP_REG(16)
+-
+-#define DSP_DECODE_OUT_WD_PTR       DSP_REG(18)
+-#define DSP_BUFFERED_LEN  		DSP_REG(19)
+-#define DSP_AFIFO_RD_OFFSET1  		DSP_REG(20)
+-
++#define AUDIO_DSP_START_PHY_ADDR 0x06000000
++#else
++#define AUDIO_DSP_START_PHY_ADDR 0x85000000
++#endif
++#define AUDIO_DSP_START_ADDR	((unsigned)phys_to_virt(AUDIO_DSP_START_PHY_ADDR))//((SYS_MEM_START+SYS_MEM_SIZE)-AUDIO_DSP_MEM_SIZE)
++#define AUDIO_DSP_END_ADDR		((AUDIO_DSP_START_ADDR+AUDIO_DSP_MEM_SIZE))
++#define REG_MEM_SIZE					(S_1K*4)
++
++
++
++
++#define DSP_REG_OFFSET	(AUDIO_DSP_START_ADDR+ AUDIO_DSP_MEM_SIZE-REG_MEM_SIZE)
++#define DSP_REG_END			(AUDIO_DSP_START_ADDR+ AUDIO_DSP_MEM_SIZE-4)
++#define DSP_REG(x)			(DSP_REG_OFFSET | ((x)<<5))
++
++#define DSP_STATUS_HALT		('H'<<24 | 'a'<<16|'l'<<8 |'t')
++#define DSP_STATUS_RUNING		('R'<<16|'u'<<8 |'n')
++#define DSP_STATUS_SLEEP    ('S'<<24 | 'L'<<16|'E'<<8 |'P')
++#define DSP_STATUS_WAKEUP   ('W'<<24 | 'A'<<16|'K'<<8 |'E')
++#define DSP_AUDIOINFO_READY ('A'<<24 | 'I'<<16|'R'<<8 |'D')
++
++#define DSP_STATUS				DSP_REG(0)
++#define DSP_JIFFIES				DSP_REG(1)
++#define DSP_STACK_START   DSP_REG(3)
++#define DSP_STACK_END   	DSP_REG(4)
++#define DSP_GP_STACK_START   DSP_REG(5)
++#define DSP_GP_STACK_END   	DSP_REG(6)
++
++#define DSP_MEM_START  		DSP_REG(7)
++#define DSP_MEM_END 	 		DSP_REG(8)
++
++
++#define DSP_DECODE_OUT_START_ADDR  	DSP_REG(9)
++#define DSP_DECODE_OUT_END_ADDR   	DSP_REG(10)
++#define DSP_DECODE_OUT_RD_ADDR  	  DSP_REG(11)
++#define DSP_DECODE_OUT_WD_ADDR  		DSP_REG(12)
++#define DSP_AUDIOINFO_STATUS              DSP_REG(13)
++#define DSP_SLEEP_STATUS                DSP_REG(14)
++//#define DEBUG_TIME_TEST
++#ifdef DEBUG_TIME_TEST
++#define DSP_TEST_TIME_VALUE                DSP_REG(15)
++#endif
++#define DSP_ARM_REF_CLK_VAL                DSP_REG(16)
++
++#define DSP_DECODE_OUT_WD_PTR       DSP_REG(18)
++#define DSP_BUFFERED_LEN  		DSP_REG(19)
++#define DSP_AFIFO_RD_OFFSET1  		DSP_REG(20)
++
+ #define DSP_DECODE_OPTION       DSP_REG(21)
+-#define DSP_AUDIO_FORMAT_INFO  DSP_REG(22)
++#define DSP_AUDIO_FORMAT_INFO  DSP_REG(22)
+ 
+-#define DSP_GET_EXTRA_INFO_FINISH    DSP_REG(23)
+-#define DSP_HDMI_SR                  DSP_REG(24)
+-
+-#define DSP_LOG_START_ADDR  	DSP_REG(28)
+-#define DSP_LOG_END_ADDR   	    DSP_REG(29)
+-#define DSP_LOG_RD_ADDR  	    DSP_REG(30)
+-#define DSP_LOG_WD_ADDR  		DSP_REG(31)
++#define DSP_GET_EXTRA_INFO_FINISH    DSP_REG(23)
++#define DSP_HDMI_SR                  DSP_REG(24)
++
++#define DSP_LOG_START_ADDR  	DSP_REG(28)
++#define DSP_LOG_END_ADDR   	    DSP_REG(29)
++#define DSP_LOG_RD_ADDR  	    DSP_REG(30)
++#define DSP_LOG_WD_ADDR  		DSP_REG(31)
+ 
+ #define DSP_CHIP_SUBID          DSP_REG(32)
+-// other definations
+-
+-// for wifi-display 
+-#define DSP_SKIP_BYTES          DSP_REG(38)
+-
+-#define MAILBOX1_REG(n)	DSP_REG(40+n)
+-#define MAILBOX2_REG(n)	DSP_REG(40+32+n)
+-
+-
+-//----------------------------------------------
+-#define DSP_DECODE_51PCM_OUT_START_ADDR  	DSP_REG(106)
+-#define DSP_DECODE_51PCM_OUT_END_ADDR   	DSP_REG(107)
+-#define DSP_DECODE_51PCM_OUT_RD_ADDR  	    DSP_REG(108)
+-#define DSP_DECODE_51PCM_OUT_WD_ADDR  		DSP_REG(109)
+-//------------------------------------------------
+-/*
+-as iec958 ouput maybe be enabled before the spdif module inititation finish in the spdif driver,
+-in this case,it will cause 958 module not work.so add a protocal register to co-work for that
+-*/
+-#define DSP_IEC958_INIT_READY_INFO  		DSP_REG(110) 
+-#define DSP_AC3_DRC_INFO 					DSP_IEC958_INIT_READY_INFO
+-#define DSP_DTS_DEC_INFO					DSP_REG(111)
+-#define DSP_WORK_INFO (AUDIO_DSP_END_ADDR - 128)
+-
+-
+-
+-#ifndef __ASSEMBLY__
+-/*mailbox struct*/
+-struct mail_msg{
+-int cmd;
+-int status;//0x1:pending.0:free
+-char *data;
+-int len;
+-};
+-#endif
+-
+-#define M1B_IRQ0_PRINT							(0+16)
+-#define M1B_IRQ1_BUF_OVERFLOW					(1+16)
+-#define M1B_IRQ2_BUF_UNDERFLOW				(2+16)
+-#define M1B_IRQ3_DECODE_ERROR					(3+16)
+-#define M1B_IRQ4_DECODE_FINISH_FRAME 		(4+16)
+-#define M1B_IRQ5_STREAM_FMT_CHANGED 			(5+16)
+-#define M1B_IRQ5_STREAM_RD_WD_TEST 			(6+16)
++// other definations
++
++// for wifi-display
++#define DSP_SKIP_BYTES          DSP_REG(38)
++
++#define MAILBOX1_REG(n)	DSP_REG(40+n)
++#define MAILBOX2_REG(n)	DSP_REG(40+32+n)
++
++
++//----------------------------------------------
++#define DSP_DECODE_51PCM_OUT_START_ADDR  	DSP_REG(106)
++#define DSP_DECODE_51PCM_OUT_END_ADDR   	DSP_REG(107)
++#define DSP_DECODE_51PCM_OUT_RD_ADDR  	    DSP_REG(108)
++#define DSP_DECODE_51PCM_OUT_WD_ADDR  		DSP_REG(109)
++//------------------------------------------------
++/*
++as iec958 ouput maybe be enabled before the spdif module inititation finish in the spdif driver,
++in this case,it will cause 958 module not work.so add a protocal register to co-work for that
++*/
++#define DSP_IEC958_INIT_READY_INFO  		DSP_REG(110)
++#define DSP_AC3_DRC_INFO 					DSP_IEC958_INIT_READY_INFO
++#define DSP_DTS_DEC_INFO					DSP_REG(111)
++#define DSP_WORK_INFO (AUDIO_DSP_END_ADDR - 128)
++
++
++
++#ifndef __ASSEMBLY__
++/*mailbox struct*/
++struct mail_msg{
++int cmd;
++int status;//0x1:pending.0:free
++char *data;
++int len;
++};
++#endif
++
++#define M1B_IRQ0_PRINT							(0+16)
++#define M1B_IRQ1_BUF_OVERFLOW					(1+16)
++#define M1B_IRQ2_BUF_UNDERFLOW				(2+16)
++#define M1B_IRQ3_DECODE_ERROR					(3+16)
++#define M1B_IRQ4_DECODE_FINISH_FRAME 		(4+16)
++#define M1B_IRQ5_STREAM_FMT_CHANGED 			(5+16)
++#define M1B_IRQ5_STREAM_RD_WD_TEST 			(6+16)
+ #define M1B_IRQ7_DECODE_FATAL_ERR			(7+16)
+-#define M1B_IRQ8_IEC958_INFO                (8+16)
+-
+-
+-#define M2B_IRQ0_DSP_HALT							(0)
+-#define M2B_IRQ1_DSP_RESET						(1)
+-#define M2B_IRQ2_DECODE_START					(2)
+-#define M2B_IRQ3_DECODE_STOP					(3)
+-#define M2B_IRQ4_AUDIO_INFO					(4)
+-#define M2B_IRQ0_DSP_SLEEP					(5)
+-#define M2B_IRQ0_DSP_WAKEUP					(6)
+-#define M2B_IRQ0_DSP_AUDIO_EFFECT			(7) //audio post process cmd 
+-
+-#define CMD_PRINT_LOG					(1234<<8 |1)
+-
+-#if  MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON6
+-#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8 //>= m8
+-#define MB0_REG EE_ASSIST_MBOX0_IRQ_REG
+-#define MB0_SEL EE_ASSIST_MBOX0_FIQ_SEL
+-#define MB0_CLR EE_ASSIST_MBOX0_CLR_REG
+-#define MB0_MSK EE_ASSIST_MBOX0_MASK
+-#define MB1_REG EE_ASSIST_MBOX1_IRQ_REG
+-#define MB1_SEL EE_ASSIST_MBOX1_FIQ_SEL
+-#define MB1_CLR EE_ASSIST_MBOX1_CLR_REG
+-#define MB1_MSK EE_ASSIST_MBOX1_MASK
+-#define MB2_REG EE_ASSIST_MBOX2_IRQ_REG
+-#define MB2_SEL EE_ASSIST_MBOX2_FIQ_SEL
+-#define MB2_CLR EE_ASSIST_MBOX2_CLR_REG
+-#define MB2_MSK EE_ASSIST_MBOX2_MASK
+-
+-#define READ_VREG(r) READ_CBUS_REG(r)
+-#define WRITE_VREG(r, val) WRITE_CBUS_REG(r, val)
+-#define WRITE_VREG_BITS(r, val, start, len) WRITE_CBUS_REG_BITS(r, val, start, len)
+-#define SET_VREG_MASK(r, mask) SET_CBUS_REG_MASK(r, mask)
+-#define CLEAR_VREG_MASK(r, mask) CLEAR_CBUS_REG_MASK(r, mask)
+-#else  //m6, m6tv
+-#define MB0_REG VDEC_ASSIST_MBOX0_IRQ_REG
+-#define MB0_SEL VDEC_ASSIST_MBOX0_FIQ_SEL
+-#define MB0_CLR VDEC_ASSIST_MBOX0_CLR_REG
+-#define MB0_MSK VDEC_ASSIST_MBOX0_MASK
+-#define MB1_REG VDEC_ASSIST_MBOX1_IRQ_REG
+-#define MB1_SEL VDEC_ASSIST_MBOX1_FIQ_SEL
+-#define MB1_CLR VDEC_ASSIST_MBOX1_CLR_REG
+-#define MB1_MSK VDEC_ASSIST_MBOX1_MASK
+-#define MB2_REG VDEC_ASSIST_MBOX2_IRQ_REG
+-#define MB2_SEL VDEC_ASSIST_MBOX2_FIQ_SEL
+-#define MB2_CLR VDEC_ASSIST_MBOX2_CLR_REG
+-#define MB2_MSK VDEC_ASSIST_MBOX2_MASK
+-
+-#define READ_VREG(r) (aml_read_reg32(DOS_REG_ADDR(r)))
+-#define WRITE_VREG(r, val) aml_write_reg32( DOS_REG_ADDR(r),val)
+-#define WRITE_VREG_BITS(r, val, start, len) \
+-    WRITE_VREG(r, (READ_VREG(r) & ~(((1L<<(len))-1)<<(start)))|((unsigned)((val)&((1L<<(len))-1)) << (start)))
+-#define SET_VREG_MASK(r, mask) WRITE_VREG(r, READ_VREG(r) | (mask))
+-#define CLEAR_VREG_MASK(r, mask) WRITE_VREG(r, READ_VREG(r) & ~(mask))
+-#endif
+-#else // < m6
+-#define MB0_REG ASSIST_MBOX0_IRQ_REG
+-#define MB0_SEL ASSIST_MBOX0_FIQ_SEL
+-#define MB0_CLR ASSIST_MBOX0_CLR_REG
+-#define MB0_MSK ASSIST_MBOX0_MASK
+-#define MB1_REG ASSIST_MBOX1_IRQ_REG
+-#define MB1_SEL ASSIST_MBOX1_FIQ_SEL
+-#define MB1_CLR ASSIST_MBOX1_CLR_REG
+-#define MB1_MSK ASSIST_MBOX1_MASK
+-#define MB2_REG ASSIST_MBOX2_IRQ_REG
+-#define MB2_SEL ASSIST_MBOX2_FIQ_SEL
+-#define MB2_CLR ASSIST_MBOX2_CLR_REG
+-#define MB2_MSK ASSIST_MBOX2_MASK
+-
+-#define READ_VREG(r) READ_CBUS_REG(r)
+-#define WRITE_VREG(r, val) WRITE_CBUS_REG(r, val)
+-#define WRITE_VREG_BITS(r, val, start, len) WRITE_CBUS_REG_BITS(r, val, start, len)
+-#define SET_VREG_MASK(r, mask) SET_CBUS_REG_MASK(r, mask)
+-#define CLEAR_VREG_MASK(r, mask) CLEAR_CBUS_REG_MASK(r, mask)
+-
+-#endif
+-
+-#define MDEC_TRIGGER_IRQ(irq)	{SET_VREG_MASK(MB0_SEL,1<<irq);\
+-								WRITE_VREG(MB0_REG,1<<irq);}
+-#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8 //>= m8
+-#define SYS_TRIGGER_IRQ(irq)		{/*SET_VREG_MASK(MB1_SEL,1<<irq);*/ \
+-								WRITE_VREG(MB1_REG,1<<irq);}
+-#define SYS_CLEAR_IRQ(irq)		{/*CLEAR_VREG_MASK(MB1_SEL,1<<irq); */\
+-								WRITE_VREG(MB1_CLR,1<<irq);}
+-#define DSP_TRIGGER_IRQ(irq)		{/*SET_VREG_MASK(MB2_SEL,1<<irq); */\
+-								WRITE_VREG(MB2_REG,1<<irq);}
+-#else
+-#define SYS_TRIGGER_IRQ(irq)		{SET_VREG_MASK(MB1_SEL,1<<irq); \
+-								WRITE_VREG(MB1_REG,1<<irq);}
+-#define SYS_CLEAR_IRQ(irq)		{CLEAR_VREG_MASK(MB1_SEL,1<<irq); \
+-								WRITE_VREG(MB1_CLR,1<<irq);}
+-#define DSP_TRIGGER_IRQ(irq)		{SET_VREG_MASK(MB2_SEL,1<<irq); \
+-								WRITE_VREG(MB2_REG,1<<irq);}
+-#endif
+-
+-
+-#define MDEC_CLEAR_IRQ(irq)		{CLEAR_VREG_MASK(MB0_SEL,1<<irq); \
+-								WRITE_VREG(MB0_CLR,1<<irq);}
+-
+-
+-
+-#define DSP_CLEAR_IRQ(irq)		{CLEAR_VREG_MASK(MB2_SEL,1<<irq); \
+-								WRITE_VREG(MB2_CLR,1<<irq);}
+-
+-
+-#define MAIBOX0_IRQ_ENABLE(irq)		SET_VREG_MASK(MB0_MSK,1<<irq)
+-#define MAIBOX1_IRQ_ENABLE(irq)		SET_VREG_MASK(MB1_MSK,1<<irq)
+-#define MAIBOX2_IRQ_ENABLE(irq)		SET_VREG_MASK(MB2_MSK,1<<irq)
+-
+-#define ARC_2_ARM_ADDR_SWAP(addr)  ((unsigned long)(phys_to_virt(addr)))
+-#define ARM_2_ARC_ADDR_SWAP(addr)  (virt_to_phys((void*)addr))
+-
+-#define DSP_RD(reg)	  (*((volatile unsigned long *)reg))
+-#define DSP_WD(reg,val)	({(*((volatile unsigned long *)(reg)))=val;})
+-
+-#endif
+-
+-
++#define M1B_IRQ8_IEC958_INFO                (8+16)
++
++
++#define M2B_IRQ0_DSP_HALT							(0)
++#define M2B_IRQ1_DSP_RESET						(1)
++#define M2B_IRQ2_DECODE_START					(2)
++#define M2B_IRQ3_DECODE_STOP					(3)
++#define M2B_IRQ4_AUDIO_INFO					(4)
++#define M2B_IRQ0_DSP_SLEEP					(5)
++#define M2B_IRQ0_DSP_WAKEUP					(6)
++#define M2B_IRQ0_DSP_AUDIO_EFFECT			(7) //audio post process cmd
++
++#define CMD_PRINT_LOG					(1234<<8 |1)
++
++#if  MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON6
++#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8 //>= m8
++#define MB0_REG EE_ASSIST_MBOX0_IRQ_REG
++#define MB0_SEL EE_ASSIST_MBOX0_FIQ_SEL
++#define MB0_CLR EE_ASSIST_MBOX0_CLR_REG
++#define MB0_MSK EE_ASSIST_MBOX0_MASK
++#define MB1_REG EE_ASSIST_MBOX1_IRQ_REG
++#define MB1_SEL EE_ASSIST_MBOX1_FIQ_SEL
++#define MB1_CLR EE_ASSIST_MBOX1_CLR_REG
++#define MB1_MSK EE_ASSIST_MBOX1_MASK
++#define MB2_REG EE_ASSIST_MBOX2_IRQ_REG
++#define MB2_SEL EE_ASSIST_MBOX2_FIQ_SEL
++#define MB2_CLR EE_ASSIST_MBOX2_CLR_REG
++#define MB2_MSK EE_ASSIST_MBOX2_MASK
++
++#define READ_VREG(r) READ_CBUS_REG(r)
++#define WRITE_VREG(r, val) WRITE_CBUS_REG(r, val)
++#define WRITE_VREG_BITS(r, val, start, len) WRITE_CBUS_REG_BITS(r, val, start, len)
++#define SET_VREG_MASK(r, mask) SET_CBUS_REG_MASK(r, mask)
++#define CLEAR_VREG_MASK(r, mask) CLEAR_CBUS_REG_MASK(r, mask)
++#else  //m6, m6tv
++#define MB0_REG VDEC_ASSIST_MBOX0_IRQ_REG
++#define MB0_SEL VDEC_ASSIST_MBOX0_FIQ_SEL
++#define MB0_CLR VDEC_ASSIST_MBOX0_CLR_REG
++#define MB0_MSK VDEC_ASSIST_MBOX0_MASK
++#define MB1_REG VDEC_ASSIST_MBOX1_IRQ_REG
++#define MB1_SEL VDEC_ASSIST_MBOX1_FIQ_SEL
++#define MB1_CLR VDEC_ASSIST_MBOX1_CLR_REG
++#define MB1_MSK VDEC_ASSIST_MBOX1_MASK
++#define MB2_REG VDEC_ASSIST_MBOX2_IRQ_REG
++#define MB2_SEL VDEC_ASSIST_MBOX2_FIQ_SEL
++#define MB2_CLR VDEC_ASSIST_MBOX2_CLR_REG
++#define MB2_MSK VDEC_ASSIST_MBOX2_MASK
++
++#define READ_VREG(r) (aml_read_reg32(DOS_REG_ADDR(r)))
++#define WRITE_VREG(r, val) aml_write_reg32( DOS_REG_ADDR(r),val)
++#define WRITE_VREG_BITS(r, val, start, len) \
++    WRITE_VREG(r, (READ_VREG(r) & ~(((1L<<(len))-1)<<(start)))|((unsigned)((val)&((1L<<(len))-1)) << (start)))
++#define SET_VREG_MASK(r, mask) WRITE_VREG(r, READ_VREG(r) | (mask))
++#define CLEAR_VREG_MASK(r, mask) WRITE_VREG(r, READ_VREG(r) & ~(mask))
++#endif
++#else // < m6
++#define MB0_REG ASSIST_MBOX0_IRQ_REG
++#define MB0_SEL ASSIST_MBOX0_FIQ_SEL
++#define MB0_CLR ASSIST_MBOX0_CLR_REG
++#define MB0_MSK ASSIST_MBOX0_MASK
++#define MB1_REG ASSIST_MBOX1_IRQ_REG
++#define MB1_SEL ASSIST_MBOX1_FIQ_SEL
++#define MB1_CLR ASSIST_MBOX1_CLR_REG
++#define MB1_MSK ASSIST_MBOX1_MASK
++#define MB2_REG ASSIST_MBOX2_IRQ_REG
++#define MB2_SEL ASSIST_MBOX2_FIQ_SEL
++#define MB2_CLR ASSIST_MBOX2_CLR_REG
++#define MB2_MSK ASSIST_MBOX2_MASK
++
++#define READ_VREG(r) READ_CBUS_REG(r)
++#define WRITE_VREG(r, val) WRITE_CBUS_REG(r, val)
++#define WRITE_VREG_BITS(r, val, start, len) WRITE_CBUS_REG_BITS(r, val, start, len)
++#define SET_VREG_MASK(r, mask) SET_CBUS_REG_MASK(r, mask)
++#define CLEAR_VREG_MASK(r, mask) CLEAR_CBUS_REG_MASK(r, mask)
++
++#endif
++
++#define MDEC_TRIGGER_IRQ(irq)	{SET_VREG_MASK(MB0_SEL,1<<irq);\
++								WRITE_VREG(MB0_REG,1<<irq);}
++#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8 //>= m8
++#define SYS_TRIGGER_IRQ(irq)		{/*SET_VREG_MASK(MB1_SEL,1<<irq);*/ \
++								WRITE_VREG(MB1_REG,1<<irq);}
++#define SYS_CLEAR_IRQ(irq)		{/*CLEAR_VREG_MASK(MB1_SEL,1<<irq); */\
++								WRITE_VREG(MB1_CLR,1<<irq);}
++#define DSP_TRIGGER_IRQ(irq)		{/*SET_VREG_MASK(MB2_SEL,1<<irq); */\
++								WRITE_VREG(MB2_REG,1<<irq);}
++#else
++#define SYS_TRIGGER_IRQ(irq)		{SET_VREG_MASK(MB1_SEL,1<<irq); \
++								WRITE_VREG(MB1_REG,1<<irq);}
++#define SYS_CLEAR_IRQ(irq)		{CLEAR_VREG_MASK(MB1_SEL,1<<irq); \
++								WRITE_VREG(MB1_CLR,1<<irq);}
++#define DSP_TRIGGER_IRQ(irq)		{SET_VREG_MASK(MB2_SEL,1<<irq); \
++								WRITE_VREG(MB2_REG,1<<irq);}
++#endif
++
++
++#define MDEC_CLEAR_IRQ(irq)		{CLEAR_VREG_MASK(MB0_SEL,1<<irq); \
++								WRITE_VREG(MB0_CLR,1<<irq);}
++
++
++
++#define DSP_CLEAR_IRQ(irq)		{CLEAR_VREG_MASK(MB2_SEL,1<<irq); \
++								WRITE_VREG(MB2_CLR,1<<irq);}
++
++
++#define MAIBOX0_IRQ_ENABLE(irq)		SET_VREG_MASK(MB0_MSK,1<<irq)
++#define MAIBOX1_IRQ_ENABLE(irq)		SET_VREG_MASK(MB1_MSK,1<<irq)
++#define MAIBOX2_IRQ_ENABLE(irq)		SET_VREG_MASK(MB2_MSK,1<<irq)
++
++#define ARC_2_ARM_ADDR_SWAP(addr)  ((unsigned long)(phys_to_virt(addr)))
++#define ARM_2_ARC_ADDR_SWAP(addr)  (virt_to_phys((void*)addr))
++
++#define DSP_RD(reg)	  (*((volatile unsigned long *)reg))
++#define DSP_WD(reg,val)	({(*((volatile unsigned long *)(reg)))=val;})
++
++#endif
+diff --git a/include/linux/amlogic/amports/jpegdec.h b/include/linux/amlogic/amports/jpegdec.h
+old mode 100644
+new mode 100755
+index 7387d9f3..915e056d
+--- a/include/linux/amlogic/amports/jpegdec.h
++++ b/include/linux/amlogic/amports/jpegdec.h
+@@ -1,93 +1,92 @@
+-/*
+- * AMLOGIC HW Jpeg decoder driver.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the named License,
+- * or any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+- *
+- * Author:  Tim Yao <timyao@amlogic.com>
+- *
+- */
+-
+-#ifndef JPEGDEC_H
+-#define JPEGDEC_H
+-
+-#define JPEGDEC_IOC_MAGIC  'J'
+-
+-#define JPEGDEC_IOC_INFOCONFIG	_IOW(JPEGDEC_IOC_MAGIC, 0x00, unsigned int)
+-#define JPEGDEC_IOC_DECCONFIG	_IOW(JPEGDEC_IOC_MAGIC, 0x01, unsigned int)
+-#define JPEGDEC_IOC_INFO		_IOW(JPEGDEC_IOC_MAGIC, 0x02, unsigned int)
+-#define JPEGDEC_IOC_STAT		_IOW(JPEGDEC_IOC_MAGIC, 0x03, unsigned int)
+-#define JPEGDEC_G_MEM_INFO		_IOW(JPEGDEC_IOC_MAGIC, 0x04, unsigned int)
+-
+-#define JPEGDEC_OPT_THUMBNAIL_ONLY		0x01
+-#define JPEGDEC_OPT_THUMBNAIL_PREFERED	0x02
+-#define JPEGDEC_OPT_FULLRANGE			0x04
+-#define JPEGDEC_OPT_SRC_CROP			0x08
+-
+-#define JPEGINFO_TYPE_PROGRESSIVE		0x01
+-#define JPEGINFO_TYPE_MULTISCAN			0x02
+-#define JPEGINFO_TYPE_GRAYSCALE			0x04
+-
+-#define JPEGDEC_STAT_WAIT_DATA			0x01
+-#define JPEGDEC_STAT_WAIT_INFOCONFIG	0x02
+-#define JPEGDEC_STAT_WAIT_DECCONFIG		0x04
+-#define JPEGDEC_STAT_ERROR				0x08
+-#define JPEGDEC_STAT_UNSUPPORT			0x10
+-#define JPEGDEC_STAT_INFO_READY			0x20
+-#define JPEGDEC_STAT_DONE				0x40
+-
+-typedef enum {
+-	CLKWISE_0    = 0,
+-	CLKWISE_90   = 1,
+-	CLKWISE_180  = 2,
+-	CLKWISE_270  = 3,
+-} jpegdec_angle_t;
+-
+-typedef struct {
+-	unsigned long	addr_y;
+-	unsigned long	addr_u;
+-	unsigned long	addr_v;
+-	unsigned 		canvas_width;
+-
+-	unsigned		opt;
+-
+-	unsigned		src_crop_x;
+-	unsigned		src_crop_y;
+-	unsigned		src_crop_w;
+-	unsigned		src_crop_h;
+-	
+-	unsigned		dec_x;
+-	unsigned		dec_y;
+-	unsigned		dec_w;
+-	unsigned		dec_h;	
+-	jpegdec_angle_t	angle;
+-} jpegdec_config_t;
+-
+-typedef struct {
+-	unsigned width;
+-	unsigned height;
+-	unsigned comp_num;
+-	unsigned type;
+-} jpegdec_info_t;
+-
+-typedef struct {
+-	jpegdec_angle_t	angle;
+-	unsigned	dec_w;
+-	unsigned	dec_h;
+-	unsigned canv_addr;
+-	unsigned canv_len;
+-}  jpegdec_mem_info_t;
+-
+-#endif /* JPEGDEC_H */
+-
++/*
++ * AMLOGIC HW Jpeg decoder driver.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the named License,
++ * or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
++ *
++ * Author:  Tim Yao <timyao@amlogic.com>
++ *
++ */
++
++#ifndef JPEGDEC_H
++#define JPEGDEC_H
++
++#define JPEGDEC_IOC_MAGIC  'J'
++
++#define JPEGDEC_IOC_INFOCONFIG	_IOW(JPEGDEC_IOC_MAGIC, 0x00, unsigned int)
++#define JPEGDEC_IOC_DECCONFIG	_IOW(JPEGDEC_IOC_MAGIC, 0x01, unsigned int)
++#define JPEGDEC_IOC_INFO		_IOW(JPEGDEC_IOC_MAGIC, 0x02, unsigned int)
++#define JPEGDEC_IOC_STAT		_IOW(JPEGDEC_IOC_MAGIC, 0x03, unsigned int)
++#define JPEGDEC_G_MEM_INFO		_IOW(JPEGDEC_IOC_MAGIC, 0x04, unsigned int)
++
++#define JPEGDEC_OPT_THUMBNAIL_ONLY		0x01
++#define JPEGDEC_OPT_THUMBNAIL_PREFERED	0x02
++#define JPEGDEC_OPT_FULLRANGE			0x04
++#define JPEGDEC_OPT_SRC_CROP			0x08
++
++#define JPEGINFO_TYPE_PROGRESSIVE		0x01
++#define JPEGINFO_TYPE_MULTISCAN			0x02
++#define JPEGINFO_TYPE_GRAYSCALE			0x04
++
++#define JPEGDEC_STAT_WAIT_DATA			0x01
++#define JPEGDEC_STAT_WAIT_INFOCONFIG	0x02
++#define JPEGDEC_STAT_WAIT_DECCONFIG		0x04
++#define JPEGDEC_STAT_ERROR				0x08
++#define JPEGDEC_STAT_UNSUPPORT			0x10
++#define JPEGDEC_STAT_INFO_READY			0x20
++#define JPEGDEC_STAT_DONE				0x40
++
++typedef enum {
++	CLKWISE_0    = 0,
++	CLKWISE_90   = 1,
++	CLKWISE_180  = 2,
++	CLKWISE_270  = 3,
++} jpegdec_angle_t;
++
++typedef struct {
++	unsigned long	addr_y;
++	unsigned long	addr_u;
++	unsigned long	addr_v;
++	unsigned 		canvas_width;
++
++	unsigned		opt;
++
++	unsigned		src_crop_x;
++	unsigned		src_crop_y;
++	unsigned		src_crop_w;
++	unsigned		src_crop_h;
++
++	unsigned		dec_x;
++	unsigned		dec_y;
++	unsigned		dec_w;
++	unsigned		dec_h;
++	jpegdec_angle_t	angle;
++} jpegdec_config_t;
++
++typedef struct {
++	unsigned width;
++	unsigned height;
++	unsigned comp_num;
++	unsigned type;
++} jpegdec_info_t;
++
++typedef struct {
++	jpegdec_angle_t	angle;
++	unsigned	dec_w;
++	unsigned	dec_h;
++	unsigned canv_addr;
++	unsigned canv_len;
++}  jpegdec_mem_info_t;
++
++#endif /* JPEGDEC_H */
+diff --git a/include/linux/amlogic/amports/ptsserv.h b/include/linux/amlogic/amports/ptsserv.h
+old mode 100644
+new mode 100755
+diff --git a/include/linux/amlogic/amports/timestamp.h b/include/linux/amlogic/amports/timestamp.h
+old mode 100644
+new mode 100755
+index 89d2d0ce..564c9455
+--- a/include/linux/amlogic/amports/timestamp.h
++++ b/include/linux/amlogic/amports/timestamp.h
+@@ -58,6 +58,10 @@ extern void timestamp_firstvpts_set(u32 pts);
+ 
+ extern u32 timestamp_firstvpts_get(void);
+ 
++extern void timestamp_checkin_firstvpts_set(u32 pts);
++
++extern u32 timestamp_checkin_firstvpts_get(void);
++
+ extern void timestamp_firstapts_set(u32 pts);
+ 
+ extern u32 timestamp_firstapts_get(void);
+diff --git a/include/linux/amlogic/amports/tsync.h b/include/linux/amlogic/amports/tsync.h
+old mode 100644
+new mode 100755
+index 9694938b..83dd0e48
+--- a/include/linux/amlogic/amports/tsync.h
++++ b/include/linux/amlogic/amports/tsync.h
+@@ -63,6 +63,8 @@ extern void tsync_set_syncthresh(unsigned int sync_thresh);
+ 
+ extern void tsync_set_dec_reset(void);
+ 
++extern int tsync_get_enable(void);
++
+ extern void tsync_set_enable(int enable);
+ 
+ extern int tsync_get_mode(void);
+diff --git a/include/linux/amlogic/amports/vformat.h b/include/linux/amlogic/amports/vformat.h
+old mode 100644
+new mode 100755
+diff --git a/include/linux/amlogic/amports/vfp.h b/include/linux/amlogic/amports/vfp.h
+old mode 100644
+new mode 100755
+index 269b0fc8..d09262fd
+--- a/include/linux/amlogic/amports/vfp.h
++++ b/include/linux/amlogic/amports/vfp.h
+@@ -1,104 +1,104 @@
+-/*
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the named License,
+- * or any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+- *
+- * Author:  Tim Yao <timyao@amlogic.com>
+- *
+- */
+-
+-#ifndef __VFP_H_
+-#define __VFP_H_
+-
+-typedef struct {
+-    int rp;
+-    int wp;
+-    int size;
+-    int pre_rp;
+-    int pre_wp;
+-    struct vframe_s **pool;
+-} vfq_t;
+-
+-static inline void vfq_lookup_start(vfq_t *q)
+-{
+-	 q->pre_rp =  q->rp ;
+-	 q->pre_wp = q->wp;
+-}
+-static inline void vfq_lookup_end(vfq_t *q)
+-{
+-	  q->rp = q->pre_rp ;
+-	  q->wp = q->pre_wp ;	
+-}
+-
+-static inline void vfq_init(vfq_t *q, u32 size, struct vframe_s **pool)
+-{
+-    q->rp = q->wp = 0;
+-    q->size = size;
+-    q->pool = pool;
+-}
+-
+-static inline bool vfq_empty(vfq_t *q)
+-{
+-    return (q->rp == q->wp);
+-}
+-
+-static inline void vfq_push(vfq_t *q, vframe_t *vf)
+-{
+-    int wp = q->wp;
+-
+-    smp_mb();
+-
+-    q->pool[wp] = vf;
+-
+-    smp_wmb();
+-
+-    q->wp = (wp == (q->size-1)) ? 0 : (wp+1);
+-}
+-
+-static inline vframe_t *vfq_pop(vfq_t *q)
+-{
+-    vframe_t *vf;
+-    int rp;
+-
+-    if (vfq_empty(q))
+-        return NULL;
+-
+-    rp = q->rp;
+-
+-    smp_rmb();
+-
+-    vf = q->pool[rp];
+-
+-    smp_mb();
+-
+-    q->rp = (rp == (q->size-1)) ? 0 : (rp+1);
+-
+-    return vf;
+-}
+-
+-static inline vframe_t *vfq_peek(vfq_t *q)
+-{
+-    return (vfq_empty(q)) ? NULL : q->pool[q->rp];
+-}
+-
+-static inline int vfq_level(vfq_t *q)
+-{
+-    int level = q->wp - q->rp;
+-    
+-    if (level < 0)
+-        level += q->size;
+-
+-    return level;
+-}
+-
+-#endif /* __VFP_H_ */
++/*
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the named License,
++ * or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
++ *
++ * Author:  Tim Yao <timyao@amlogic.com>
++ *
++ */
++
++#ifndef __VFP_H_
++#define __VFP_H_
++
++typedef struct {
++    int rp;
++    int wp;
++    int size;
++    int pre_rp;
++    int pre_wp;
++    struct vframe_s **pool;
++} vfq_t;
++
++static inline void vfq_lookup_start(vfq_t *q)
++{
++	 q->pre_rp =  q->rp ;
++	 q->pre_wp = q->wp;
++}
++static inline void vfq_lookup_end(vfq_t *q)
++{
++	  q->rp = q->pre_rp ;
++	  q->wp = q->pre_wp ;
++}
++
++static inline void vfq_init(vfq_t *q, u32 size, struct vframe_s **pool)
++{
++    q->rp = q->wp = 0;
++    q->size = size;
++    q->pool = pool;
++}
++
++static inline bool vfq_empty(vfq_t *q)
++{
++    return (q->rp == q->wp);
++}
++
++static inline void vfq_push(vfq_t *q, vframe_t *vf)
++{
++    int wp = q->wp;
++
++    smp_mb();
++
++    q->pool[wp] = vf;
++
++    smp_wmb();
++
++    q->wp = (wp == (q->size-1)) ? 0 : (wp+1);
++}
++
++static inline vframe_t *vfq_pop(vfq_t *q)
++{
++    vframe_t *vf;
++    int rp;
++
++    if (vfq_empty(q))
++        return NULL;
++
++    rp = q->rp;
++
++    smp_rmb();
++
++    vf = q->pool[rp];
++
++    smp_mb();
++
++    q->rp = (rp == (q->size-1)) ? 0 : (rp+1);
++
++    return vf;
++}
++
++static inline vframe_t *vfq_peek(vfq_t *q)
++{
++    return (vfq_empty(q)) ? NULL : q->pool[q->rp];
++}
++
++static inline int vfq_level(vfq_t *q)
++{
++    int level = q->wp - q->rp;
++
++    if (level < 0)
++        level += q->size;
++
++    return level;
++}
++
++#endif /* __VFP_H_ */
+diff --git a/include/linux/amlogic/amports/vframe.h b/include/linux/amlogic/amports/vframe.h
+old mode 100644
+new mode 100755
+index afd0812b..15923dc1
+--- a/include/linux/amlogic/amports/vframe.h
++++ b/include/linux/amlogic/amports/vframe.h
+@@ -169,6 +169,7 @@ typedef struct vframe_s {
+         u32 ratio_control;
+ 
+         u32 orientation;
++        u32 video_angle;
+         enum vframe_source_type_e source_type;
+         enum vframe_secam_phase_e  phase;
+         enum vframe_source_mode_e source_mode;
+@@ -194,6 +195,7 @@ typedef struct vframe_s {
+         enum pixel_aspect_ratio_e pixel_ratio;
+         u64 ready_jiffies64;//ready from decode on  jiffies_64
+         atomic_t use_cnt;
++		u32  frame_dirty;
+ } vframe_t;
+ 
+ #if 0
+@@ -222,4 +224,3 @@ u8 is_vpp_postblend(void);
+ 
+ void pause_video(unsigned char);
+ #endif /* VFRAME_H */
+-
+diff --git a/include/linux/amlogic/amports/vframe_provider.h b/include/linux/amlogic/amports/vframe_provider.h
+old mode 100644
+new mode 100755
+index 491211e3..60d1362a
+--- a/include/linux/amlogic/amports/vframe_provider.h
++++ b/include/linux/amlogic/amports/vframe_provider.h
+@@ -47,7 +47,7 @@ typedef struct vframe_operations_s {
+     struct vframe_s * (*get ) (void* op_arg);
+     void (*put ) (struct vframe_s *, void* op_arg);
+     int  (*event_cb)(int type, void* data, void* private_data);
+-  	int (*vf_states)(vframe_states_t *states, void* op_arg);
++	int (*vf_states)(vframe_states_t *states, void* op_arg);
+ } vframe_operations_t;
+ 
+ typedef struct vframe_provider_s {
+@@ -81,10 +81,9 @@ void get_video_keep_buffer(unsigned long *addr, unsigned long *phys_addr);
+ vframe_t* get_cur_dispbuf(void);
+ int query_video_status(int type , int* value);
+ 
+-#ifdef CONFIG_V4L_AMLOGIC_VIDEO 
++#ifdef CONFIG_V4L_AMLOGIC_VIDEO
+ void v4l_reg_provider(struct vframe_provider_s *prov);
+ void v4l_unreg_provider(void);
+ const vframe_provider_t * v4l_get_vfp(void);
+ #endif
+ #endif /* VFRAME_PROVIDER_H */
+-
+diff --git a/include/linux/amlogic/amports/vframe_receiver.h b/include/linux/amlogic/amports/vframe_receiver.h
+old mode 100644
+new mode 100755
+index 498cb14f..ab4d9191
+--- a/include/linux/amlogic/amports/vframe_receiver.h
++++ b/include/linux/amlogic/amports/vframe_receiver.h
+@@ -78,4 +78,3 @@ int vf_notify_receiver_by_name(const char* receiver_name, int event_type, void*
+ 
+ 
+ #endif /* VFRAME_RECEIVER_H */
+-
+diff --git a/include/linux/amlogic/amports/video_prot.h b/include/linux/amlogic/amports/video_prot.h
+old mode 100644
+new mode 100755

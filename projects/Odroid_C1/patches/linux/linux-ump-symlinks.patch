@@ -1,0 +1,16 @@
+diff --git a/drivers/amlogic/gpu/mali b/drivers/amlogic/gpu/mali
+new file mode 120000
+index 00000000..b4f382b3
+--- /dev/null
++++ b/drivers/amlogic/gpu/mali
+@@ -0,0 +1 @@
++../../gpu/arm/mali
+\ No newline at end of file
+diff --git a/drivers/amlogic/gpu/ump b/drivers/amlogic/gpu/ump
+new file mode 120000
+index 00000000..814304e2
+--- /dev/null
++++ b/drivers/amlogic/gpu/ump
+@@ -0,0 +1 @@
++../../gpu/arm/ump
+\ No newline at end of file

@@ -1,0 +1,631 @@
+diff --git a/include/linux/amlogic/osd/osd.h b/include/linux/amlogic/osd/osd.h
+old mode 100644
+new mode 100755
+index 73d3030e..4864a1d6
+--- a/include/linux/amlogic/osd/osd.h
++++ b/include/linux/amlogic/osd/osd.h
+@@ -1,163 +1,163 @@
+-/*
+- * Amlogic OSD
+- * frame buffer driver
+- *
+- * Copyright (C) 2009 Amlogic, Inc.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the named License,
+- * or any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+- *
+- * Author:	Tim Yao <timyao@amlogic.com>
+- *
+- */
+-
+-#ifndef OSD_H
+-#define OSD_H
+-#include  <linux/fb.h>
+-
+-typedef  enum {
+-	COLOR_INDEX_02_PAL4    = 2,  // 0
+-    	COLOR_INDEX_04_PAL16   = 4, // 0
+-	COLOR_INDEX_08_PAL256=8,
+-	COLOR_INDEX_16_655 =9,
+-	COLOR_INDEX_16_844 =10,
+-	COLOR_INDEX_16_6442 =11 ,
+-	COLOR_INDEX_16_4444_R = 12,
+-	COLOR_INDEX_16_4642_R = 13,
+-	COLOR_INDEX_16_1555_A=14,
+-	COLOR_INDEX_16_4444_A = 15,
+-	COLOR_INDEX_16_565 =16,
+-	
+-	COLOR_INDEX_24_6666_A=19,
+-	COLOR_INDEX_24_6666_R=20,
+-	COLOR_INDEX_24_8565 =21,
+-	COLOR_INDEX_24_5658 = 22,
+-	COLOR_INDEX_24_888_B = 23,
+-	COLOR_INDEX_24_RGB = 24,
+-
+-	COLOR_INDEX_32_BGRA=29,
+-	COLOR_INDEX_32_ABGR = 30,
+-	COLOR_INDEX_32_RGBA=31,
+-	COLOR_INDEX_32_ARGB=32,
+-
+-	COLOR_INDEX_YUV_422=33,
+-	
+-}color_index_t;
+-
+-typedef struct {
+-	unsigned int addr;
+-} aml_hwc_addr_t;
+-
+-
+-typedef  struct {
+-	color_index_t	color_index;
+-	u8	hw_colormat;
+-	u8	hw_blkmode;
+-
+-	u8	red_offset ;
+-	u8	red_length;
+-	u8	red_msb_right;
+-	
+-	u8	green_offset;
+-	u8	green_length;
+-	u8	green_msb_right;
+-
+-	u8	blue_offset;
+-	u8	blue_length;
+-	u8	blue_msb_right;
+-
+-	u8	transp_offset;
+-	u8	transp_length;
+-	u8	transp_msb_right;
+-
+-	u8	color_type;
+-	u8	bpp;
+-
+-		
+-	
+-}color_bit_define_t;
+-typedef struct osd_ctl_s {
+-    u32  xres_virtual;
+-    u32  yres_virtual;
+-    u32  xres;
+-    u32  yres;
+-    u32  disp_start_x; //coordinate of screen 
+-    u32  disp_start_y;
+-    u32  disp_end_x;
+-    u32  disp_end_y;
+-    u32  addr;
+-    u32  index;
+-} osd_ctl_t;
+-#define  INVALID_BPP_ITEM    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+-
+-static const  color_bit_define_t   default_color_format_array[]={
+-	INVALID_BPP_ITEM,
+-	INVALID_BPP_ITEM,
+-	{COLOR_INDEX_02_PAL4,0,0,/*red*/ 0,2,0,/*green*/0,2,0,/*blue*/0,2,0,/*trans*/0,0,0,FB_VISUAL_PSEUDOCOLOR,2},
+-	INVALID_BPP_ITEM,	
+-	{COLOR_INDEX_04_PAL16,0,1,/*red*/ 0,4,0,/*green*/0,4,0,/*blue*/0,4,0,/*trans*/0,0,0,FB_VISUAL_PSEUDOCOLOR,4},
+-	INVALID_BPP_ITEM,	
+-	INVALID_BPP_ITEM,	
+-	INVALID_BPP_ITEM,	
+-	{COLOR_INDEX_08_PAL256,0,2,/*red*/ 0,8,0,/*green*/0,8,0,/*blue*/0,8,0,/*trans*/0,0,0,FB_VISUAL_PSEUDOCOLOR,8},
+-/*16 bit color*/
+-	{COLOR_INDEX_16_655,0,4,/*red*/ 10,6,0,/*green*/5,5,0,/*blue*/0,5,0,/*trans*/0,0,0,FB_VISUAL_TRUECOLOR,16},
+-	{COLOR_INDEX_16_844,1,4,/*red*/ 8,8,0,/*green*/4,4,0,/*blue*/0,4,0,/*trans*/0,0,0,FB_VISUAL_TRUECOLOR,16},
+-	{COLOR_INDEX_16_6442,2,4,/*red*/ 10,6,0,/*green*/6,4,0,/*blue*/2,4,0,/*trans*/0,2,0,FB_VISUAL_TRUECOLOR,16},
+-	{COLOR_INDEX_16_4444_R,3,4,/*red*/ 12,4,0,/*green*/8,4,0,/*blue*/4,4,0,/*trans*/0,4,0,FB_VISUAL_TRUECOLOR,16,},
+-	{COLOR_INDEX_16_4642_R,7,4,/*red*/ 12,4,0,/*green*/6,6,0,/*blue*/2,4,0,/*trans*/0,2,0,FB_VISUAL_TRUECOLOR,16},
+-	{COLOR_INDEX_16_1555_A,6,4,/*red*/ 10,5,0,/*green*/5,5,0,/*blue*/0,5,0,/*trans*/15,1,0,FB_VISUAL_TRUECOLOR,16},
+-	{COLOR_INDEX_16_4444_A,5,4,/*red*/ 8,4,0,/*green*/4,4,0,/*blue*/0,4,0,/*trans*/12,4,0,FB_VISUAL_TRUECOLOR,16},
+-	{COLOR_INDEX_16_565,4,4,/*red*/ 11,5,0,/*green*/5,6,0,/*blue*/0,5,0,/*trans*/0,0,0,FB_VISUAL_TRUECOLOR,16},
+-/*24 bit color*/
+-	INVALID_BPP_ITEM,
+-	INVALID_BPP_ITEM,
+-	{COLOR_INDEX_24_6666_A,4,7,/*red*/ 12,6,0,/*green*/6,6,0,/*blue*/0,6,0,/*trans*/18,6,0,FB_VISUAL_TRUECOLOR,24},
+-	{COLOR_INDEX_24_6666_R,3,7,/*red*/ 18,6,0,/*green*/12,6,0,/*blue*/6,6,0,/*trans*/0,6,0,FB_VISUAL_TRUECOLOR,24},
+-	{COLOR_INDEX_24_8565,2,7,/*red*/ 11,5,0,/*green*/5,6,0,/*blue*/0,5,0,/*trans*/16,8,0,FB_VISUAL_TRUECOLOR,24},
+-	{COLOR_INDEX_24_5658,1,7,/*red*/ 19,5,0,/*green*/13,6,0,/*blue*/8,5,0,/*trans*/0,8,0,FB_VISUAL_TRUECOLOR,24},
+-	{COLOR_INDEX_24_888_B,5,7,/*red*/ 0,8,0,/*green*/8,8,0,/*blue*/16,8,0,/*trans*/0,0,0,FB_VISUAL_TRUECOLOR,24},
+-	{COLOR_INDEX_24_RGB,0,7,/*red*/ 16,8,0,/*green*/8,8,0,/*blue*/0,8,0,/*trans*/0,0,0,FB_VISUAL_TRUECOLOR,24},
+-/*32 bit color*/
+-	INVALID_BPP_ITEM,
+-	INVALID_BPP_ITEM,
+-	INVALID_BPP_ITEM,
+-	INVALID_BPP_ITEM,
+-	{COLOR_INDEX_32_BGRA,3,5,/*red*/ 8,8,0,/*green*/16,8,0,/*blue*/24,8,0,/*trans*/0,8,0,FB_VISUAL_TRUECOLOR,32},
+-	{COLOR_INDEX_32_ABGR,2,5,/*red*/ 0,8,0,/*green*/8,8,0,/*blue*/16,8,0,/*trans*/24,8,0,FB_VISUAL_TRUECOLOR,32},
+-	{COLOR_INDEX_32_RGBA,0,5,/*red*/ 24,8,0,/*green*/16,8,0,/*blue*/8,8,0,/*trans*/0,8,0,FB_VISUAL_TRUECOLOR,32},
+-	{COLOR_INDEX_32_ARGB,1,5,/*red*/ 16,8,0,/*green*/8,8,0,/*blue*/0,8,0,/*trans*/24,8,0,FB_VISUAL_TRUECOLOR,32},
+-/*YUV color*/
+-	{COLOR_INDEX_YUV_422,0,3,0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,16},
+-};
+-
+-typedef struct reg_val_pair{
++/*
++ * Amlogic OSD
++ * frame buffer driver
++ *
++ * Copyright (C) 2009 Amlogic, Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the named License,
++ * or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
++ *
++ * Author:	Tim Yao <timyao@amlogic.com>
++ *
++ */
++
++#ifndef OSD_H
++#define OSD_H
++#include  <linux/fb.h>
++
++typedef  enum {
++	COLOR_INDEX_02_PAL4    = 2,  // 0
++	COLOR_INDEX_04_PAL16   = 4, // 0
++	COLOR_INDEX_08_PAL256=8,
++	COLOR_INDEX_16_655 =9,
++	COLOR_INDEX_16_844 =10,
++	COLOR_INDEX_16_6442 =11 ,
++	COLOR_INDEX_16_4444_R = 12,
++	COLOR_INDEX_16_4642_R = 13,
++	COLOR_INDEX_16_1555_A=14,
++	COLOR_INDEX_16_4444_A = 15,
++	COLOR_INDEX_16_565 =16,
++
++	COLOR_INDEX_24_6666_A=19,
++	COLOR_INDEX_24_6666_R=20,
++	COLOR_INDEX_24_8565 =21,
++	COLOR_INDEX_24_5658 = 22,
++	COLOR_INDEX_24_888_B = 23,
++	COLOR_INDEX_24_RGB = 24,
++
++	COLOR_INDEX_32_BGRA=29,
++	COLOR_INDEX_32_ABGR = 30,
++	COLOR_INDEX_32_RGBA=31,
++	COLOR_INDEX_32_ARGB=32,
++
++	COLOR_INDEX_YUV_422=33,
++
++}color_index_t;
++
++typedef struct {
++	unsigned int addr;
++} aml_hwc_addr_t;
++
++
++typedef  struct {
++	color_index_t	color_index;
++	u8	hw_colormat;
++	u8	hw_blkmode;
++
++	u8	red_offset ;
++	u8	red_length;
++	u8	red_msb_right;
++
++	u8	green_offset;
++	u8	green_length;
++	u8	green_msb_right;
++
++	u8	blue_offset;
++	u8	blue_length;
++	u8	blue_msb_right;
++
++	u8	transp_offset;
++	u8	transp_length;
++	u8	transp_msb_right;
++
++	u8	color_type;
++	u8	bpp;
++
++
++
++}color_bit_define_t;
++typedef struct osd_ctl_s {
++    u32  xres_virtual;
++    u32  yres_virtual;
++    u32  xres;
++    u32  yres;
++    u32  disp_start_x; //coordinate of screen
++    u32  disp_start_y;
++    u32  disp_end_x;
++    u32  disp_end_y;
++    u32  addr;
++    u32  index;
++} osd_ctl_t;
++#define  INVALID_BPP_ITEM    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
++
++static const  color_bit_define_t   default_color_format_array[]={
++	INVALID_BPP_ITEM,
++	INVALID_BPP_ITEM,
++	{COLOR_INDEX_02_PAL4,0,0,/*red*/ 0,2,0,/*green*/0,2,0,/*blue*/0,2,0,/*trans*/0,0,0,FB_VISUAL_PSEUDOCOLOR,2},
++	INVALID_BPP_ITEM,
++	{COLOR_INDEX_04_PAL16,0,1,/*red*/ 0,4,0,/*green*/0,4,0,/*blue*/0,4,0,/*trans*/0,0,0,FB_VISUAL_PSEUDOCOLOR,4},
++	INVALID_BPP_ITEM,
++	INVALID_BPP_ITEM,
++	INVALID_BPP_ITEM,
++	{COLOR_INDEX_08_PAL256,0,2,/*red*/ 0,8,0,/*green*/0,8,0,/*blue*/0,8,0,/*trans*/0,0,0,FB_VISUAL_PSEUDOCOLOR,8},
++/*16 bit color*/
++	{COLOR_INDEX_16_655,0,4,/*red*/ 10,6,0,/*green*/5,5,0,/*blue*/0,5,0,/*trans*/0,0,0,FB_VISUAL_TRUECOLOR,16},
++	{COLOR_INDEX_16_844,1,4,/*red*/ 8,8,0,/*green*/4,4,0,/*blue*/0,4,0,/*trans*/0,0,0,FB_VISUAL_TRUECOLOR,16},
++	{COLOR_INDEX_16_6442,2,4,/*red*/ 10,6,0,/*green*/6,4,0,/*blue*/2,4,0,/*trans*/0,2,0,FB_VISUAL_TRUECOLOR,16},
++	{COLOR_INDEX_16_4444_R,3,4,/*red*/ 12,4,0,/*green*/8,4,0,/*blue*/4,4,0,/*trans*/0,4,0,FB_VISUAL_TRUECOLOR,16,},
++	{COLOR_INDEX_16_4642_R,7,4,/*red*/ 12,4,0,/*green*/6,6,0,/*blue*/2,4,0,/*trans*/0,2,0,FB_VISUAL_TRUECOLOR,16},
++	{COLOR_INDEX_16_1555_A,6,4,/*red*/ 10,5,0,/*green*/5,5,0,/*blue*/0,5,0,/*trans*/15,1,0,FB_VISUAL_TRUECOLOR,16},
++	{COLOR_INDEX_16_4444_A,5,4,/*red*/ 8,4,0,/*green*/4,4,0,/*blue*/0,4,0,/*trans*/12,4,0,FB_VISUAL_TRUECOLOR,16},
++	{COLOR_INDEX_16_565,4,4,/*red*/ 11,5,0,/*green*/5,6,0,/*blue*/0,5,0,/*trans*/0,0,0,FB_VISUAL_TRUECOLOR,16},
++/*24 bit color*/
++	INVALID_BPP_ITEM,
++	INVALID_BPP_ITEM,
++	{COLOR_INDEX_24_6666_A,4,7,/*red*/ 12,6,0,/*green*/6,6,0,/*blue*/0,6,0,/*trans*/18,6,0,FB_VISUAL_TRUECOLOR,24},
++	{COLOR_INDEX_24_6666_R,3,7,/*red*/ 18,6,0,/*green*/12,6,0,/*blue*/6,6,0,/*trans*/0,6,0,FB_VISUAL_TRUECOLOR,24},
++	{COLOR_INDEX_24_8565,2,7,/*red*/ 11,5,0,/*green*/5,6,0,/*blue*/0,5,0,/*trans*/16,8,0,FB_VISUAL_TRUECOLOR,24},
++	{COLOR_INDEX_24_5658,1,7,/*red*/ 19,5,0,/*green*/13,6,0,/*blue*/8,5,0,/*trans*/0,8,0,FB_VISUAL_TRUECOLOR,24},
++	{COLOR_INDEX_24_888_B,5,7,/*red*/ 0,8,0,/*green*/8,8,0,/*blue*/16,8,0,/*trans*/0,0,0,FB_VISUAL_TRUECOLOR,24},
++	{COLOR_INDEX_24_RGB,0,7,/*red*/ 16,8,0,/*green*/8,8,0,/*blue*/0,8,0,/*trans*/0,0,0,FB_VISUAL_TRUECOLOR,24},
++/*32 bit color*/
++	INVALID_BPP_ITEM,
++	INVALID_BPP_ITEM,
++	INVALID_BPP_ITEM,
++	INVALID_BPP_ITEM,
++	{COLOR_INDEX_32_BGRA,3,5,/*red*/ 8,8,0,/*green*/16,8,0,/*blue*/24,8,0,/*trans*/0,8,0,FB_VISUAL_TRUECOLOR,32},
++	{COLOR_INDEX_32_ABGR,2,5,/*red*/ 0,8,0,/*green*/8,8,0,/*blue*/16,8,0,/*trans*/24,8,0,FB_VISUAL_TRUECOLOR,32},
++	{COLOR_INDEX_32_RGBA,0,5,/*red*/ 24,8,0,/*green*/16,8,0,/*blue*/8,8,0,/*trans*/0,8,0,FB_VISUAL_TRUECOLOR,32},
++	{COLOR_INDEX_32_ARGB,1,5,/*red*/ 16,8,0,/*green*/8,8,0,/*blue*/0,8,0,/*trans*/24,8,0,FB_VISUAL_TRUECOLOR,32},
++/*YUV color*/
++	{COLOR_INDEX_YUV_422,0,3,0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,16},
++};
++
++typedef struct reg_val_pair{
+     uint reg;
+     uint val;
+-} reg_val_pair_t;	
+-
+-#ifdef CONFIG_VSYNC_RDMA
+-int VSYNCOSD_WR_MPEG_REG(unsigned long adr, unsigned long val);
+-int VSYNCOSD_WR_MPEG_REG_BITS(unsigned long adr, unsigned long val, unsigned long start, unsigned long len);
+-u32  VSYNCOSD_RD_MPEG_REG(unsigned long addr);
+-int VSYNCOSD_SET_MPEG_REG_MASK(unsigned long adr, unsigned long _mask);
+-int VSYNCOSD_CLR_MPEG_REG_MASK(unsigned long adr, unsigned long _mask);
+-#else
+-#define VSYNCOSD_WR_MPEG_REG(adr,val) aml_write_reg32(P_##adr, val)
+-#define VSYNCOSD_WR_MPEG_REG_BITS(adr, val, start, len)  aml_set_reg32_bits(P_##adr, val, start, len)
+-#define VSYNCOSD_RD_MPEG_REG(adr) aml_read_reg32(P_##adr)
+-#define VSYNCOSD_SET_MPEG_REG_MASK(adr, _mask) aml_set_reg32_mask(P_##adr, _mask)
+-#define VSYNCOSD_CLR_MPEG_REG_MASK(adr,  _mask) aml_clr_reg32_mask(P_##adr, _mask)
+-#endif
+-#endif /* OSD1_H */
++} reg_val_pair_t;
++
++#ifdef CONFIG_VSYNC_RDMA
++int VSYNCOSD_WR_MPEG_REG(unsigned long adr, unsigned long val);
++int VSYNCOSD_WR_MPEG_REG_BITS(unsigned long adr, unsigned long val, unsigned long start, unsigned long len);
++u32  VSYNCOSD_RD_MPEG_REG(unsigned long addr);
++int VSYNCOSD_SET_MPEG_REG_MASK(unsigned long adr, unsigned long _mask);
++int VSYNCOSD_CLR_MPEG_REG_MASK(unsigned long adr, unsigned long _mask);
++#else
++#define VSYNCOSD_WR_MPEG_REG(adr,val) aml_write_reg32(P_##adr, val)
++#define VSYNCOSD_WR_MPEG_REG_BITS(adr, val, start, len)  aml_set_reg32_bits(P_##adr, val, start, len)
++#define VSYNCOSD_RD_MPEG_REG(adr) aml_read_reg32(P_##adr)
++#define VSYNCOSD_SET_MPEG_REG_MASK(adr, _mask) aml_set_reg32_mask(P_##adr, _mask)
++#define VSYNCOSD_CLR_MPEG_REG_MASK(adr,  _mask) aml_clr_reg32_mask(P_##adr, _mask)
++#endif
++#endif /* OSD1_H */
+diff --git a/include/linux/amlogic/osd/osd_dev.h b/include/linux/amlogic/osd/osd_dev.h
+old mode 100644
+new mode 100755
+index 8c028c84..1561bbe4
+--- a/include/linux/amlogic/osd/osd_dev.h
++++ b/include/linux/amlogic/osd/osd_dev.h
+@@ -28,7 +28,7 @@
+ #include "osd.h"
+ #include <linux/amlogic/vout/vinfo.h>
+ #include <linux/amlogic/logo/logo.h>
+-#include <ump/ump_kernel_interface.h>
++#include "../../../../drivers/amlogic/gpu/ump/include/ump/ump_kernel_interface.h"
+ #define  OSD_COUNT 	2 /* we have two osd layer on hardware*/
+ 
+ #define KEYCOLOR_FLAG_TARGET  1
+@@ -46,15 +46,15 @@ typedef struct myfb_dev {
+ 	void __iomem *fb_mem_vaddr;
+ 	u32 fb_len;
+ 	const color_bit_define_t  *color;
+-   	 vmode_t vmode;
+-    	
+-    	struct osd_ctl_s osd_ctl;
+-	u32  order;	
+-	u32  scale;	
++	 vmode_t vmode;
++
++	struct osd_ctl_s osd_ctl;
++	u32  order;
++	u32  scale;
+ 	u32  enable_3d;
+ 	u32  preblend_enable;
+ 	u32  enable_key_flag;
+-	u32  color_key;	
++	u32  color_key;
+ #ifdef CONFIG_FB_AMLOGIC_UMP
+        ump_dd_handle ump_wrapped_buffer[OSD_MAX_FB][2];
+ #endif
+@@ -115,14 +115,18 @@ extern void osddev_set_osd_clone(u32 index, u32 clone);
+ extern void osddev_set_osd_update_pan(u32 index);
+ extern void osddev_get_osd_rotate_angle(u32 index, u32 *angle);
+ extern void osddev_set_osd_rotate_angle(u32 index, u32 angle);
++extern void osddev_get_update_state(u32 index, u32 *up_free);
++extern void osddev_set_update_state(u32 index, u32 up_free);
+ extern void osddev_get_prot_canvas(u32 index, s32 *x_start, s32 *y_start, s32 *x_end, s32 *y_end);
+ extern void osddev_set_prot_canvas(u32 index, s32 x_start, s32 y_start, s32 x_end, s32 y_end);
+ extern void osddev_set(struct myfb_dev *fbdev);
+ extern void osddev_update_disp_axis(struct myfb_dev *fbdev,int  mode_change) ;
+ extern int osddev_setcolreg(unsigned regno, u16 red, u16 green, u16 blue,
+         u16 transp, struct myfb_dev *fbdev);
+-extern void osddev_init(void) ;        
++extern void osddev_init(void) ;
+ extern void osddev_enable(int enable,int index);
++extern int osddev_sync_request( struct fb_info * info,u32 xoffset, u32 yoffset,s32 in_fence_fd);
++extern int osddev_wait_for_vsync(void);
+ 
+ extern void osddev_pan_display(struct fb_var_screeninfo *var,struct fb_info *fbi);
+ 
+@@ -137,4 +141,3 @@ extern u32  osddev_get_gbl_alpha(u32  index);
+ extern  void  osddev_suspend(void);
+ extern  void  osddev_resume(void);
+ #endif /* OSDFBDEV_H */
+-
+diff --git a/include/linux/amlogic/osd/osd_hw.h b/include/linux/amlogic/osd/osd_hw.h
+old mode 100644
+new mode 100755
+index 2b94fe2b..ffba9473
+--- a/include/linux/amlogic/osd/osd_hw.h
++++ b/include/linux/amlogic/osd/osd_hw.h
+@@ -1,6 +1,14 @@
+ #ifndef  OSD_HW_H
+ #define OSD_HW_H
+ 
++#include "osd.h"
++#include <plat/fiq_bridge.h>
++
++#define HW_OSD_COUNT					2
++#define HW_OSD_BLOCK_COUNT			4
++#define HW_OSD_BLOCK_REG_COUNT		(HW_OSD_BLOCK_COUNT*2)
++#define HIBERNATE_OSD_SAVE_REG_COUNT		9
++
+ typedef  enum{
+ 	OSD1=0,
+ 	OSD2
+@@ -13,7 +21,7 @@ typedef  enum{
+ 
+ typedef  enum{
+ 	SCAN_MODE_INTERLACE,
+-	SCAN_MODE_PROGRESSIVE	
++	SCAN_MODE_PROGRESSIVE
+ }scan_mode_t;
+ 
+ typedef  enum{
+@@ -39,13 +47,121 @@ typedef struct {
+ 	s32 y_end;
+ } pandata_t;
+ 
++typedef  void (*update_func_t)(void);
++
++typedef  struct{
++	struct list_head  	list ;
++	update_func_t    	update_func;  //each reg group has it's own update function.
++}hw_list_t;
++
++typedef  struct{
++	u32  width;  //in byte unit
++	u32	height;
++	u32  canvas_idx;
++	u32	addr;
++}fb_geometry_t;
++
++typedef  struct{
++	u16	h_enable;
++	u16	v_enable;
++}osd_scale_t;
++
++typedef  struct{
++	u16	hfs_enable;
++	u16	vfs_enable;
++}osd_freescale_t;
++
++typedef  struct{
++	osd_scale_t  origin_scale;
++	u16  enable;
++	u16  left_right;
++	u16  l_start;
++	u16  l_end;
++	u16  r_start;
++	u16  r_end;
++}osd_3d_mode_t;
++
++typedef struct{
++	u32  on_off;
++	u32  angle;
++}osd_rotate_t;
++
++//define osd fence map .
++typedef struct{
++	u32  xoffset;
++	u32  yoffset;
++	u32  yres;
++	s32  in_fd;
++	s32  out_fd;
++	u32  val;
++	struct sync_fence *in_fence;
++	struct files_struct * files;
++}osd_fen_map_t;
++
++typedef struct {
++	struct list_head list;
++
++	u32  fb_index;
++	u32  buf_num;
++	u32  xoffset;
++	u32  yoffset;
++	u32  yres;
++	s32  in_fd;
++	s32  out_fd;
++	u32  val;
++	struct sync_fence *in_fence;
++	struct files_struct * files;
++}osd_fence_map_t;
++
++typedef  pandata_t  dispdata_t;
++
++typedef  struct {
++	pandata_t 		pandata[HW_OSD_COUNT];
++	dispdata_t		dispdata[HW_OSD_COUNT];
++	pandata_t 		scaledata[HW_OSD_COUNT];
++	pandata_t 		free_scale_data[HW_OSD_COUNT];
++	pandata_t		free_dst_data[HW_OSD_COUNT];
++	u32  			gbl_alpha[HW_OSD_COUNT];
++	u32  			color_key[HW_OSD_COUNT];
++	u32				color_key_enable[HW_OSD_COUNT];
++	u32				enable[HW_OSD_COUNT];
++	u32				reg_status_save[HIBERNATE_OSD_SAVE_REG_COUNT];
++	bridge_item_t 		fiq_handle_item;
++	osd_scale_t		scale[HW_OSD_COUNT];
++	osd_freescale_t	free_scale[HW_OSD_COUNT];
++	u32				free_scale_enable[HW_OSD_COUNT];
++	u32				free_scale_width[HW_OSD_COUNT];
++	u32				free_scale_height[HW_OSD_COUNT];
++	fb_geometry_t		fb_gem[HW_OSD_COUNT];
++	const color_bit_define_t *color_info[HW_OSD_COUNT];
++	u32				scan_mode;
++	u32				osd_order;
++	osd_3d_mode_t	mode_3d[HW_OSD_COUNT];
++	u32			updated[HW_OSD_COUNT];
++	u32 			block_windows[HW_OSD_COUNT][HW_OSD_BLOCK_REG_COUNT];
++	u32 			block_mode[HW_OSD_COUNT];
++	u32			free_scale_mode[HW_OSD_COUNT];
++	u32			osd_reverse[HW_OSD_COUNT];
++	osd_rotate_t		rotate[HW_OSD_COUNT];
++	pandata_t	rotation_pandata[HW_OSD_COUNT];
++	hw_list_t	 	reg[HW_OSD_COUNT][HW_REG_INDEX_MAX];
++	u32			field_out_en;
++	u32			scale_workaround;
++	u32			fb_for_4k2k;
++	u32         		antiflicker_mode;
++	u32			angle[HW_OSD_COUNT];
++	u32			clone;
++	u32	       bot_type;
++	dispdata_t	cursor_dispdata[HW_OSD_COUNT];
++}hw_para_t;
++
+ #define  OSD_ORDER_01		1	 /*forground osd1*/
+ #define  OSD_ORDER_10		2	 /*forground osd2*/
+-#define OSD_GLOBAL_ALPHA_DEF  0xff
+-#define OSD_DATA_BIG_ENDIAN 	0
+-#define OSD_DATA_LITTLE_ENDIAN 1
+-#define OSD_TC_ALPHA_ENABLE_DEF 0  //disable tc_alpha
+-#define   REG_OFFSET		(0x20<<2)
++#define  OSD_GLOBAL_ALPHA_DEF  0xff
++#define  OSD_DATA_BIG_ENDIAN 	0
++#define  OSD_DATA_LITTLE_ENDIAN 1
++#define  OSD_TC_ALPHA_ENABLE_DEF 0  //disable tc_alpha
++#define  REG_OFFSET		(0x20<<2)
+ 
+ extern void  osd_set_colorkey_hw(u32 index,u32 bpp,u32 colorkey ) ;
+ extern void  osd_srckey_enable_hw(u32  index,u8 enable);
+@@ -64,17 +180,17 @@ extern void osd_setup(struct osd_ctl_s *osd_ctl,
+                 u32 disp_end_x,
+                 u32 disp_end_y,
+                 u32 fbmem,
+-              	  const color_bit_define_t *color,
++		  const color_bit_define_t *color,
+                 int index);
+ extern void  osddev_update_disp_axis_hw(
+ 			u32 display_h_start,
+-                  	u32 display_h_end,
+-                  	u32 display_v_start,
+-                  	u32 display_v_end,
++			u32 display_h_end,
++			u32 display_v_start,
++			u32 display_v_end,
+ 			u32 xoffset,
+-                  	u32 yoffset,
+-                  	u32 mode_change,
+-                  	u32 index) ;
++			u32 yoffset,
++			u32 mode_change,
++			u32 index) ;
+ extern void osd_change_osd_order_hw(u32 index,u32 order);
+ extern u32 osd_get_osd_order_hw(u32 index);
+ extern void osd_free_scale_enable_hw(u32 index,u32 enable);
+@@ -106,6 +222,8 @@ extern void osd_set_osd_rotate_on_hw(u32 index, u32 on_off);
+ extern void osd_get_osd_rotate_on_hw(u32 index, u32 *on_off);
+ extern void osd_set_osd_antiflicker_hw(u32 index, u32 vmode, u32 yres);
+ extern void osd_get_osd_antiflicker_hw(u32 index, u32 *on_off);
++extern void osd_set_osd_updatestate_hw(u32 index, u32 up_free);
++extern void osd_get_osd_updatestate_hw(u32 index,u32 *up_free);
+ extern void osd_get_osd_angle_hw(u32 index, u32 *angle);
+ extern void osd_set_osd_angle_hw(u32 index, u32 angle, u32  virtual_osd1_yres, u32 virtual_osd2_yres);
+ extern void osd_get_osd_clone_hw(u32 index, u32 *clone);
+@@ -118,6 +236,8 @@ extern void osd_set_prot_canvas_hw(u32 index, s32 x_start, s32 y_start, s32 x_en
+ extern void osd_setpal_hw(unsigned regno, unsigned red, unsigned green, unsigned blue, unsigned transp,int index);
+ extern void osd_enable_hw(int enable,int index );
+ extern void osd_pan_display_hw(unsigned int xoffset, unsigned int yoffset,int index );
++extern int osd_sync_request(u32 index, u32 yres,u32 xoffset ,u32 yoffset,s32 in_fence_fd);
++extern s32  osd_wait_vsync_event(void);
+ #if defined(CONFIG_FB_OSD2_CURSOR)
+ extern void osd_cursor_hw(s16 x, s16 y, s16 xstart, s16 ystart, u32 osd_w, u32 osd_h, int index);
+ #endif
+@@ -128,4 +248,4 @@ extern void osd_init_hw(u32  logo_loaded);
+ #if MESON_CPU_TYPE < MESON_CPU_TYPE_MESON8
+ extern void osd_init_scan_mode(void);
+ #endif
+-#endif 
++#endif
+diff --git a/include/linux/amlogic/osd/osd_main.h b/include/linux/amlogic/osd/osd_main.h
+old mode 100644
+new mode 100755
+index 6cb050a4..d0a543ec
+--- a/include/linux/amlogic/osd/osd_main.h
++++ b/include/linux/amlogic/osd/osd_main.h
+@@ -60,7 +60,7 @@ static struct fb_var_screeninfo mydef_var[] = {
+ 	.sync            = 0,
+ 	.vmode           = FB_VMODE_NONINTERLACED,
+ 	.rotate          = 0,
+-	
++
+ }
+ 
+ #ifdef  CONFIG_FB_OSD2_ENABLE
+@@ -114,7 +114,7 @@ static struct fb_var_screeninfo mydef_var[] = {
+ 	.vmode           = FB_VMODE_NONINTERLACED,
+ 	.rotate          = 0,
+ }
+-#endif 
++#endif
+ };
+ 
+ 
+@@ -161,6 +161,7 @@ typedef  struct {
+ #define  FBIOPUT_OSD_REVERSE		0x4515
+ #define  FBIOPUT_OSD_ROTATE_ON   	0x4516
+ #define  FBIOPUT_OSD_ROTATE_ANGLE	0x4517
++#define  FBIOPUT_OSD_SYNC_ADD	0x4518
+ 
+ #define GET_UMP_SECURE_ID_BUF1 _IOWR('m', 311, unsigned int)
+ #define GET_UMP_SECURE_ID_BUF2 _IOWR('m', 312, unsigned int)

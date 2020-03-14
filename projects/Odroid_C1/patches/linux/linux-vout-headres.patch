@@ -1,0 +1,1409 @@
+diff --git a/include/linux/amlogic/vout/aml_lcd_common.h b/include/linux/amlogic/vout/aml_lcd_common.h
+index 598a713b..16d23d7b 100644
+--- a/include/linux/amlogic/vout/aml_lcd_common.h
++++ b/include/linux/amlogic/vout/aml_lcd_common.h
+@@ -1,13 +1,13 @@
+-#ifndef AML_LCD_COMMON_H
+-#define AML_LCD_COMMON_H
+-
+-static const char* lcd_type_table[]={
+-	"MIPI",
+-	"LVDS",
+-	"eDP",
+-	"TTL",
+-	"miniLVDS",
+-	"invalid",
+-};
+-
+-#endif
++#ifndef AML_LCD_COMMON_H
++#define AML_LCD_COMMON_H
++
++static const char* lcd_type_table[]={
++	"MIPI",
++	"LVDS",
++	"eDP",
++	"TTL",
++	"miniLVDS",
++	"invalid",
++};
++
++#endif
+diff --git a/include/linux/amlogic/vout/aml_lcd_extern.h b/include/linux/amlogic/vout/aml_lcd_extern.h
+old mode 100644
+new mode 100755
+index 05762ff7..857012f5
+--- a/include/linux/amlogic/vout/aml_lcd_extern.h
++++ b/include/linux/amlogic/vout/aml_lcd_extern.h
+@@ -1,55 +1,53 @@
+-
+-#ifndef __AMLOGIC_LCD_EXTERN_H_
+-#define __AMLOGIC_LCD_EXTERN_H_
+-
+-#include <linux/amlogic/aml_gpio_consumer.h>
+-#include <linux/pinctrl/consumer.h>
+-
+-typedef enum {
+-	LCD_EXTERN_I2C = 0,
+-	LCD_EXTERN_SPI,
+-	LCD_EXTERN_MIPI,
+-	LCD_EXTERN_MAX,
+-} Lcd_Extern_Type_t;
+-
+-//global API
+-struct aml_lcd_extern_driver_t {
+-	char *name;
+-	Lcd_Extern_Type_t type;
+-	int (*reg_read)  (unsigned char reg, unsigned char *buf);
+-	int (*reg_write) (unsigned char reg, unsigned char value);
+-	int (*power_on)(void);
+-	int (*power_off)(void);
+-	unsigned char *init_on_cmd_8;
+-	unsigned char *init_off_cmd_8;
+-	//unsigned short *init_on_cmd_16;
+-	//unsigned short *init_off_cmd_16;
+-};
+-
+-struct lcd_extern_config_t {
+-	char *name;
+-	Lcd_Extern_Type_t type;
+-	int status;
+-	int i2c_addr;
+-	int i2c_bus;
+-	int spi_cs;
+-	int spi_clk;
+-	int spi_data;
+-};
+-
+-#define LCD_EXTERN_DRIVER		"lcd_extern"
+-
+-#define lcd_extern_gpio_request(gpio) 				amlogic_gpio_request(gpio, LCD_EXTERN_DRIVER)
+-#define lcd_extern_gpio_free(gpio) 					amlogic_gpio_free(gpio, LCD_EXTERN_DRIVER)
+-#define lcd_extern_gpio_direction_input(gpio) 		amlogic_gpio_direction_input(gpio, LCD_EXTERN_DRIVER)
+-#define lcd_extern_gpio_direction_output(gpio, val) amlogic_gpio_direction_output(gpio, val, LCD_EXTERN_DRIVER)
+-#define lcd_extern_gpio_get_value(gpio) 			amlogic_get_value(gpio, LCD_EXTERN_DRIVER)
+-#define lcd_extern_gpio_set_value(gpio,val) 		amlogic_set_value(gpio, val, LCD_EXTERN_DRIVER)
+-
+-extern struct aml_lcd_extern_driver_t* aml_lcd_extern_get_driver(void);
+-extern int lcd_extern_driver_check(void);
+-extern int get_lcd_extern_dt_data(struct device_node* of_node, struct lcd_extern_config_t *pdata);
+-extern int remove_lcd_extern(struct lcd_extern_config_t *pdata);
+-
+-#endif
+-
++
++#ifndef __AMLOGIC_LCD_EXTERN_H_
++#define __AMLOGIC_LCD_EXTERN_H_
++
++#include <linux/amlogic/aml_gpio_consumer.h>
++#include <linux/pinctrl/consumer.h>
++
++typedef enum {
++	LCD_EXTERN_I2C = 0,
++	LCD_EXTERN_SPI,
++	LCD_EXTERN_MIPI,
++	LCD_EXTERN_MAX,
++} Lcd_Extern_Type_t;
++
++struct lcd_extern_config_t {
++	char *name;
++	Lcd_Extern_Type_t type;
++	int status;
++	int i2c_addr;
++	int i2c_bus;
++	int spi_cs;
++	int spi_clk;
++	int spi_data;
++};
++
++//global API
++struct aml_lcd_extern_driver_t {
++	char *name;
++	Lcd_Extern_Type_t type;
++	int (*reg_read)  (unsigned char reg, unsigned char *buf);
++	int (*reg_write) (unsigned char reg, unsigned char value);
++	int (*power_on)(void);
++	int (*power_off)(void);
++	unsigned char *init_on_cmd_8;
++	unsigned char *init_off_cmd_8;
++	//unsigned short *init_on_cmd_16;
++	//unsigned short *init_off_cmd_16;
++};
++
++#define LCD_EXTERN_DRIVER		"lcd_extern"
++
++#define lcd_extern_gpio_request(gpio) 				amlogic_gpio_request(gpio, LCD_EXTERN_DRIVER)
++#define lcd_extern_gpio_free(gpio) 					amlogic_gpio_free(gpio, LCD_EXTERN_DRIVER)
++#define lcd_extern_gpio_direction_input(gpio) 		amlogic_gpio_direction_input(gpio, LCD_EXTERN_DRIVER)
++#define lcd_extern_gpio_direction_output(gpio, val) amlogic_gpio_direction_output(gpio, val, LCD_EXTERN_DRIVER)
++#define lcd_extern_gpio_get_value(gpio) 			amlogic_get_value(gpio, LCD_EXTERN_DRIVER)
++#define lcd_extern_gpio_set_value(gpio,val) 		amlogic_set_value(gpio, val, LCD_EXTERN_DRIVER)
++
++extern struct aml_lcd_extern_driver_t* aml_lcd_extern_get_driver(void);
++extern int lcd_extern_driver_check(void);
++extern int get_lcd_extern_dt_data(struct device_node* of_node, struct lcd_extern_config_t *pdata);
++
++#endif
+diff --git a/include/linux/amlogic/vout/enc_clk_config.h b/include/linux/amlogic/vout/enc_clk_config.h
+old mode 100644
+new mode 100755
+index fa32194c..019e4abc
+--- a/include/linux/amlogic/vout/enc_clk_config.h
++++ b/include/linux/amlogic/vout/enc_clk_config.h
+@@ -1,39 +1,40 @@
+-#ifndef __ENC_CLK_CONFIG_H__
+-#define __ENC_CLK_CONFIG_H__
+-
+-typedef enum viu_type {
+-    VIU_ENCL = 0,
+-    VIU_ENCI,
+-    VIU_ENCP,
+-    VIU_ENCT,
+-} viu_type_e;
+-
+-extern int set_viu_path(unsigned viu_channel_sel, viu_type_e viu_type_sel);
+-extern void set_enci_clk(unsigned clk);
+-extern void set_encp_clk(unsigned clk);
+-extern void set_vmode_clk(vmode_t mode);
+-
+-
+-typedef struct enc_clk_val{
+-    vmode_t mode;
+-    unsigned hpll_clk_out;
+-    unsigned hpll_hdmi_od;
+-#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8
+-    unsigned hpll_lvds_od;
+-#endif
+-    unsigned viu_path;
+-    viu_type_e viu_type;
+-    unsigned vid_pll_div;
+-    unsigned clk_final_div;
+-    unsigned hdmi_tx_pixel_div;
+-    unsigned encp_div;
+-    unsigned enci_div;
+-    unsigned enct_div;
+-    unsigned encl_div;
+-    unsigned vdac0_div;
+-    unsigned vdac1_div;
+-    unsigned unused;    // prevent compile error\r
+-}enc_clk_val_t;
+-
+-
+-#endif
++#ifndef __ENC_CLK_CONFIG_H__
++#define __ENC_CLK_CONFIG_H__
++
++typedef enum viu_type {
++    VIU_ENCL = 0,
++    VIU_ENCI,
++    VIU_ENCP,
++    VIU_ENCT,
++} viu_type_e;
++
++extern int set_viu_path(unsigned viu_channel_sel, viu_type_e viu_type_sel);
++extern void set_enci_clk(unsigned clk);
++extern void set_encp_clk(unsigned clk);
++extern void set_vmode_clk(vmode_t mode);
++extern unsigned int reset_hpll(void);
++extern int hdmitx_is_special_tv_process(void);
++
++typedef struct enc_clk_val{
++    vmode_t mode;
++    unsigned hpll_clk_out;
++    unsigned hpll_hdmi_od;
++#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8
++    unsigned hpll_lvds_od;
++#endif
++    unsigned viu_path;
++    viu_type_e viu_type;
++    unsigned vid_pll_div;
++    unsigned clk_final_div;
++    unsigned hdmi_tx_pixel_div;
++    unsigned encp_div;
++    unsigned enci_div;
++    unsigned enct_div;
++    unsigned encl_div;
++    unsigned vdac0_div;
++    unsigned vdac1_div;
++    unsigned unused;    // prevent compile error
++}enc_clk_val_t;
++
++
++#endif
+diff --git a/include/linux/amlogic/vout/lcd.h b/include/linux/amlogic/vout/lcd.h
+old mode 100644
+new mode 100755
+index 6e58d527..0d881835
+--- a/include/linux/amlogic/vout/lcd.h
++++ b/include/linux/amlogic/vout/lcd.h
+@@ -87,6 +87,7 @@ typedef enum
+     LCD_DIGITAL_TTL,
+     LCD_DIGITAL_LVDS,
+     LCD_DIGITAL_MINILVDS,
++    LCD_DIGITAL_VBYONE,
+     LCD_TYPE_MAX,
+ } Lcd_Type_t;
+ 
+diff --git a/include/linux/amlogic/vout/lcd_aml.h b/include/linux/amlogic/vout/lcd_aml.h
+old mode 100644
+new mode 100755
+diff --git a/include/linux/amlogic/vout/lcdoutc.h b/include/linux/amlogic/vout/lcdoutc.h
+old mode 100644
+new mode 100755
+index 02949ba5..18f7221f
+--- a/include/linux/amlogic/vout/lcdoutc.h
++++ b/include/linux/amlogic/vout/lcdoutc.h
+@@ -1,324 +1,328 @@
+-/*
+- * AMLOGIC lcd controller driver.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the named License,
+- * or any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+- *
+- * Author:  Tim Yao <timyao@amlogic.com>
+- *
+- * Modify:  Evoke Zhang <evoke.zhang@amlogic.com>
+- *
+- */
+-
+-#ifndef LCDOUTC_H
+-#define LCDOUTC_H
+-#include <linux/types.h>
+-#include <linux/amlogic/aml_gpio_consumer.h>
+-#include <linux/pinctrl/consumer.h>
+-
+-//**********************************************
+-//debug print define
+-//***********************************************
+-//#define LCD_DEBUG_INFO
+-
+-extern unsigned int lcd_print_flag;
+-extern void lcd_print(const char *fmt, ...);
+-//**********************************************
+-//global define
+-//***********************************************
+-	#define FIN_FREQ                 (24 * 1000)
+-	
+-	//clk_ctrl
+-	#define CLK_CTRL_AUTO             31
+-	//#define CLK_CTRL_VCLK_SEL         30
+-	//#define CLK_CTRL_DIV_SEL          29
+-	//#define CLK_CTRL_PLL_SEL          28
+-	#define CLK_CTRL_RESERVED         12 //[27:12] //for specific CPU define
+-	#define CLK_CTRL_SS               8  //[11:8]
+-	#define CLK_CTRL_XD               0  //[7:0]
+-
+-	//pol_ctrl
+-	#define POL_CTRL_CLK              6
+-	#define POL_CTRL_DE               2
+-	#define POL_CTRL_VS               1
+-	#define POL_CTRL_HS               0
+-	
+-	//gamma_ctrl
+-	#define GAMMA_CTRL_REVERSE        4
+-	#define GAMMA_CTRL_EN             0
+-
+-typedef enum {
+-	GAMMA_SEL_R = 0,
+-	GAMMA_SEL_G,
+-	GAMMA_SEL_B,
+-} Lcd_Gamma_Sel_t;
+-//***************************************
+-
+-typedef enum {
+-	LCD_POWER_TYPE_CPU = 0,
+-	LCD_POWER_TYPE_PMU,
+-	LCD_POWER_TYPE_SIGNAL,
+-	LCD_POWER_TYPE_INITIAL,
+-	LCD_POWER_TYPE_MAX,
+-} Lcd_Power_Type_t;
+-
+-typedef enum {
+-	LCD_POWER_PMU_GPIO0 = 0,
+-	LCD_POWER_PMU_GPIO1,
+-	LCD_POWER_PMU_GPIO2,
+-	LCD_POWER_PMU_GPIO3,
+-	LCD_POWER_PMU_GPIO4,
+-	LCD_POWER_PMU_GPIO_MAX,
+-} Lcd_Power_Pmu_Gpio_t;
+-
+-#define	LCD_POWER_GPIO_OUTPUT_LOW	0
+-#define	LCD_POWER_GPIO_OUTPUT_HIGH	1
+-#define	LCD_POWER_GPIO_INPUT		2
+-
+-typedef enum {
+-	LCD_DIGITAL_MIPI = 0,
+-	LCD_DIGITAL_LVDS,
+-	LCD_DIGITAL_EDP,
+-	LCD_DIGITAL_TTL,
+-	LCD_DIGITAL_MINILVDS,
+-	LCD_TYPE_MAX,
+-} Lcd_Type_t;
+-
+-typedef struct {
+-	char *model_name;
+-	u16 h_active;		// Horizontal display area
+-	u16 v_active;		// Vertical display area
+-	u16 h_period;		// Horizontal total period time
+-	u16 v_period;		// Vertical total period time
+-	u32 screen_ratio_width;			// screen aspect ratio width 
+-	u32 screen_ratio_height;		// screen aspect ratio height 
+-	u32 h_active_area;				/* screen physical width in "mm" unit */
+-	u32 v_active_area;				/* screen physical height in "mm" unit */
+-
+-	Lcd_Type_t lcd_type;
+-	u16 lcd_bits;			// 6 or 8 bits
+-	u16 lcd_bits_option;	//option=0, means the panel only support one lcd_bits option
+-}Lcd_Basic_t;
+-
+-typedef struct {
+-	u32 pll_ctrl;		/* video PLL settings */
+-	u32 div_ctrl;		/* video pll div settings */
+-	u32 clk_ctrl;		/* video clock settings */  //[31]clk_auto, [11:8]ss_ctrl, [7:0]xd
+-	u32 lcd_clk;		/* lcd clock*/
+-	u16 sync_duration_num;
+-	u16 sync_duration_den;
+-	
+-	u16 pol_ctrl;
+-	//u16 inv_cnt_addr;
+-	//u16 tcon_misc_sel_addr;
+-	
+-	u16 video_on_pixel;
+-	u16 video_on_line;
+-	
+-	u16 hsync_width;
+-	u16 hsync_bp;
+-	u16 vsync_width;
+-	u16 vsync_bp;
+-	u32 vsync_h_phase; //[31]sign [15:0]value
+-	u16 hvsync_valid;
+-	//u16 de_hstart;
+-	//u16 de_vstart;
+-	u16 de_valid;
+-	u32 h_offset;
+-	u32 v_offset;
+-
+-	u16 de_hs_addr;
+-	u16 de_he_addr;
+-	u16 de_vs_addr;
+-	u16 de_ve_addr;
+-
+-	u16 hs_hs_addr;
+-	u16 hs_he_addr;
+-	u16 hs_vs_addr;
+-	u16 hs_ve_addr;
+-
+-	u16 vs_hs_addr;
+-	u16 vs_he_addr;
+-	u16 vs_vs_addr;
+-	u16 vs_ve_addr;
+-	
+-	u16 vso_hstart;
+-	u16 vso_vstart;
+-	u16 vso_user;
+-} Lcd_Timing_t;
+-
+-// Fine Effect Tune
+-typedef struct {
+-	u32 rgb_base_addr;
+-	u32 rgb_coeff_addr;
+-	unsigned char dith_user;
+-	u32 dith_cntl_addr;
+-
+-	u32 vadj_brightness;
+-	u32 vadj_contrast;
+-	u32 vadj_saturation;
+-	
+-	unsigned char gamma_ctrl;
+-	u16 gamma_r_coeff;
+-	u16 gamma_g_coeff;
+-	u16 gamma_b_coeff;
+-	u16 GammaTableR[256];
+-	u16 GammaTableG[256];
+-	u16 GammaTableB[256];
+-	void (*set_gamma_table)(unsigned gamma_en);
+-} Lcd_Effect_t;
+-
+-//mipi-dsi config
+-#define DSI_INIT_ON_MAX           100
+-#define DSI_INIT_OFF_MAX          30
+-
+-#define BIT_OPERATION_MODE_INIT   0
+-#define BIT_OPERATION_MODE_DISP   4
+-#define BIT_TRANS_CTRL_CLK        0
+-#define BIT_TRANS_CTRL_SWITCH     4 //[5:4]
+-typedef struct DSI_Config_s{
+-    unsigned char lane_num;
+-    unsigned int bit_rate_max;
+-    unsigned int bit_rate_min;
+-    unsigned int bit_rate;
+-    unsigned int factor_denominator;
+-    unsigned int factor_numerator;
+-
+-    unsigned int venc_data_width;
+-    unsigned int dpi_data_format;
+-    unsigned int venc_fmt;
+-    unsigned int operation_mode;  //mipi-dsi operation mode: video, command. [4]display , [0]init
+-    unsigned int transfer_ctrl;  //[0]LP mode auto stop clk lane, [5:4]phy switch between LP and HS
+-    unsigned char video_mode_type;  //burst, non-burst(sync pulse, sync event)
+-
+-    unsigned char *dsi_init_on;
+-    unsigned char *dsi_init_off;
+-    unsigned char lcd_extern_init;
+-}DSI_Config_t;
+-
+-typedef struct {
+-	unsigned char max_lane_count;
+-	unsigned char link_user;
+-	unsigned char lane_count;
+-	unsigned char link_rate;
+-	unsigned char link_adaptive;
+-	unsigned char vswing;
+-	unsigned char preemphasis;
+-	unsigned int bit_rate;
+-	unsigned int sync_clock_mode;
+-} EDP_Config_t;
+-
+-typedef struct {
+-	unsigned lvds_vswing;
+-	unsigned lvds_repack_user;
+-	unsigned lvds_repack;
+-	unsigned pn_swap;
+-} LVDS_Config_t;
+-
+-typedef struct {
+-	unsigned char rb_swap;
+-	unsigned char bit_swap;
+-} TTL_Config_t;
+-
+-typedef struct {
+-	int channel_num;
+-	int hv_sel;
+-	int tcon_1st_hs_addr;
+-	int tcon_1st_he_addr;
+-	int tcon_1st_vs_addr;
+-	int tcon_1st_ve_addr;
+-	int tcon_2nd_hs_addr;
+-	int tcon_2nd_he_addr;
+-	int tcon_2nd_vs_addr;
+-	int tcon_2nd_ve_addr;
+-} MLVDS_Tcon_Config_t;
+-
+-typedef struct {
+-	int mlvds_insert_start;
+-	int total_line_clk;
+-	int test_dual_gate;
+-	int test_pair_num;
+-	int phase_select;
+-	int TL080_phase;
+-	int scan_function;
+-} MLVDS_Config_t;
+-
+-typedef struct {
+-	DSI_Config_t *mipi_config;
+-	EDP_Config_t *edp_config;
+-	LVDS_Config_t *lvds_config;
+-	TTL_Config_t *ttl_config;
+-	MLVDS_Config_t *mlvds_config;
+-	MLVDS_Tcon_Config_t *mlvds_tcon_config;
+-} Lcd_Control_Config_t;
+-
+-typedef enum {
+-    OFF = 0,
+-    ON = 1,
+-} Bool_t;
+-
+-// Power Control
+-typedef struct {
+-	unsigned char type;
+-	int gpio;
+-	unsigned short value;
+-	unsigned short delay;
+-} Lcd_Power_Config_t;
+-
+-#define LCD_POWER_CTRL_STEP_MAX		15
+-typedef struct {
+-	Lcd_Power_Config_t power_on_config[LCD_POWER_CTRL_STEP_MAX];
+-	Lcd_Power_Config_t power_off_config[LCD_POWER_CTRL_STEP_MAX];
+-	int power_on_step;
+-	int power_off_step;
+-	int (*power_ctrl)(Bool_t status);
+-	void (*ports_ctrl)(Bool_t status);
+-	int (*power_ctrl_video)(Bool_t status);
+-} Lcd_Power_Ctrl_t;
+-
+-typedef struct {
+-    struct pinctrl *pin;
+-    unsigned char vpp_sel; /*0:vpp, 1:vpp2 */
+-    struct class *debug_class;
+-    unsigned char lcd_status;
+-    void (*module_enable)(void);
+-    void (*module_disable)(void);
+-    void (*lcd_test)(unsigned num);
+-    void (*print_version)(void);
+-} Lcd_Misc_Ctrl_t;
+-
+-typedef struct {
+-    Lcd_Basic_t lcd_basic;
+-    Lcd_Timing_t lcd_timing;
+-    Lcd_Effect_t lcd_effect;
+-    Lcd_Control_Config_t lcd_control;
+-    Lcd_Power_Ctrl_t lcd_power_ctrl;
+-    Lcd_Misc_Ctrl_t lcd_misc_ctrl;
+-} Lcd_Config_t;
+-
+-extern Lcd_Config_t* get_lcd_config(void);
+-extern void lcd_config_init(Lcd_Config_t *pConf);
+-extern void lcd_config_probe(Lcd_Config_t *pConf);
+-extern void lcd_config_remove(Lcd_Config_t *pConf);
+-
+-
+-#define LCD_NAME	"lcd"
+-#define lcd_gpio_request(gpio)               amlogic_gpio_request(gpio, LCD_NAME)
+-#define lcd_gpio_free(gpio)                  amlogic_gpio_free(gpio, LCD_NAME)
+-#define lcd_gpio_direction_input(gpio)       amlogic_gpio_direction_input(gpio, LCD_NAME)
+-#define lcd_gpio_direction_output(gpio, val) amlogic_gpio_direction_output(gpio, val, LCD_NAME)
+-#define lcd_gpio_get_value(gpio)             amlogic_get_value(gpio, LCD_NAME)
+-#define lcd_gpio_set_value(gpio,val)         amlogic_set_value(gpio, val, LCD_NAME)
+-
+-#endif
++/*
++ * AMLOGIC lcd controller driver.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the named License,
++ * or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
++ *
++ * Author:  Tim Yao <timyao@amlogic.com>
++ *
++ * Modify:  Evoke Zhang <evoke.zhang@amlogic.com>
++ *
++ */
++
++#ifndef LCDOUTC_H
++#define LCDOUTC_H
++#include <linux/types.h>
++#include <linux/amlogic/aml_gpio_consumer.h>
++#include <linux/pinctrl/consumer.h>
++
++//**********************************************
++//debug print define
++//***********************************************
++//#define LCD_DEBUG_INFO
++
++extern unsigned int lcd_print_flag;
++extern void lcd_print(const char *fmt, ...);
++//**********************************************
++//global define
++//***********************************************
++	#define FIN_FREQ                 (24 * 1000)
++
++	//clk_ctrl
++	#define CLK_CTRL_AUTO             31
++	//#define CLK_CTRL_VCLK_SEL         30
++	//#define CLK_CTRL_DIV_SEL          29
++	//#define CLK_CTRL_PLL_SEL          28
++	#define CLK_CTRL_RESERVED         12 //[27:12] //for specific CPU define
++	#define CLK_CTRL_SS               8  //[11:8]
++	#define CLK_CTRL_XD               0  //[7:0]
++
++	//pol_ctrl
++	#define POL_CTRL_CLK              6
++	#define POL_CTRL_DE               2
++	#define POL_CTRL_VS               1
++	#define POL_CTRL_HS               0
++
++	//gamma_ctrl
++	#define GAMMA_CTRL_REVERSE        4
++	#define GAMMA_CTRL_EN             0
++
++typedef enum {
++	GAMMA_SEL_R = 0,
++	GAMMA_SEL_G,
++	GAMMA_SEL_B,
++} Lcd_Gamma_Sel_t;
++//***************************************
++
++typedef enum {
++	LCD_POWER_TYPE_CPU = 0,
++	LCD_POWER_TYPE_PMU,
++	LCD_POWER_TYPE_SIGNAL,
++	LCD_POWER_TYPE_INITIAL,
++	LCD_POWER_TYPE_MAX,
++} Lcd_Power_Type_t;
++
++typedef enum {
++	LCD_POWER_PMU_GPIO0 = 0,
++	LCD_POWER_PMU_GPIO1,
++	LCD_POWER_PMU_GPIO2,
++	LCD_POWER_PMU_GPIO3,
++	LCD_POWER_PMU_GPIO4,
++	LCD_POWER_PMU_GPIO_MAX,
++} Lcd_Power_Pmu_Gpio_t;
++
++#define	LCD_POWER_GPIO_OUTPUT_LOW	0
++#define	LCD_POWER_GPIO_OUTPUT_HIGH	1
++#define	LCD_POWER_GPIO_INPUT		2
++
++typedef enum {
++	LCD_DIGITAL_MIPI = 0,
++	LCD_DIGITAL_LVDS,
++	LCD_DIGITAL_EDP,
++	LCD_DIGITAL_TTL,
++	LCD_DIGITAL_MINILVDS,
++	LCD_TYPE_MAX,
++} Lcd_Type_t;
++
++typedef struct {
++	char *model_name;
++	u16 h_active;		// Horizontal display area
++	u16 v_active;		// Vertical display area
++	u16 h_period;		// Horizontal total period time
++	u16 v_period;		// Vertical total period time
++	u32 screen_ratio_width;			// screen aspect ratio width
++	u32 screen_ratio_height;		// screen aspect ratio height
++	u32 h_active_area;				/* screen physical width in "mm" unit */
++	u32 v_active_area;				/* screen physical height in "mm" unit */
++
++	Lcd_Type_t lcd_type;
++	u16 lcd_bits;			// 6 or 8 bits
++	u16 lcd_bits_option;	//option=0, means the panel only support one lcd_bits option
++}Lcd_Basic_t;
++
++typedef struct {
++	u32 pll_ctrl;		/* video PLL settings */
++	u32 div_ctrl;		/* video pll div settings */
++	u32 clk_ctrl;		/* video clock settings */  //[31]clk_auto, [11:8]ss_ctrl, [7:0]xd
++	u32 lcd_clk;		/* lcd clock*/
++	u16 sync_duration_num;
++	u16 sync_duration_den;
++
++	u16 pol_ctrl;
++	//u16 inv_cnt_addr;
++	//u16 tcon_misc_sel_addr;
++
++	u16 video_on_pixel;
++	u16 video_on_line;
++
++	u16 hsync_width;
++	u16 hsync_bp;
++	u16 vsync_width;
++	u16 vsync_bp;
++	u32 vsync_h_phase; //[31]sign [15:0]value
++	u16 hvsync_valid;
++	//u16 de_hstart;
++	//u16 de_vstart;
++	u16 de_valid;
++	u32 h_offset;
++	u32 v_offset;
++
++	u16 de_hs_addr;
++	u16 de_he_addr;
++	u16 de_vs_addr;
++	u16 de_ve_addr;
++
++	u16 hs_hs_addr;
++	u16 hs_he_addr;
++	u16 hs_vs_addr;
++	u16 hs_ve_addr;
++
++	u16 vs_hs_addr;
++	u16 vs_he_addr;
++	u16 vs_vs_addr;
++	u16 vs_ve_addr;
++
++	u16 vso_hstart;
++	u16 vso_vstart;
++	u16 vso_user;
++} Lcd_Timing_t;
++
++// Fine Effect Tune
++typedef struct {
++	u32 rgb_base_addr;
++	u32 rgb_coeff_addr;
++	unsigned char dith_user;
++	u32 dith_cntl_addr;
++
++	u32 vadj_brightness;
++	u32 vadj_contrast;
++	u32 vadj_saturation;
++
++	unsigned char gamma_ctrl;
++	u16 gamma_r_coeff;
++	u16 gamma_g_coeff;
++	u16 gamma_b_coeff;
++	u16 GammaTableR[256];
++	u16 GammaTableG[256];
++	u16 GammaTableB[256];
++	void (*set_gamma_table)(unsigned int gamma_en);
++	void (*gamma_test)(unsigned int num);
++} Lcd_Effect_t;
++
++//mipi-dsi config
++#define DSI_CMD_CNT_INDEX         1 //byte[1]
++#define DSI_INIT_ON_MAX           100
++#define DSI_INIT_OFF_MAX          30
++
++#define BIT_OPERATION_MODE_INIT   0
++#define BIT_OPERATION_MODE_DISP   4
++#define BIT_TRANS_CTRL_CLK        0
++#define BIT_TRANS_CTRL_SWITCH     4 //[5:4]
++typedef struct DSI_Config_s{
++    unsigned char lane_num;
++    unsigned int bit_rate_max;
++    unsigned int bit_rate_min;
++    unsigned int bit_rate;
++    unsigned int factor_denominator;
++    unsigned int factor_numerator;
++
++    unsigned int venc_data_width;
++    unsigned int dpi_data_format;
++    unsigned int venc_fmt;
++    unsigned int operation_mode;  //mipi-dsi operation mode: video, command. [4]display , [0]init
++    unsigned int transfer_ctrl;  //[0]LP mode auto stop clk lane, [5:4]phy switch between LP and HS
++    unsigned char video_mode_type;  //burst, non-burst(sync pulse, sync event)
++
++    unsigned char *dsi_init_on;
++    unsigned char *dsi_init_off;
++    unsigned char lcd_extern_init;
++}DSI_Config_t;
++
++typedef struct {
++	unsigned char max_lane_count;
++	unsigned char link_user;
++	unsigned char lane_count;
++	unsigned char link_rate;
++	unsigned char link_adaptive;
++	unsigned char vswing;
++	unsigned char preemphasis;
++	unsigned int bit_rate;
++	unsigned int sync_clock_mode;
++	unsigned char edid_timing_used;
++} EDP_Config_t;
++
++typedef struct {
++	unsigned lvds_vswing;
++	unsigned lvds_repack_user;
++	unsigned lvds_repack;
++	unsigned pn_swap;
++} LVDS_Config_t;
++
++typedef struct {
++	unsigned char rb_swap;
++	unsigned char bit_swap;
++} TTL_Config_t;
++
++typedef struct {
++	int channel_num;
++	int hv_sel;
++	int tcon_1st_hs_addr;
++	int tcon_1st_he_addr;
++	int tcon_1st_vs_addr;
++	int tcon_1st_ve_addr;
++	int tcon_2nd_hs_addr;
++	int tcon_2nd_he_addr;
++	int tcon_2nd_vs_addr;
++	int tcon_2nd_ve_addr;
++} MLVDS_Tcon_Config_t;
++
++typedef struct {
++	int mlvds_insert_start;
++	int total_line_clk;
++	int test_dual_gate;
++	int test_pair_num;
++	int phase_select;
++	int TL080_phase;
++	int scan_function;
++} MLVDS_Config_t;
++
++typedef struct {
++	DSI_Config_t *mipi_config;
++	EDP_Config_t *edp_config;
++	LVDS_Config_t *lvds_config;
++	TTL_Config_t *ttl_config;
++	MLVDS_Config_t *mlvds_config;
++	MLVDS_Tcon_Config_t *mlvds_tcon_config;
++} Lcd_Control_Config_t;
++
++typedef enum {
++    OFF = 0,
++    ON = 1,
++} Bool_t;
++
++// Power Control
++typedef struct {
++	unsigned char type;
++	int gpio;
++	unsigned short value;
++	unsigned short delay;
++} Lcd_Power_Config_t;
++
++#define LCD_POWER_CTRL_STEP_MAX		15
++typedef struct {
++	Lcd_Power_Config_t power_on_config[LCD_POWER_CTRL_STEP_MAX];
++	Lcd_Power_Config_t power_off_config[LCD_POWER_CTRL_STEP_MAX];
++	int power_on_step;
++	int power_off_step;
++	int (*power_ctrl)(Bool_t status);
++	void (*ports_ctrl)(Bool_t status);
++	int (*power_ctrl_video)(Bool_t status);
++} Lcd_Power_Ctrl_t;
++
++typedef struct {
++    struct pinctrl *pin;
++    unsigned char vpp_sel; /*0:vpp, 1:vpp2 */
++    struct class *debug_class;
++    unsigned char lcd_status;
++    void (*module_enable)(void);
++    void (*module_disable)(void);
++    void (*lcd_test)(unsigned num);
++    void (*print_version)(void);
++    void (*edp_edid_load)(void);
++} Lcd_Misc_Ctrl_t;
++
++typedef struct {
++    Lcd_Basic_t lcd_basic;
++    Lcd_Timing_t lcd_timing;
++    Lcd_Effect_t lcd_effect;
++    Lcd_Control_Config_t lcd_control;
++    Lcd_Power_Ctrl_t lcd_power_ctrl;
++    Lcd_Misc_Ctrl_t lcd_misc_ctrl;
++} Lcd_Config_t;
++
++extern Lcd_Config_t* get_lcd_config(void);
++extern void lcd_config_init(Lcd_Config_t *pConf);
++extern void lcd_config_probe(Lcd_Config_t *pConf);
++extern void lcd_config_remove(Lcd_Config_t *pConf);
++
++
++#define LCD_NAME	"lcd"
++#define lcd_gpio_request(gpio)               amlogic_gpio_request(gpio, LCD_NAME)
++#define lcd_gpio_free(gpio)                  amlogic_gpio_free(gpio, LCD_NAME)
++#define lcd_gpio_direction_input(gpio)       amlogic_gpio_direction_input(gpio, LCD_NAME)
++#define lcd_gpio_direction_output(gpio, val) amlogic_gpio_direction_output(gpio, val, LCD_NAME)
++#define lcd_gpio_get_value(gpio)             amlogic_get_value(gpio, LCD_NAME)
++#define lcd_gpio_set_value(gpio,val)         amlogic_set_value(gpio, val, LCD_NAME)
++
++#endif
+diff --git a/include/linux/amlogic/vout/vdac_switch.h b/include/linux/amlogic/vout/vdac_switch.h
+old mode 100644
+new mode 100755
+index 38fa70c4..fc6ad5b8
+--- a/include/linux/amlogic/vout/vdac_switch.h
++++ b/include/linux/amlogic/vout/vdac_switch.h
+@@ -1,39 +1,39 @@
+-/*
+- * VDAC SWITCH definitions
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License version 2 as
+- * published by the Free Software Foundation.
+- */
+-
+-#ifndef __AML_VDAC_SWITCH_H__
+-#define __AML_VDAC_SWITCH_H__
+-
+-#include <linux/types.h>
+-
+-enum aml_vdac_switch_type {
+-	VOUT_CVBS,
+-	VOUT_COMPONENT,
+-	VOUT_VGA,
+-	VOUT_MAX
+-};
+-
+-#ifdef CONFIG_USE_OF
+-struct aml_vdac_hw_ctrl {
+-    unsigned int pin1;
+-    unsigned int val1;
+-    unsigned int pin2;
+-    unsigned int val2;
+-};
+-
+-struct aml_vdac_hw_switch {
+-    struct aml_vdac_hw_ctrl cvbs;
+-    struct aml_vdac_hw_ctrl ypbr;
+-    struct aml_vdac_hw_ctrl vga;
+-};
+-#endif
+-
+-struct aml_vdac_switch_platform_data {
+-	void (*vdac_switch_change_type_func)(unsigned type);
+-};
+-
+-#endif
++/*
++ * VDAC SWITCH definitions
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#ifndef __AML_VDAC_SWITCH_H__
++#define __AML_VDAC_SWITCH_H__
++
++#include <linux/types.h>
++
++enum aml_vdac_switch_type {
++	VOUT_CVBS,
++	VOUT_COMPONENT,
++	VOUT_VGA,
++	VOUT_MAX
++};
++
++#ifdef CONFIG_USE_OF
++struct aml_vdac_hw_ctrl {
++    unsigned int pin1;
++    unsigned int val1;
++    unsigned int pin2;
++    unsigned int val2;
++};
++
++struct aml_vdac_hw_switch {
++    struct aml_vdac_hw_ctrl cvbs;
++    struct aml_vdac_hw_ctrl ypbr;
++    struct aml_vdac_hw_ctrl vga;
++};
++#endif
++
++struct aml_vdac_switch_platform_data {
++	void (*vdac_switch_change_type_func)(unsigned type);
++};
++
++#endif
+diff --git a/include/linux/amlogic/vout/vinfo.h b/include/linux/amlogic/vout/vinfo.h
+old mode 100644
+new mode 100755
+index bd76501a..ea6e346b
+--- a/include/linux/amlogic/vout/vinfo.h
++++ b/include/linux/amlogic/vout/vinfo.h
+@@ -24,19 +24,21 @@
+ 
+ #ifndef VINFO_H
+ #define VINFO_H
++#include "../hdmi_tx/hdmi_common.h"
+ //the MSB is represent vmode set by logo
+ #define	VMODE_LOGO_BIT_MASK	0x8000
+ #define	VMODE_MODE_BIT_MASK	0xff
++
++#define MREG_END_MARKER 0xffff
++
+ typedef enum {
+-    VMODE_480X320P_60HZ = 0,
+-    VMODE_480X272P_60HZ,
+-    VMODE_480I,
++    VMODE_480I  = 0,
+     VMODE_480I_RPT  ,
+     VMODE_480CVBS,
+     VMODE_480P  ,
+ #ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
+     VMODE_480P_59HZ,// for framerate automation 480p 59.94hz
+-#endif   
++#endif
+     VMODE_480P_RPT  ,
+     VMODE_576I   ,
+     VMODE_576I_RPT  ,
+@@ -45,45 +47,47 @@ typedef enum {
+     VMODE_576P_RPT  ,
+     VMODE_720P  ,
+ #ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
+-    VMODE_720P_59HZ , // for framerate automation 720p 59.94hz
++	VMODE_720P_59HZ , // for framerate automation 720p 59.94hz
+ #endif
+-    VMODE_800P ,
+-    VMODE_800X480P_60HZ,
+-    VMODE_480X800P_60HZ,
+-    VMODE_1366X768P_60HZ,
+-    VMODE_1600X900P_60HZ,
+-    VMODE_800X600P_60HZ,
+-    VMODE_1024X600P_60HZ,
+-    VMODE_1024X768P_60HZ,
+-    VMODE_1360X768P_60HZ,
+-    VMODE_1440X900P_60HZ,
+-    VMODE_1680X1050P_60HZ,
+     VMODE_1080I ,
+ #ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
+     VMODE_1080I_59HZ , // for framerate automation 1080i 59.94hz
+-#endif   
++#endif
+     VMODE_1080P ,
+ #ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
+-    VMODE_1080P_59HZ , // for framerate automation 1080p 59.94hz
++	VMODE_1080P_59HZ , // for framerate automation 1080p 59.94hz
+ #endif
+     VMODE_720P_50HZ ,
+     VMODE_1080I_50HZ ,
+     VMODE_1080P_50HZ ,
+     VMODE_1080P_24HZ ,
+ #ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
+-    VMODE_1080P_23HZ , // for framerate automation 1080p 23.97hz
++	VMODE_1080P_23HZ , // for framerate automation 1080p 23.97hz
+ #endif
+     VMODE_4K2K_30HZ ,
+ #ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
+-    VMODE_4K2K_29HZ , // for framerate automation 4k2k 29.97hz
++	VMODE_4K2K_29HZ , // for framerate automation 4k2k 29.97hz
+ #endif
+     VMODE_4K2K_25HZ ,
+     VMODE_4K2K_24HZ ,
+ #ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
+-    VMODE_4K2K_23HZ , // for framerate automation 4k2k 23.97hz
++	VMODE_4K2K_23HZ , // for framerate automation 4k2k 23.97hz
+ #endif
+     VMODE_4K2K_SMPTE,
+-    VMODE_1920x1200,
++    VMODE_4K2K_FAKE_5G,   // timing same as 4k2k30hz, Vsync from 30hz to 50hz
++    VMODE_4K2K_60HZ,	  // timing same as 4k2k30hz, Vsync from 30hz to 60hz
++    VMODE_4K2K_60HZ_Y420,
++    VMODE_4K2K_50HZ,	  // timing same as 4k2k25hz, Vsync from 25hz to 50hz
++    VMODE_4K2K_50HZ_Y420,
++    VMODE_4K2K_5G,
++    VMODE_4K1K_120HZ,
++    VMODE_4K1K_120HZ_Y420,
++    VMODE_4K1K_100HZ,
++    VMODE_4K1K_100HZ_Y420,
++    VMODE_4K05K_240HZ,
++    VMODE_4K05K_240HZ_Y420,
++    VMODE_4K05K_200HZ,
++    VMODE_4K05K_200HZ_Y420,
+     VMODE_VGA,
+     VMODE_SVGA,
+     VMODE_XGA,
+@@ -94,11 +98,78 @@ typedef enum {
+     VMODE_LVDS_1080P,
+     VMODE_LVDS_1080P_50HZ,
+     VMODE_LVDS_768P,
++    VMODE_VX1_4K2K_60HZ,
+     VMODE_MAX,
+     VMODE_INIT_NULL,
+     VMODE_MASK = 0xFF,
+ } vmode_t;
+ 
++typedef enum {
++    TVMODE_480I  = 0,
++    TVMODE_480I_RPT  ,
++    TVMODE_480CVBS,
++    TVMODE_480P  ,
++#ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
++	TVMODE_480P_59HZ , // for framerate automation 480p 59.94hz
++#endif
++    TVMODE_480P_RPT  ,
++    TVMODE_576I  ,
++    TVMODE_576I_RPT  ,
++    TVMODE_576CVBS,
++    TVMODE_576P  ,
++    TVMODE_576P_RPT  ,
++    TVMODE_720P  ,
++#ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
++	TVMODE_720P_59HZ , // for framerate automation 720p 59.94hz
++#endif
++    TVMODE_1080I ,
++#ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
++	TVMODE_1080I_59HZ , // for framerate automation 1080i 59.94hz
++#endif
++    TVMODE_1080P ,
++#ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
++	TVMODE_1080P_59HZ , // for framerate automation 1080p 59.94hz
++#endif
++    TVMODE_720P_50HZ ,
++    TVMODE_1080I_50HZ ,
++    TVMODE_1080P_50HZ ,
++    TVMODE_1080P_24HZ ,
++#ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
++	TVMODE_1080P_23HZ , // for framerate automation 1080p 23.97hz
++#endif
++    TVMODE_4K2K_30HZ ,
++#ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
++	TVMODE_4K2K_29HZ , // for framerate automation 4k2k 29.97hz
++#endif
++    TVMODE_4K2K_25HZ ,
++    TVMODE_4K2K_24HZ ,
++#ifdef CONFIG_AML_VOUT_FRAMERATE_AUTOMATION
++	TVMODE_4K2K_23HZ , // for framerate automation 4k2k 23.97hz
++#endif
++    TVMODE_4K2K_SMPTE ,
++    TVMODE_4K2K_FAKE_5G ,
++    TVMODE_4K2K_60HZ ,
++    TVMODE_4K2K_60HZ_Y420,
++    TVMODE_4K2K_50HZ ,
++    TVMODE_4K2K_50HZ_Y420,
++    TVMODE_4K2K_5G,
++    TVMODE_4K1K_120HZ,
++    TVMODE_4K1K_120HZ_Y420,
++    TVMODE_4K1K_100HZ,
++    TVMODE_4K1K_100HZ_Y420,
++    TVMODE_4K05K_240HZ,
++    TVMODE_4K05K_240HZ_Y420,
++    TVMODE_4K05K_200HZ,
++    TVMODE_4K05K_200HZ_Y420,
++    TVMODE_VGA ,
++    TVMODE_SVGA,
++    TVMODE_XGA,
++    TVMODE_SXGA,
++    TVMODE_WSXGA,
++    TVMODE_FHDVGA,
++    TVMODE_MAX    
++} tvmode_t;
++
+ typedef struct {
+ 	char  		*name;
+ 	vmode_t		mode;
+@@ -114,4 +185,26 @@ typedef struct {
+ 	u32			video_clk;
+ } vinfo_t;
+ 
+-#endif /* TVMODE_H */
++typedef struct reg_s {
++    unsigned int reg;
++    unsigned int val;
++} reg_t;
++
++struct tvregs_set_t {
++    tvmode_t tvmode;
++    const reg_t *reg_setting;
++};
++
++struct tv_hdmi_set_t {
++    HDMI_Video_Codes_t vic;
++    const reg_t *reg_setting;
++};
++
++typedef struct tvinfo_s {
++    tvmode_t tvmode;
++    uint xres;
++    uint yres;
++    const char *id;
++} tvinfo_t;
++
++#endif /* VINFO_H */
+diff --git a/include/linux/amlogic/vout/vout_notify.h b/include/linux/amlogic/vout/vout_notify.h
+old mode 100644
+new mode 100755
+index 7b0e0491..45d2b2ec
+--- a/include/linux/amlogic/vout/vout_notify.h
++++ b/include/linux/amlogic/vout/vout_notify.h
+@@ -1,102 +1,102 @@
+-/*
+- * Amlogic Apollo
+- * frame buffer driver
+- *
+- * Copyright (C) 2009 Amlogic, Inc.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the named License,
+- * or any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, write to the Free Software
+- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+- *
+- * Author:	jianfeng_wang
+- *
+- */
+-#ifndef  VOUT_NOTIFY_H
+-#define  VOUT_NOTIFY_H
+-
+-#include <linux/notifier.h>
+-#include <linux/list.h>
+-#include <linux/pm.h>
+-#include "vinfo.h"
+-
+-typedef struct 
+-{
+-    const vinfo_t* (*get_vinfo)(void);
+-    int	           (*set_vmode)(vmode_t);
+-    vmode_t        (*validate_vmode)(char *);
+-    int            (*vmode_is_supported)(vmode_t);
+-    int            (*disable)(vmode_t );
+-    int            (*set_vframe_rate_hint)(int);
+-    int            (*set_vframe_rate_end_hint)(void);
+-    int            (*vout_suspend)(void);
+-    int            (*vout_resume)(void);
+-}vout_op_t ;
+-
+-
+-typedef  struct list_head  list_head_T;
+-
+-
+-typedef struct 
+-{
+-	list_head_T  list;
+-	char  	  *name;
+-	vout_op_t  op;
+-} vout_server_t;
+-
+-typedef struct {
+-	list_head_T   vout_server_list;
+-	vout_server_t *curr_vout_server;
+-}vout_module_t;
+-
+-extern int vout_register_client(struct notifier_block * ) ;
+-extern int vout_unregister_client(struct notifier_block *) ;
+-extern int vout_register_server(vout_server_t *);
+-extern int vout_unregister_server(vout_server_t*  );
+-extern int vout_notifier_call_chain(unsigned long, void *) ;
+-
+-extern const vinfo_t *get_current_vinfo(void);
+-extern vmode_t get_current_vmode(void);
+-extern int set_current_vmode(vmode_t);
+-extern vmode_t validate_vmode(char *);
+-extern int set_vframe_rate_hint(int);
+-extern int set_vframe_rate_end_hint(void);
+-
+-extern int vout_suspend(void); 
+-extern int vout_resume(void);
+-
+-extern int get_power_level(void);
+-
+-
+-#define VOUT_EVENT_MODE_CHANGE		0x00010000	
+-#define VOUT_EVENT_OSD_BLANK			0x00020000
+-#define VOUT_EVENT_OSD_DISP_AXIS			0x00030000
+-#define  VOUT_EVENT_OSD_PREBLEND_ENABLE		0x00040000
+-
+-/* vout2 */
+-extern int vout2_register_client(struct notifier_block * ) ;
+-extern int vout2_unregister_client(struct notifier_block *) ;
+-extern int vout2_register_server(vout_server_t *);
+-extern int vout2_unregister_server(vout_server_t*  );
+-extern int vout2_notifier_call_chain(unsigned long, void *) ;
+-
+-extern const vinfo_t *get_current_vinfo2(void);
+-extern vmode_t get_current_vmode2(void);
+-extern int set_current_vmode2(vmode_t);
+-extern vmode_t validate_vmode2(char *);
+-extern void  set_vout2_mode_internal(char * name);
+-
+-extern int vout2_suspend(void); 
+-extern int vout2_resume(void);
+-/**/
+-
+-#endif /* VOUT_NOTIFY_H */
++/*
++ * Amlogic Apollo
++ * frame buffer driver
++ *
++ * Copyright (C) 2009 Amlogic, Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the named License,
++ * or any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
++ *
++ * Author:	jianfeng_wang
++ *
++ */
++#ifndef  VOUT_NOTIFY_H
++#define  VOUT_NOTIFY_H
++
++#include <linux/notifier.h>
++#include <linux/list.h>
++#include <linux/pm.h>
++#include "vinfo.h"
++
++typedef struct
++{
++	const vinfo_t*	(*get_vinfo)(void);
++	int		(*set_vmode)(vmode_t);
++	vmode_t		(*validate_vmode)(char *);
++	int		(*vmode_is_supported)(vmode_t);
++	int		(*disable)(vmode_t );
++	int		(*set_vframe_rate_hint)(int);
++	int		(*set_vframe_rate_end_hint)(void);
++	int		(*vout_suspend)(int);
++	int		(*vout_resume)(int);
++}vout_op_t ;
++
++
++typedef  struct list_head  list_head_T;
++
++
++typedef struct
++{
++	list_head_T	list;
++	char		*name;
++	vout_op_t	op;
++} vout_server_t;
++
++typedef struct {
++	list_head_T   vout_server_list;
++	vout_server_t *curr_vout_server;
++}vout_module_t;
++
++extern int vout_register_client(struct notifier_block * ) ;
++extern int vout_unregister_client(struct notifier_block *) ;
++extern int vout_register_server(vout_server_t *);
++extern int vout_unregister_server(vout_server_t*  );
++extern int vout_notifier_call_chain(unsigned long, void *) ;
++
++extern const vinfo_t *get_current_vinfo(void);
++extern vmode_t get_current_vmode(void);
++extern int set_current_vmode(vmode_t);
++extern vmode_t validate_vmode(char *);
++extern int set_vframe_rate_hint(int);
++extern int set_vframe_rate_end_hint(void);
++
++extern int vout_suspend(int);
++extern int vout_resume(int);
++
++extern int get_power_level(void);
++
++
++#define VOUT_EVENT_MODE_CHANGE			0x00010000
++#define VOUT_EVENT_OSD_BLANK			0x00020000
++#define VOUT_EVENT_OSD_DISP_AXIS		0x00030000
++#define  VOUT_EVENT_OSD_PREBLEND_ENABLE		0x00040000
++
++/* vout2 */
++extern int vout2_register_client(struct notifier_block * ) ;
++extern int vout2_unregister_client(struct notifier_block *) ;
++extern int vout2_register_server(vout_server_t *);
++extern int vout2_unregister_server(vout_server_t*  );
++extern int vout2_notifier_call_chain(unsigned long, void *) ;
++
++extern const vinfo_t *get_current_vinfo2(void);
++extern vmode_t get_current_vmode2(void);
++extern int set_current_vmode2(vmode_t);
++extern vmode_t validate_vmode2(char *);
++extern void  set_vout2_mode_internal(char * name);
++
++extern int vout2_suspend(int pm_event);
++extern int vout2_resume(int pm_event);
++/**/
++
++#endif /* VOUT_NOTIFY_H */
