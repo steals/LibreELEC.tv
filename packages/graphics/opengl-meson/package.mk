@@ -25,7 +25,7 @@ case $MESON_FAMILY in
     PKG_VERSION="8-r5p1-01rel0-armhf"
     ;;
   6)
-    PKG_VERSION="6-r5p1-01rel0-armhf"
+    PKG_VERSION="6-r5p1-02rel0-armhf"
     ;;
   gxbb)
     if [ $TARGET_ARCH = "arm" ]; then
